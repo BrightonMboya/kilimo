@@ -1,0 +1,36 @@
+import type { ReactElement } from "react";
+import { useUser } from "@clerk/nextjs";
+
+import { api } from "~/utils/api";
+import AgriLayout from "~/components/agriBusiness/Layout/Layout";
+import Header from "~/components/agriBusiness/farmers/Header";
+import FarmersTable from "~/components/agriBusiness/farmers/farmers-table";
+import { NoAsset } from "~/components/agriBusiness/harvests";
+
+export default function Page() {
+  const { user } = useUser();
+  const { data, isLoading } = api.organization.fetchFarmers.useQuery({
+    email: user?.primaryEmailAddress?.emailAddress as unknown as string,
+  });
+
+  console.log(data);
+  return (
+    <main className="pl-5">
+      <Header name={user?.username as unknown as string} />
+      {data?.length === 0 && (
+        <NoAsset
+          bigTitle="You haven't added your Farmers yet"
+          smallTitle="It's easier to manage, your farmers. Go ahead and them now"
+          c2a="Add Farmers"
+          c2aUrl="/agri/dashboard/farmers/new"
+        />
+      )}
+      {/* @ts-ignore */}
+      {data!?.length >= 0 && <FarmersTable data={data} />}
+    </main>
+  );
+}
+
+Page.getLayout = function getLayout(page: ReactElement) {
+  return <AgriLayout>{page}</AgriLayout>;
+};
