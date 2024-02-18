@@ -1,6 +1,6 @@
 export default function Features() {
   return (
-    <section className="dark:bg-dark pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
+    <section className="dark:bg-dark flex flex-col items-center justify-center pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
       <div className="container">
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4">
@@ -8,7 +8,7 @@ export default function Features() {
               <span className="text-primary mb-2 block text-lg font-semibold">
                 Features
               </span>
-              <h2 className="text-dark mb-3 text-3xl font-bold dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+              <h2 className="text-dark mb-3 text-3xl font-bold sm:text-4xl md:text-[40px] md:leading-[1.2] dark:text-white">
                 Main Features Of Shamba AgriBusiness
               </h2>
               <p className="text-body-color dark:text-dark-6 text-base">
@@ -42,7 +42,6 @@ export default function Features() {
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
                 Lorem Ipsum is simply dummy text of the printing and industry.
               </p>
-             
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
@@ -63,12 +62,11 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                  Feature 2
+                Feature 2
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
                 Lorem Ipsum is simply dummy text of the printing and industry.
               </p>
-             
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
@@ -121,12 +119,11 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                  Feature 3
+                Feature 3
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
                 Lorem Ipsum is simply dummy text of the printing and industry.
               </p>
-              
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
@@ -159,12 +156,11 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                 Feature 4
+                Feature 4
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
                 Lorem Ipsum is simply dummy text of the printing and industry.
               </p>
-             
             </div>
           </div>
         </div>

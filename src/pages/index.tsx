@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import Layout from "~/components/Layout/HomeLayout";
 import {
   About,
@@ -8,7 +9,7 @@ import {
   Pricing,
 } from "~/components/landingPage";
 
-export default function Index() {
+function Page() {
   return (
     <Layout>
       <HeroSection />
@@ -21,3 +22,9 @@ export default function Index() {
     </Layout>
   );
 }
+
+Page.getLayout = function getLayout(page: ReactElement) {
+  return <Layout>{page}</Layout>;
+};
+
+export default Page;

@@ -4,13 +4,13 @@ import BlurImage from "~/components/UI/BlurImage";
 
 export default function About() {
   return (
-    <section className="bg-gray-1 dark:bg-dark-2 pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
+    <section className="bg-gray-1 dark:bg-dark-2 flex flex-col items-center justify-center pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
       <div className="container">
         <div className="wow fadeInUp" data-wow-delay=".2s">
           <div className="-mx-4 flex flex-wrap items-center">
             <div className="w-full px-4 lg:w-1/2">
               <div className="mb-12 max-w-[540px] lg:mb-0">
-                <h2 className="text-dark mb-5 text-3xl font-bold leading-tight dark:text-white sm:text-[40px] sm:leading-[1.2]">
+                <h2 className="text-dark mb-5 text-3xl font-bold leading-tight sm:text-[40px] sm:leading-[1.2] dark:text-white">
                   Manage your Agribusiness the Smart Way.
                 </h2>
                 <p className="text-body-color dark:text-dark-6 mb-10 text-base leading-relaxed">

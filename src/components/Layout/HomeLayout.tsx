@@ -9,8 +9,8 @@ export default function Layout({ children }: Props) {
   return (
     <>
       <Nav />
-      <main className="mb-[100px]">{children}</main>
-      <Footer />
+      <main>{children}</main>
+      {/* <Footer /> */}
     </>
   );
 }

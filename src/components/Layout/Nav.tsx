@@ -53,26 +53,15 @@ const Nav = () => {
                 router.pathname === "/#about" ? activeRoute : normalRoute
               }
             >
-              What we do
+             Sub Heading
             </Link>
           </li>
-          <li>
-            <Link
-              href="/zambia"
-              className={
-                router.pathname === "/zambia" ? activeRoute : normalRoute
-              }
-            >
-              Zambia
-            </Link>
-          </li>
+          
 
           <li>
             <Link href="/contactus">Contact Us</Link>
           </li>
-          <li>
-            <Link href="/careers">Careers</Link>
-          </li>
+         
         </ul>
 
         {/* for freaking wide screens */}
@@ -110,29 +99,11 @@ const Nav = () => {
                   router.pathname === "/#about" ? activeRoute : normalRoute
                 }
               >
-                What we do
+                sub Header
               </Link>
             </li>
-            <li>
-              <Link
-                href="/zambia"
-                className={
-                  router.pathname === "/zambia" ? activeRoute : normalRoute
-                }
-              >
-                Zambia
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/careers"
-                className={
-                  router.pathname === "/careers" ? activeRoute : normalRoute
-                }
-              >
-                Careers
-              </Link>
-            </li>
+            
+           
             <li>
               <Link href="https://cal.com/shamba-data/30min">
                 <button className="font-semi-bold rounded-md bg-white px-4 py-2 text-black">
