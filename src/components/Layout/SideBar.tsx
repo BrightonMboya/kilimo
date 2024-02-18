@@ -3,23 +3,13 @@ import { useRouter } from "next/router";
 import { UserButton } from "@clerk/nextjs";
 import { CubeIcon, PersonIcon } from "@radix-ui/react-icons";
 
-import BlurImage from "~/components/UI/BlurImage";
-
-
 export default function SideBar() {
   const router = useRouter();
-
 
   return (
     <section className="font-montserrat ">
       <div className="flex w-[150px] flex-col items-center justify-center space-y-7 pt-5 ">
-
-        <UserButton afterSignOutUrl="/agri"
-        appearance={{
-          
-        }}
-        />
-      
+        <UserButton afterSignOutUrl="/agri" appearance={{}} />
 
         <Link href="/agri/dashboard/farmers">
           <div
@@ -52,8 +42,6 @@ export default function SideBar() {
             <h3 className="font-montserrat">Harvests</h3>
           </div>
         </Link>
-
-       
 
         <Link href="/agri/dashboard/accounting">
           <div

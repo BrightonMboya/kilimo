@@ -1,4 +1,4 @@
-import { Button } from "../../UI";
+import { Button } from "~/components/UI";
 
 export default function Pricing() {
   return (

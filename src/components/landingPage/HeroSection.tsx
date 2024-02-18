@@ -1,6 +1,6 @@
 import Image from "next/legacy/image";
 
-import { Button } from "../../UI";
+import { Button } from "~/components/UI";
 import styles from "./gradient.module.css";
 
 export default function HeroSection() {
