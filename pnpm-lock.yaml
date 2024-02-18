@@ -65,6 +65,9 @@ dependencies:
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
+  clsx:
+    specifier: ^2.1.0
+    version: 2.1.0
   cmdk:
     specifier: ^0.2.1
     version: 0.2.1(@types/react@18.2.56)(react-dom@18.2.0)(react@18.2.0)
@@ -89,10 +92,16 @@ dependencies:
   react-hook-form:
     specifier: ^7.50.1
     version: 7.50.1(react@18.2.0)
+  react-icons:
+    specifier: ^5.0.1
+    version: 5.0.1(react@18.2.0)
   recharts:
     specifier: ^2.12.0
     version: 2.12.0(react-dom@18.2.0)(react@18.2.0)
   superjson:
+    specifier: ^2.2.1
+    version: 2.2.1
+  tailwind-merge:
     specifier: ^2.2.1
     version: 2.2.1
   zod:
@@ -4082,6 +4091,14 @@ packages:
       react: 18.2.0
     dev: false
 
+  /react-icons@5.0.1(react@18.2.0):
+    resolution: {integrity: sha512-WqLZJ4bLzlhmsvme6iFdgO8gfZP17rfjYEJ2m9RsZjZ+cc4k1hTzknEz63YS1MeT50kVzoa1Nz36f4BEx+Wigw==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -4561,6 +4578,12 @@ packages:
     dependencies:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  /tailwind-merge@2.2.1:
+    resolution: {integrity: sha512-o+2GTLkthfa5YUt4JxPfzMIpQzZ3adD1vLVkvKE1Twl9UAhGsEbIZhHHZVRttyW177S8PDJI3bTQNaebyofK3Q==}
+    dependencies:
+      '@babel/runtime': 7.23.9
     dev: false
 
   /tailwindcss@3.4.1:
