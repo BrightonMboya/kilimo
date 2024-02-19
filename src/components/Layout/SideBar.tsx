@@ -2,9 +2,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { UserButton } from "@clerk/nextjs";
 import { CubeIcon, PersonIcon } from "@radix-ui/react-icons";
+import Button from "../ui/Button";
+import { LogOutIcon } from "lucide-react";
 
 export default function SideBar() {
   const router = useRouter();
+
+  function signOut(arg0: () => Promise<boolean>): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <section className="font-montserrat ">
@@ -26,6 +32,8 @@ export default function SideBar() {
             <h3 className="font-montserrat">Farmers</h3>
           </div>
         </Link>
+
+        
 
         <Link href="/dashboard/harvests">
           <div
@@ -58,6 +66,15 @@ export default function SideBar() {
             <h3 className="font-montserrat">Accounting</h3>
           </div>
         </Link>
+
+        <Button
+          className="fixed bottom-10 ml-10 w-[150px] space-x-2"
+          variant="destructive"
+          onClick={() => signOut(() => router.push("/auth/login"))}
+        >
+          <LogOutIcon />
+          <span>Log out</span>
+        </Button>
       </div>
     </section>
   );

@@ -31,11 +31,9 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         },
       }}
     >
-      {getLayout(
-        <main className={`${montserrat.variable} font-montserrat`}>
-          <Component {...pageProps} />
-        </main>,
-      )}
+      <main className={`${montserrat.className}`}>
+        {getLayout(<Component {...pageProps} />)}
+      </main>
     </ClerkProvider>
   );
 };

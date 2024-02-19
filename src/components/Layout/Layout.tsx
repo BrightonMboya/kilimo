@@ -1,8 +1,8 @@
 import * as React from "react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 
-import SignUpForm from "../auth/signUpPage";
 import SideBar from "./SideBar";
+import LoginForm from "../auth/LoginPage";
 
 type Props = {
   children: React.ReactNode;
@@ -10,19 +10,17 @@ type Props = {
 export default function AgriLayout({ children }: Props) {
   return (
     <React.Fragment>
-      {/* <SignedIn> */}
+      <SignedIn>
         <section>
-          <div className="flex space-x-5 font-sans ">
+          <div className="flex space-x-[100px] font-sans ">
             <SideBar />
             <main className="">{children}</main>
           </div>
         </section>
-      {/* </SignedIn> */}
-      {/* <SignedOut>
-        <section className="flex h-screen items-center justify-center">
-          <SignUpForm />
-        </section>
-      </SignedOut> */}
+      </SignedIn>
+      <SignedOut>
+        <LoginForm />
+      </SignedOut>
     </React.Fragment>
   );
 }

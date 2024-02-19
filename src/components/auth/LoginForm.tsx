@@ -1,5 +1,6 @@
 "use client";
 import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 
 export function LoginForm() {
   return (
@@ -13,7 +14,9 @@ export function LoginForm() {
             Enter your email to login
           </p>
         </div>
-        <SignIn afterSignInUrl="/trips" />
+      
+        <SignIn afterSignInUrl="/dashboard/farmers" />
+        {/* <SignUp/> */}
       </div>
     </div>
   );
