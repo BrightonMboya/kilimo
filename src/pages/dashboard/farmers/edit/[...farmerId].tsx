@@ -3,18 +3,15 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-
-
 import { api } from "~/utils/api";
 import { Button, Input } from "~/components/UI";
 import { Textarea } from "~/components/UI/TextArea";
 import { ToastAction } from "~/components/UI/Toast";
 import { Toaster } from "~/components/UI/Toaster";
 import { Icons } from "~/components/UI/icons";
-import AgriLayout from "~/components/agriBusiness/Layout/Layout";
-import { GenderDropDown } from "~/components/agriBusiness/farmers/GenderDropDown";
+import Layout from "~/components/Layout/HomeLayout";
+import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { AssetLabel, ItemLayout, ValidationSchema, schema } from "../new";
-
 
 export default function Page() {
   const {
@@ -28,7 +25,7 @@ export default function Page() {
   const { data, isLoading } = api.organization.fetchFarmerById.useQuery({
     id: router.query.farmerId as unknown as number,
   });
-  console.log(typeof(router.query.farmerId), "router id");
+  console.log(typeof router.query.farmerId, "router id");
 
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {};
   return (
@@ -46,7 +43,7 @@ export default function Page() {
               <Input
                 placeholder="John Doe"
                 {...register("fullName")}
-                value={data?.fullName}
+                // value={data?.fullName}
               />
             </ItemLayout>
 
@@ -141,5 +138,5 @@ export default function Page() {
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <AgriLayout>{page}</AgriLayout>;
+  return <Layout>{page}</Layout>;
 };

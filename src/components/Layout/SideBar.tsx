@@ -11,11 +11,11 @@ export default function SideBar() {
       <div className="flex w-[150px] flex-col items-center justify-center space-y-7 pt-5 ">
         <UserButton afterSignOutUrl="/agri" appearance={{}} />
 
-        <Link href="/agri/dashboard/farmers">
+        <Link href="/dashboard/farmers">
           <div
             className={`flex items-center justify-center space-x-2
               ${
-                router.pathname.startsWith("/agri/dashboard/farmers")
+                router.pathname.startsWith("/dashboard/farmers")
                   ? "text-dark"
                   : "text-gray-500"
               }
@@ -27,11 +27,11 @@ export default function SideBar() {
           </div>
         </Link>
 
-        <Link href="/agri/dashboard/harvests">
+        <Link href="/dashboard/harvests">
           <div
             className={`flex items-center justify-center space-x-2
               ${
-                router.pathname.startsWith("/agri/dashboard/harvests")
+                router.pathname.startsWith("/dashboard/harvests")
                   ? "text-dark"
                   : "text-gray-500"
               }
@@ -43,11 +43,11 @@ export default function SideBar() {
           </div>
         </Link>
 
-        <Link href="/agri/dashboard/accounting">
+        <Link href="/dashboard/accounting">
           <div
             className={`flex items-center justify-center space-x-2
               ${
-                router.pathname.startsWith("/agri/dashboard/accounting")
+                router.pathname.startsWith("/dashboard/accounting")
                   ? "text-dark"
                   : "text-gray-500"
               }

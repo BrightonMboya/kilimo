@@ -10,11 +10,26 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Organization {
+  id      Int                   @id @default(autoincrement())
+  name    String
+  country String
+  Email   String @unique
+  farmers organizationFarmers[]
+}
 
-    @@index([name])
+model organizationFarmers {
+  fullName          String
+  phoneNumber       String       @unique
+  id                Int          @id @default(autoincrement())
+  farmSize          Int?
+  quantityCanSupply Int?
+  gender            String
+  description       String       @db.Text()
+  // latitude          Float?
+  // longitude         Float?
+  province          String?
+  cropTheySell      String?
+  organizationId    Int
+  organization      Organization @relation(fields: [organizationId], references: [id])
 }
