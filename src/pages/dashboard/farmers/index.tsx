@@ -10,22 +10,22 @@ import { NoAsset } from "~/components/harvests";
 
 export default function Page() {
   const { user } = useUser();
-  // const { data, isLoading } = api.organization.fetchFarmers.useQuery({
-  //   email: user?.primaryEmailAddress?.emailAddress as unknown as string,
-  // });
-const data =[]
+  const { data, isLoading } = api.organization.fetchFarmers.useQuery({
+    email: user?.primaryEmailAddress?.emailAddress as unknown as string,
+  });
+
   // console.log(data);
   return (
     <main className="pl-5">
-      {/* <Header name={user?.username as unknown as string} /> */}
-      {data?.length === 0 && (
-        <NoAsset
-          bigTitle="You haven't added your Farmers yet"
-          smallTitle="It's easier to manage, your farmers. Go ahead and them now"
-          c2a="Add Farmers"
-          c2aUrl="/agri/dashboard/farmers/new"
-        />
-      )}
+      <Header name={user?.username as unknown as string} />
+
+      <NoAsset
+        bigTitle="You haven't added your Farmers yet"
+        smallTitle="It's easier to manage, your farmers. Go ahead and them now"
+        c2a="Add Farmers"
+        c2aUrl="/dashboard/farmers/new"
+      />
+
       {/* @ts-ignore */}
       {data!?.length >= 0 && <FarmersTable data={data} />}
     </main>

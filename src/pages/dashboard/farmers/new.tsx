@@ -2,7 +2,7 @@ import React, { type ReactElement } from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AppRouter } from "@shamba/api";
+import { AppRouter } from "~/server/api/root";
 import { inferProcedureInput } from "@trpc/server";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,8 +14,8 @@ import { Textarea } from "~/components/UI/TextArea";
 import { ToastAction } from "~/components/UI/Toast";
 import { Toaster } from "~/components/UI/Toaster";
 import { Icons } from "~/components/UI/icons";
-import AgriLayout from "~/components/agriBusiness/Layout/Layout";
-import { GenderDropDown } from "~/components/agriBusiness/farmers/GenderDropDown";
+import Layout from "~/components/Layout/Layout";
+import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { useToast } from "~/hooks/useToast";
 
 export const schema = z.object({
@@ -188,5 +188,5 @@ export default function Page() {
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <AgriLayout>{page}</AgriLayout>;
+  return <Layout>{page}</Layout>;
 };

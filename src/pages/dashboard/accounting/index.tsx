@@ -2,8 +2,6 @@ import React, { type ReactElement } from "react";
 import { Metadata } from "next";
 import Image from "next/image";
 
-
-
 import Button from "~/components/UI/Button";
 import {
   Card,
@@ -13,13 +11,12 @@ import {
   CardTitle,
 } from "~/components/UI/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/UI/Tabs";
-import AgriLayout from "~/components/agriBusiness/Layout/Layout";
-import Reports from "~/components/agriBusiness/accounting//reports";
-import ExpenseAndSales from "~/components/agriBusiness/accounting/ExpenseAndSales";
-import { CalendarDateRangePicker } from "~/components/agriBusiness/accounting/date-range-picker";
-import { Overview } from "~/components/agriBusiness/accounting/overview";
-import { RecentSales } from "~/components/agriBusiness/accounting/recent-sales";
-
+import Layout from "~/components/Layout/Layout";
+import Reports from "~/components/accounting//reports";
+import ExpenseAndSales from "~/components/accounting/ExpenseAndSales";
+import { CalendarDateRangePicker } from "~/components/accounting/date-range-picker";
+import { Overview } from "~/components/accounting/overview";
+import { RecentSales } from "~/components/accounting/recent-sales";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -60,10 +57,7 @@ export default function Page() {
               <TabsTrigger value="expenseandsales">
                 Expense and Sales
               </TabsTrigger>
-              <TabsTrigger value="reports" >
-                Reports
-              </TabsTrigger>
-             
+              <TabsTrigger value="reports">Reports</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -204,7 +198,6 @@ export default function Page() {
   );
 }
 
-
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <AgriLayout>{page}</AgriLayout>;
+  return <Layout>{page}</Layout>;
 };

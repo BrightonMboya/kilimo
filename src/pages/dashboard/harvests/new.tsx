@@ -4,8 +4,8 @@ import Button from "~/components/UI/Button";
 import { DatePicker } from "~/components/UI/DatePicker";
 import Input from "~/components/UI/Input";
 import { Textarea } from "~/components/UI/TextArea";
-import AgriLayout from "~/components/agriBusiness/Layout/Layout";
-import CategoryDropDown from "~/components/agriBusiness/harvests/CategoryDropDown";
+import Layout from "~/components/Layout/Layout"
+import CategoryDropDown from "~/components/harvests/CategoryDropDown";
 
 function AssetLabel({ label, caption }: { label: string; caption?: string }) {
   return (
@@ -83,5 +83,5 @@ export default function Page() {
 }
 
 Page.getLayout = function getLayout(page: ReactElement) {
-  return <AgriLayout>{page}</AgriLayout>;
+  return <Layout>{page}</Layout>;
 };
