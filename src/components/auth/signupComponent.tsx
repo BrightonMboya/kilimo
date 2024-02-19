@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 import EmailVerification from "./email-verification";
 import { UserAuthForm } from "./signup-form";
 

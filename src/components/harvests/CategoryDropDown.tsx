@@ -3,19 +3,19 @@
 import * as React from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
 
-import Button from "~/components/UI/Button";
+import Button from "~/components/ui/Button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "~/components/UI/Command";
+} from "~/components/ui/Command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/UI/popover";
+} from "~/components/ui/popover";
 import { cn } from "~/lib/utils";
 
 const farmers = [

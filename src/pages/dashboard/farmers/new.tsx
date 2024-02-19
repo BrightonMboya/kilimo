@@ -8,12 +8,12 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { api } from "~/utils/api";
-import Button from "~/components/UI/Button";
-import Input from "~/components/UI/Input";
-import { Textarea } from "~/components/UI/TextArea";
-import { ToastAction } from "~/components/UI/Toast";
-import { Toaster } from "~/components/UI/Toaster";
-import { Icons } from "~/components/UI/icons";
+import Button from "~/components/ui/Button";
+import Input from "~/components/ui/Input";
+import { Textarea } from "~/components/ui/TextArea";
+import { ToastAction } from "~/components/ui/Toast";
+import { Toaster } from "~/components/ui/Toaster";
+import { Icons } from "~/components/ui/icons";
 import Layout from "~/components/Layout/Layout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { useToast } from "~/hooks/useToast";
@@ -30,7 +30,13 @@ export const schema = z.object({
 
 export type ValidationSchema = z.infer<typeof schema>;
 
-export function AssetLabel({ label, caption }: { label: string; caption?: string }) {
+export function AssetLabel({
+  label,
+  caption,
+}: {
+  label: string;
+  caption?: string;
+}) {
   return (
     <div className="max-w-[400px] ">
       <h3 className="text-base font-medium">{label}</h3>
@@ -85,7 +91,6 @@ export default function Page() {
       console.log("I have started mutating");
       mutateAsync(input);
     } catch (cause) {
-      
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -127,7 +132,10 @@ export default function Page() {
         </ItemLayout>
 
         <ItemLayout>
-          <AssetLabel label="Quantity" caption="Quantity in kg this farmer produce on a single harvest" />
+          <AssetLabel
+            label="Quantity"
+            caption="Quantity in kg this farmer produce on a single harvest"
+          />
           <Input
             placeholder="50"
             {...register("quantityCanSupply", { valueAsNumber: true })}
@@ -141,7 +149,10 @@ export default function Page() {
         </ItemLayout>
 
         <ItemLayout>
-          <AssetLabel label="Farm Size" caption="What is the farm size of this farmer in Acres" />
+          <AssetLabel
+            label="Farm Size"
+            caption="What is the farm size of this farmer in Acres"
+          />
           <Input
             placeholder="30"
             {...register("farmSize", { valueAsNumber: true })}

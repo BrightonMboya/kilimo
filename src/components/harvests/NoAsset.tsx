@@ -1,5 +1,5 @@
-import BlurImage from "~/components/UI/BlurImage";
-import Button from "~/components/UI/Button";
+import BlurImage from "~/components/ui/BlurImage";
+import Button from "~/components/ui/Button";
 import Link from "next/link";
 
 type NoAssetProps = {
@@ -9,7 +9,12 @@ type NoAssetProps = {
   c2aUrl: string;
 };
 
-export default function NoAsset({ c2a, bigTitle, smallTitle, c2aUrl}: NoAssetProps) {
+export default function NoAsset({
+  c2a,
+  bigTitle,
+  smallTitle,
+  c2aUrl,
+}: NoAssetProps) {
   return (
     <div className=" bg-lightest mt-[50px] flex h-[500px] w-[1000px] flex-col items-center justify-center rounded-md shadow-md">
       <div className="relative h-[200px] w-[200px] rounded-full">
@@ -20,9 +25,7 @@ export default function NoAsset({ c2a, bigTitle, smallTitle, c2aUrl}: NoAssetPro
         />
       </div>
       <h3 className="mt-5 text-lg font-medium">{bigTitle}</h3>
-      <h3 className="pt-2">
-       {smallTitle}
-      </h3>
+      <h3 className="pt-2">{smallTitle}</h3>
 
       <Link href={c2aUrl}>
         <Button className="mt-[30px]">{c2a}</Button>

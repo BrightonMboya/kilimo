@@ -1,10 +1,10 @@
 import React, { type ReactElement } from "react";
 
-import Button from "~/components/UI/Button";
-import { DatePicker } from "~/components/UI/DatePicker";
-import Input from "~/components/UI/Input";
-import { Textarea } from "~/components/UI/TextArea";
-import Layout from "~/components/Layout/Layout"
+import Button from "~/components/ui/Button";
+import { DatePicker } from "~/components/ui/DatePicker";
+import Input from "~/components/ui/Input";
+import { Textarea } from "~/components/ui/TextArea";
+import Layout from "~/components/Layout/Layout";
 import CategoryDropDown from "~/components/harvests/CategoryDropDown";
 
 function AssetLabel({ label, caption }: { label: string; caption?: string }) {
@@ -40,7 +40,7 @@ export default function Page() {
             label="Crop Name"
             caption="What is the name of the crop harvested?"
           />
-          <Input placeholder="Kapenta Siavonga"/>
+          <Input placeholder="Kapenta Siavonga" />
         </ItemLayout>
 
         <ItemLayout>
@@ -60,12 +60,12 @@ export default function Page() {
           <Input placeholder="100" />
         </ItemLayout>
 
-          <ItemLayout>
+        <ItemLayout>
           <AssetLabel
             label="Inputs Used"
             caption="List of the inputs used in this harvest"
           />
-          <Input placeholder="npk fertilizer, potassium fertilizer"/>
+          <Input placeholder="npk fertilizer, potassium fertilizer" />
         </ItemLayout>
 
         <ItemLayout>

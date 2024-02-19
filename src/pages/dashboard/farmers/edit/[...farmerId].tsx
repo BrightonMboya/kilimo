@@ -4,11 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import { api } from "~/utils/api";
-import { Button, Input } from "~/components/UI";
-import { Textarea } from "~/components/UI/TextArea";
-import { ToastAction } from "~/components/UI/Toast";
-import { Toaster } from "~/components/UI/Toaster";
-import { Icons } from "~/components/UI/icons";
+import { Button, Input } from "~/components/ui";
+import { Textarea } from "~/components/ui/TextArea";
+import { ToastAction } from "~/components/ui/Toast";
+import { Toaster } from "~/components/ui/Toaster";
+import { Icons } from "~/components/ui/icons";
 import Layout from "~/components/Layout/HomeLayout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { AssetLabel, ItemLayout, ValidationSchema, schema } from "../new";

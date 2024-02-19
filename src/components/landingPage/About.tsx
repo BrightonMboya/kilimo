@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import BlurImage from "~/components/UI/BlurImage";
+import BlurImage from "~/components/ui/BlurImage";
 
 export default function About() {
   return (

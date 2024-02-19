@@ -1,5 +1,5 @@
-import Label from "~/components/UI/label";
-import { RadioGroup, RadioGroupItem } from "~/components/UI/radio-group";
+import Label from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
 export function GenderDropDown({ setGender }: any) {
   return (

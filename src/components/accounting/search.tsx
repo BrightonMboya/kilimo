@@ -1,4 +1,4 @@
-import Input from "~/components/UI/Input";
+import Input from "~/components/ui/Input";
 
 export function Search() {
   return (

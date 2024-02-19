@@ -1,4 +1,4 @@
-import { Button } from "~/components/UI";
+import { Button } from "~/components/ui";
 
 export default function Pricing() {
   return (
@@ -10,7 +10,7 @@ export default function Pricing() {
               <span className="text-primary mb-2 block text-lg font-semibold">
                 Pricing Table
               </span>
-              <h2 className="text-dark mb-3 text-3xl font-bold dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]">
+              <h2 className="text-dark mb-3 text-3xl font-bold sm:text-4xl md:text-[40px] md:leading-[1.2] dark:text-white">
                 Awesome Pricing Plan
               </h2>
               <p className="text-body-color dark:text-dark-6 text-base">
@@ -26,7 +26,7 @@ export default function Pricing() {
               <span className="text-dark mb-5 block text-xl font-medium dark:text-white">
                 Starter
               </span>
-              <h2 className="text-dark mb-11 text-4xl font-semibold dark:text-white xl:text-[42px] xl:leading-[1.21]">
+              <h2 className="text-dark mb-11 text-4xl font-semibold xl:text-[42px] xl:leading-[1.21] dark:text-white">
                 <span className="text-xl font-medium">$</span>
                 <span className="-ml-1 -tracking-[2px]">25.00</span>
                 <span className="text-body-color dark:text-dark-6 text-base font-normal">
@@ -64,7 +64,7 @@ export default function Pricing() {
               <span className="text-dark mb-5 block text-xl font-medium dark:text-white">
                 Basic
               </span>
-              <h2 className="text-dark mb-11 text-4xl font-semibold dark:text-white xl:text-[42px] xl:leading-[1.21]">
+              <h2 className="text-dark mb-11 text-4xl font-semibold xl:text-[42px] xl:leading-[1.21] dark:text-white">
                 <span className="text-xl font-medium">$</span>
                 <span className="-ml-1 -tracking-[2px]">59.00</span>
                 <span className="text-body-color dark:text-dark-6 text-base font-normal">
@@ -98,7 +98,7 @@ export default function Pricing() {
               <span className="text-dark mb-5 block text-xl font-medium dark:text-white">
                 Premium
               </span>
-              <h2 className="text-dark mb-11 text-4xl font-semibold dark:text-white xl:text-[42px] xl:leading-[1.21]">
+              <h2 className="text-dark mb-11 text-4xl font-semibold xl:text-[42px] xl:leading-[1.21] dark:text-white">
                 <span className="text-xl font-medium">$</span>
                 <span className="-ml-1 -tracking-[2px]">699.00</span>
                 <span className="text-body-color dark:text-dark-6 text-base font-normal">

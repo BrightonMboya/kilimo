@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 import { useSignUp } from "@clerk/nextjs";
 
 import { api } from "~/utils/api";
-import { Input } from "~/components/UI";
-import Button from "~/components/UI/Button";
-import { Icons } from "~/components/UI/icons";
+import Input from "~/components/ui/Input";
+import Button from "~/components/ui/Button";
+import { Icons } from "~/components/ui/icons";
 import { useToast } from "~/hooks/useToast";
 
 export default function Index() {

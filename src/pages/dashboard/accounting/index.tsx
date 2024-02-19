@@ -2,15 +2,15 @@ import React, { type ReactElement } from "react";
 import { Metadata } from "next";
 import Image from "next/image";
 
-import Button from "~/components/UI/Button";
+import Button from "~/components/ui/Button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/UI/Card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/UI/Tabs";
+} from "~/components/ui/Card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/Tabs";
 import Layout from "~/components/Layout/Layout";
 import Reports from "~/components/accounting//reports";
 import ExpenseAndSales from "~/components/accounting/ExpenseAndSales";

@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import z from "zod";
 
-import Button from "~/components/UI/Button";
-import Input from "~/components/UI/Input";
-import { Icons } from "~/components/UI/icons";
-import Label from "~/components/UI/label";
+import Button from "~/components/ui/Button";
+import Input from "~/components/ui/Input";
+import { Icons } from "~/components/ui/icons";
+import  Label  from "~/components/ui/label";
 import { useToast } from "~/hooks/useToast";
 import { cn } from "~/lib/utils";
 
@@ -127,14 +127,14 @@ export function UserAuthForm({
         By clicking continue, you agree to our{" "}
         <Link
           href="/terms"
-          className="hover:text-primary underline underline-offset-4"
+          className="underline underline-offset-4 hover:text-primary"
         >
           Terms of Service
         </Link>{" "}
         and{" "}
         <Link
           href="/privacy"
-          className="hover:text-primary underline underline-offset-4"
+          className="underline underline-offset-4 hover:text-primary"
         >
           Privacy Policy
         </Link>

@@ -4,10 +4,10 @@ import {
   CardHeader,
   CardContent,
   Card,
-} from "~/components/UI/Card";
-import  Label  from "~/components/UI/label";
-import Input from "~/components/UI/Input";
-import Button from "~/components/UI/Button";
+} from "~/components/ui/Card";
+import Label from "~/components/ui/label";
+import Input from "~/components/ui/Input";
+import Button from "~/components/ui/Button";
 
 export default function ExpenseAndSales() {
   return (

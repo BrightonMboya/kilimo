@@ -6,13 +6,13 @@ import { addDays, format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
 import { cn } from "~/lib/utils";
-import Button from "~/components/UI/Button";
-import { Calendar } from "~/components/UI/calendar";
+import Button from "~/components/ui/Button";
+import { Calendar } from "~/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/UI/popover";
+} from "~/components/ui/popover";
 
 export function CalendarDateRangePicker({
   className,

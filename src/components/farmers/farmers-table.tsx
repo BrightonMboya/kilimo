@@ -20,9 +20,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import Button from "~/components/UI/Button";
-import Input from "~/components/UI/Input";
-import { Checkbox } from "~/components/UI/checkbox";
+import Button from "~/components/ui/Button";
+import Input from "~/components/ui/Input";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -31,7 +31,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/UI/dropdown-menu";
+} from "~/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -39,7 +39,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/UI/table";
+} from "~/components/ui/table";
 
 export type Farmers = {
   id: string;
@@ -150,7 +150,9 @@ export const columns: ColumnDef<Farmers>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href={`/agri/dashboard/farmers/edit/${farmer.id}`}>Edit Farmer</Link>
+              <Link href={`/agri/dashboard/farmers/edit/${farmer.id}`}>
+                Edit Farmer
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
