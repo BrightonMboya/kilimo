@@ -17,7 +17,7 @@ export default function Page() {
   // console.log(data);
   return (
     <main className="pl-5">
-      <Header name={user?.username as unknown as string} />
+      <Header caption={user?.username as unknown as string} />
 
       <NoAsset
         bigTitle="You haven't added your Farmers yet"
