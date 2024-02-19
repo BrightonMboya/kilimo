@@ -5,6 +5,7 @@ import { CubeIcon, PersonIcon } from "@radix-ui/react-icons";
 import Button from "../ui/Button";
 import { LogOutIcon } from "lucide-react";
 
+
 export default function SideBar() {
   const router = useRouter();
 
