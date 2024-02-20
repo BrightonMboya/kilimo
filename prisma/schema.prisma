@@ -12,14 +12,15 @@ datasource db {
 }
 
 model Organization {
-  id      Int                   @id @default(autoincrement())
-  name    String
-  country String
-  Email   String                @unique
-  farmers organizationFarmers[]
+  id       Int        @id @default(autoincrement())
+  name     String
+  country  String
+  Email    String     @unique
+  farmers  Farmers[]
+  harvests Harvests[]
 }
 
-model organizationFarmers {
+model Farmers {
   fullName          String
   phoneNumber       String       @unique
   id                Int          @id @default(autoincrement())
@@ -27,10 +28,14 @@ model organizationFarmers {
   quantityCanSupply Int?
   gender            String
   description       String       @db.Text()
-  // latitude          Float?
-  // longitude         Float?
   province          String?
   cropTheySell      String?
   organizationId    Int
   organization      Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Harvests {
+  id             String       @id @default(cuid())
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId Int
 }
