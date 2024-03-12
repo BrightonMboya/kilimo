@@ -16,7 +16,7 @@ function Page() {
       <Features />
       <About />
       <Call2Action />
-      <Pricing />
+      {/* <Pricing /> */}
       <Faq />
       <Call2Action />
     </Layout>

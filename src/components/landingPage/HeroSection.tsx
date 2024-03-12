@@ -1,7 +1,6 @@
-import Image from "next/legacy/image";
-
 import { Button } from "~/components/ui";
 import styles from "./gradient.module.css";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -20,18 +19,20 @@ export default function HeroSection() {
                     flows.
                   </h1>
                   <p className="mx-auto mb-9 max-w-[600px] text-base font-medium sm:text-lg sm:leading-[1.44]">
-                    Something catchy I cant think of as of right now. What I
-                    know is that it will be exactly this long for easy
-                    readiblity and flow.
+                   Move from recording data from Excel sheets, papers and move to a custom software tailored to 
+                   your business workflow. 
                   </p>
                   <ul className="mb-10 flex flex-wrap items-center justify-center gap-5">
                     <li>
+                      <Link href="https://cal.com/brightonmboya/15min">
+                      
                       <Button>Contact Sales</Button>
+                      </Link>
                     </li>
 
-                    <li>
+                    {/* <li>
                       <Button variant="ghost">Watch Demo</Button>
-                    </li>
+                    </li> */}
                   </ul>
                   {/* <div>
                   <p className="mb-4 text-center text-base font-medium">

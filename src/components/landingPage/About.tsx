@@ -14,15 +14,12 @@ export default function About() {
                   Manage your Agribusiness the Smart Way.
                 </h2>
                 <p className="text-body-color dark:text-dark-6 mb-10 text-base leading-relaxed">
-                  The main ‘thrust' is to focus on educating attendees on how to
-                  best protect highly vulnerable business applications with
-                  interactive panel discussions and roundtables led by subject
-                  matter experts.
+                  Recording your company data in excel sheet doesnt scale well enough and soon
+                  you will be having bunches of excel sheet that is hard to keep track of.
                   <br />
                   <br />
-                  The main ‘thrust' is to focus on educating attendees on how to
-                  best protect highly vulnerable business applications with
-                  interactive panel.
+                  At Yuwe, we cover that for you and you can focus on the core operations of your business
+                  to increase revenue and growth. 
                 </p>
 
                 <Link href="/contactus">

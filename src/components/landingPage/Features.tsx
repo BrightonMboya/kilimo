@@ -9,11 +9,11 @@ export default function Features() {
                 Features
               </span>
               <h2 className="text-dark mb-3 text-3xl font-bold sm:text-4xl md:text-[40px] md:leading-[1.2] dark:text-white">
-                Main Features Of Shamba AgriBusiness
+                Main Features Of Yuwe
               </h2>
               <p className="text-body-color dark:text-dark-6 text-base">
-                There are many variations of passages of Lorem Ipsum available
-                but the majority have suffered alteration in some form.
+                With Yuwe you can rest assured your tech stack of your business is handled well and you can focus
+                on the core operations of your business.
               </p>
             </div>
           </div>
@@ -37,10 +37,10 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                Feature 1
+                Tailored to your workflow
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-                Lorem Ipsum is simply dummy text of the printing and industry.
+              Yuwe is tailored around your business workflow and not the other way around.
               </p>
             </div>
           </div>
@@ -62,10 +62,10 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                Feature 2
+                Custom Made
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-                Lorem Ipsum is simply dummy text of the printing and industry.
+                Request custom features that are unique to your business and workflow.
               </p>
             </div>
           </div>
@@ -119,10 +119,10 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                Feature 3
+               Own Your Data
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-                Lorem Ipsum is simply dummy text of the printing and industry.
+               With Yuwe you can chose to self host your data as it is open source.
               </p>
             </div>
           </div>
@@ -156,10 +156,10 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-                Feature 4
+                Open Sourced
               </h4>
               <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-                Lorem Ipsum is simply dummy text of the printing and industry.
+               Yuwe is Open Sourced allowing anyone to contribute to the software and catch bugs.
               </p>
             </div>
           </div>

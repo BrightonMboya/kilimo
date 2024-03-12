@@ -105,7 +105,7 @@ const Nav = () => {
             
            
             <li>
-              <Link href="https://cal.com/shamba-data/30min">
+              <Link href="https://cal.com/brightonmboya/15min">
                 <button className="font-semi-bold rounded-md bg-white px-4 py-2 text-black">
                   Book an Enteprise Demo
                 </button>

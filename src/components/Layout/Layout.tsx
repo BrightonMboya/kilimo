@@ -10,17 +10,17 @@ type Props = {
 export default function AgriLayout({ children }: Props) {
   return (
     <React.Fragment>
-      <SignedIn>
+      {/* <SignedIn> */}
         <section>
           <div className="flex space-x-[100px] font-sans ">
             <SideBar />
             <main className="">{children}</main>
           </div>
         </section>
-      </SignedIn>
-      <SignedOut>
+      {/* </SignedIn> */}
+      {/* <SignedOut>
         <LoginForm />
-      </SignedOut>
+      </SignedOut> */}
     </React.Fragment>
   );
 }

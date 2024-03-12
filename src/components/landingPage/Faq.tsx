@@ -11,10 +11,10 @@ export default function Faq() {
               <h2 className="text-dark mb-3 text-3xl font-bold leading-[1.2] dark:text-white sm:text-4xl md:text-[40px]">
                 Any Questions? Look Here
               </h2>
-              <p className="text-body-color dark:text-dark-6 mx-auto max-w-[485px] text-base">
+              {/* <p className="text-body-color dark:text-dark-6 mx-auto max-w-[485px] text-base">
                 There are many variations of passages of Lorem Ipsum available
                 but the majority have suffered alteration in some form.
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
@@ -35,12 +35,11 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
-                  A nice short question
+                  What is Yuwe
                 </h3>
                 <p className=" text-base">
-                  The answer should speak to the pain points of the business of
-                  the customer. Talk here as if you are directly talking to the
-                  person and you clearly understand why you need to write this.
+                 Yuwe helps Agribusiness collect, manage, and analyze data by creating custom enteprise software 
+                 that aligns with their workflow.
                 </p>
               </div>
             </div>
@@ -59,12 +58,11 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
-                  A nice short question
+                  Why Open Source
                 </h3>
                 <p className=" text-base">
-                  The answer should speak to the pain points of the business of
-                  the customer. Talk here as if you are directly talking to the
-                  person and you clearly understand why you need to write this.
+                 We believe that as AI models continue to improve, the company should have a transparency
+                 on how their data is collected, and distributed in a very open way and that is why we chose the open source route.
                 </p>
               </div>
             </div>
@@ -85,12 +83,11 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
-                  A nice short question
+                  Why you should care
                 </h3>
                 <p className=" text-base">
-                  The answer should speak to the pain points of the business of
-                  the customer. Talk here as if you are directly talking to the
-                  person and you clearly understand why you need to write this.
+                  AI is here to stay, and what better way to take the advantage of it than integrating it within your business.
+                  The first step however is having the data to work with the AI models in the first place.
                 </p>
               </div>
             </div>
@@ -109,12 +106,11 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
-                  A nice short question
+                  How can I self host?
                 </h3>
                 <p className=" text-base">
-                  The answer should speak to the pain points of the business of
-                  the customer. Talk here as if you are directly talking to the
-                  person and you clearly understand why you need to write this.
+                  With each software created, comes with a dedicated manual on how you can self host.
+                  Also, we gurantee 99% uptime for all the software shipped so that you can keep on focusing on your business operations.
                 </p>
               </div>
             </div>
