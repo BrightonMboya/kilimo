@@ -12,30 +12,81 @@ datasource db {
 }
 
 model Organization {
-  id       Int        @id @default(autoincrement())
+  id       String     @id @default(cuid())
   name     String
   country  String
-  Email    String     @unique
+  email    String     @unique
   farmers  Farmers[]
   harvests Harvests[]
 }
 
 model Farmers {
-  fullName          String
-  phoneNumber       String       @unique
-  id                Int          @id @default(autoincrement())
-  farmSize          Int?
-  quantityCanSupply Int?
-  gender            String
-  description       String       @db.Text()
-  province          String?
-  cropTheySell      String?
-  organizationId    Int
-  organization      Organization @relation(fields: [organizationId], references: [id])
+  id             String                  @id @default(cuid())
+  fullName       String
+  gender         String
+  phoneNumber    String
+  farmSize       String
+  latitude       Float?
+  longitude      Float?
+  province       String
+  nationalId     FarmersNationalId?
+  profilePictyre FarmersProfilePictures?
+  organizationId String
+  organization   Organization            @relation(fields: [organizationId], references: [id])
+  harvests       Harvests[]
+}
+
+model FarmersNationalId {
+  id        String  @id @default(cuid())
+  farmer    Farmers @relation(fields: [farmersId], references: [id])
+  farmersId String  @unique
+}
+
+model FarmersProfilePictures {
+  id        String  @id @default(cuid())
+  farmer    Farmers @relation(fields: [farmersId], references: [id])
+  farmersId String  @unique
 }
 
 model Harvests {
   id             String       @id @default(cuid())
+  date           DateTime
+  name           String
+  qrCodeLink     String
+  crop           String
+  size           String
   Organization   Organization @relation(fields: [organizationId], references: [id])
-  organizationId Int
+  organizationId String
+  Farmers        Farmers      @relation(fields: [farmersId], references: [id])
+  farmersId      String
+}
+
+model Equipments {
+  id             String   @id @default(cuid())
+  name           String
+  type           String?
+  leased         Boolean
+  dateAcquired   DateTime
+  purchasePrice  String
+  estimatedValue String?
+  brand          String?
+  status         String
+}
+
+model Warehouses {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  maxCapacity Int
+  unit        String
+}
+
+model Inventory {
+  id                    String  @id @default(cuid())
+  name                  String
+  // the type is things like seed, vaccine etc
+  inventoryType         String
+  inventoryUnit         String
+  description           String?
+  estimatedValuePerUnit String
 }

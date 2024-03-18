@@ -11,10 +11,10 @@ export default function AgriLayout({ children }: Props) {
   return (
     <React.Fragment>
       {/* <SignedIn> */}
-        <section>
+        <section >
           <div className="flex space-x-[100px] font-sans ">
             <SideBar />
-            <main className="">{children}</main>
+            <main className="font-montserrat">{children}</main>
           </div>
         </section>
       {/* </SignedIn> */}

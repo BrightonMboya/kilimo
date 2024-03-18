@@ -31,9 +31,20 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         },
       }}
     >
-      <main className={`${montserrat.className}`}>
+      {
+        getLayout(
+        <main className={`${montserrat.className}`}>
+<Component {...pageProps}  />
+        </main>
+        )
+      }
+      {/* <main className={`${montserrat.className}`}>
         {getLayout(<Component {...pageProps} />)}
-      </main>
+      </main> */}
+      {/* <main className={`${montserrat.className}`}>
+        
+        {getLayout(<Component {...pageProps}  />)}
+      </main> */}
     </ClerkProvider>
   );
 };

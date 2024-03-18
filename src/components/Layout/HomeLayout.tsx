@@ -9,7 +9,7 @@ export default function Layout({ children }: Props) {
   return (
     <>
       <Nav />
-      <main>{children}</main>
+      <main className="font-montserrat">{children}</main>
       {/* <Footer /> */}
     </>
   );
