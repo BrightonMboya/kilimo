@@ -1,13 +1,17 @@
-import type { ReactElement, ReactNode } from "react";
+import { type AppType } from "next/app";
 import type { NextPage } from "next";
-import type { AppProps, AppType } from "next/app";
-import { Montserrat } from "next/font/google";
+import type { AppProps } from "next/app";
 
-import { api } from "../utils/api";
-import "../styles/globals.css";
+import { api } from "~/utils/api";
+import type { ReactElement, ReactNode } from "react";
 import { ClerkProvider } from "@clerk/nextjs";
 
-const montserrat = Montserrat({
+import "~/styles/globals.css";
+
+import { Montserrat } from "next/font/google";
+import Layout from "~/components/Layout/Layout";
+
+export const monsterrat = Montserrat({
   subsets: ["latin"],
   variable: "--font-montserrat",
 });
@@ -31,20 +35,11 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         },
       }}
     >
-      {
-        getLayout(
-        <main className={`${montserrat.className}`}>
-<Component {...pageProps}  />
-        </main>
-        )
-      }
-      {/* <main className={`${montserrat.className}`}>
-        {getLayout(<Component {...pageProps} />)}
-      </main> */}
-      {/* <main className={`${montserrat.className}`}>
-        
-        {getLayout(<Component {...pageProps}  />)}
-      </main> */}
+      {getLayout(
+        <main className={`${monsterrat.className}`}>
+          <Component {...pageProps} />
+        </main>,
+      )}
     </ClerkProvider>
   );
 };

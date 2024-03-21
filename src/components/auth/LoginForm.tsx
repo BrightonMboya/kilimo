@@ -15,10 +15,10 @@ export function LoginForm() {
         </div>
 
         <SignIn
-        afterSignInUrl="/dashboard/farmers"
-        routing="path"
-        path="/auth/sign-in"
-        signUpUrl="/auth/signin"
+          afterSignInUrl="/dashboard/farmers"
+          // routing="path"
+          // path="/auth/sign-in"
+          // signUpUrl="/auth/signin"
         />
         {/* <SignUp /> */}
       </div>

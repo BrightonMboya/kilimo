@@ -1,26 +1,22 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useClerk } from "@clerk/nextjs";
 import { CubeIcon, PersonIcon } from "@radix-ui/react-icons";
 import Button from "../ui/Button";
-import { LogOutIcon } from "lucide-react";
-
+import { DoorOpen, Flower, Flower2, LogOutIcon, Tractor } from "lucide-react";
 
 export default function SideBar() {
   const router = useRouter();
-
-  function signOut(arg0: () => Promise<boolean>): void {
-    throw new Error("Function not implemented.");
-  }
+  const { signOut } = useClerk();
 
   return (
-    <section className="font-montserrat ">
-      <div className="flex w-[150px] flex-col items-center justify-center space-y-7 pt-5 ">
+    <section className="min-h-screen w-[200px] bg-primary/10 pl-5">
+      <div className="flex w-[150px] flex-col  space-y-7 pt-5 ">
         <UserButton afterSignOutUrl="/agri" appearance={{}} />
 
         <Link href="/dashboard/farmers">
           <div
-            className={`flex items-center justify-center space-x-2
+            className={`flex items-center space-x-2
               ${
                 router.pathname.startsWith("/dashboard/farmers")
                   ? "text-dark"
@@ -30,15 +26,13 @@ export default function SideBar() {
           >
             <PersonIcon width={20} height={20} />
 
-            <h3 className="font-montserrat">Farmers</h3>
+            <h3 className="">Farmers</h3>
           </div>
         </Link>
 
-        
-
         <Link href="/dashboard/harvests">
           <div
-            className={`flex items-center justify-center space-x-2
+            className={`flex items-center  space-x-2
               ${
                 router.pathname.startsWith("/dashboard/harvests")
                   ? "text-dark"
@@ -46,15 +40,63 @@ export default function SideBar() {
               }
           `}
           >
+            <Flower2 width={20} height={20} />
+
+            <h3 className="">Harvests</h3>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/equipments">
+          <div
+            className={`flex items-center  space-x-2
+              ${
+                router.pathname.startsWith("/dashboard/equipments")
+                  ? "text-dark"
+                  : "text-gray-500"
+              }
+          `}
+          >
+            <Tractor width={20} height={20} />
+
+            <h3 className="">Equipments</h3>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/warehouses">
+          <div
+            className={`flex items-center  space-x-2
+              ${
+                router.pathname.startsWith("/dashboard/warehouses")
+                  ? "text-dark"
+                  : "text-gray-500"
+              }
+          `}
+          >
+            <DoorOpen width={20} height={20} />
+
+            <h3 className="">Warehouses</h3>
+          </div>
+        </Link>
+
+        <Link href="/dashboard/inventories">
+          <div
+            className={`flex items-center  space-x-2
+              ${
+                router.pathname.startsWith("/dashboard/inventories")
+                  ? "text-dark"
+                  : "text-gray-500"
+              }
+          `}
+          >
             <CubeIcon width={20} height={20} />
 
-            <h3 className="font-montserrat">Harvests</h3>
+            <h3 className="">Inventories</h3>
           </div>
         </Link>
 
         <Link href="/dashboard/accounting">
           <div
-            className={`flex items-center justify-center space-x-2
+            className={`flex items-center space-x-2
               ${
                 router.pathname.startsWith("/dashboard/accounting")
                   ? "text-dark"
@@ -64,14 +106,14 @@ export default function SideBar() {
           >
             <span>$</span>
 
-            <h3 className="font-montserrat">Accounting</h3>
+            <h3 className="">Accounting</h3>
           </div>
         </Link>
 
         <Button
-          className="fixed bottom-10 ml-10 w-[150px] space-x-2"
+          className="fixed bottom-10 w-[150px] space-x-2"
           variant="destructive"
-          onClick={() => signOut(() => router.push("/auth/login"))}
+          onClick={() => signOut(() => router.push("/auth/sign-in"))}
         >
           <LogOutIcon />
           <span>Log out</span>

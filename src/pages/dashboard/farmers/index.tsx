@@ -14,10 +14,13 @@ export default function Page() {
     email: user?.primaryEmailAddress?.emailAddress as unknown as string,
   });
 
-  // console.log(data);
   return (
     <main className="pl-5">
-      <Header caption={user?.username as unknown as string} />
+      <Header
+        caption={user?.username as unknown as string}
+        link="/dashboard/farmers/new"
+        title="New Farmers"
+      />
 
       <NoAsset
         bigTitle="You haven't added your Farmers yet"

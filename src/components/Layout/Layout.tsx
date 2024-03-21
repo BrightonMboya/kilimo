@@ -3,24 +3,25 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 import SideBar from "./SideBar";
 import LoginForm from "../auth/LoginPage";
+import { monsterrat } from "~/pages/_app";
 
 type Props = {
   children: React.ReactNode;
 };
 export default function AgriLayout({ children }: Props) {
   return (
-    <React.Fragment>
-      {/* <SignedIn> */}
-        <section >
-          <div className="flex space-x-[100px] font-sans ">
+    <main className={monsterrat.className}>
+      <SignedIn>
+        <section>
+          <div className="flex space-x-[100px] ">
             <SideBar />
-            <main className="font-montserrat">{children}</main>
+            <main className="">{children}</main>
           </div>
         </section>
-      {/* </SignedIn> */}
-      {/* <SignedOut>
+      </SignedIn>
+      <SignedOut>
         <LoginForm />
-      </SignedOut> */}
-    </React.Fragment>
+      </SignedOut>
+    </main>
   );
 }
