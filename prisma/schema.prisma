@@ -81,16 +81,19 @@ model Warehouses {
   description    String
   maxCapacity    Int
   unit           String
+  inventory      Inventory[]
   Organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
 }
 
 model Inventory {
-  id                    String  @id @default(cuid())
+  id                    String     @id @default(cuid())
   name                  String
   // the type is things like seed, vaccine etc
   inventoryType         String
   inventoryUnit         String
   description           String?
   estimatedValuePerUnit String
+  Warehouses            Warehouses @relation(fields: [warehousesId], references: [id])
+  warehousesId          String
 }
