@@ -1,9 +1,7 @@
 import Image from "next/legacy/image";
 import Link from "next/link";
 
-import { buttonVariants } from "~/components/ui/Button";
 import { Toaster } from "~/components/ui/Toaster";
-import { cn } from "~/utils/utils";
 import SignUpComponent from "./SignupComponent";
 import { SignUp } from "@clerk/nextjs";
 
