@@ -10,9 +10,9 @@ import z from "zod";
 import Button from "~/components/ui/Button";
 import Input from "~/components/ui/Input";
 import { Icons } from "~/components/ui/icons";
-import  Label  from "~/components/ui/label";
+import Label from "~/components/ui/label";
 import { useToast } from "~/hooks/useToast";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 
 const schema = z.object({
   email: z.string(),
@@ -66,7 +66,7 @@ export function UserAuthForm({
         <h1 className="text-2xl font-semibold tracking-tight">
           Create an account
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Enter your company credentials to get started
         </p>
       </div>
@@ -123,7 +123,7 @@ export function UserAuthForm({
           </Button>
         </div>
       </form>
-      <p className="text-muted-foreground px-8 text-center text-sm">
+      <p className="px-8 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
         <Link
           href="/terms"

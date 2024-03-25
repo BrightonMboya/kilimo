@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 
 export function MainNav({
   className,
@@ -13,7 +13,7 @@ export function MainNav({
     >
       <Link
         href="/examples/dashboard"
-        className="hover:text-primary text-sm font-medium transition-colors"
+        className="text-sm font-medium transition-colors hover:text-primary"
       >
         Overview
       </Link>

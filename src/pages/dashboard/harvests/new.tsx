@@ -5,6 +5,7 @@ import { DatePicker } from "~/components/ui/DatePicker";
 import Input from "~/components/ui/Input";
 import { Textarea } from "~/components/ui/TextArea";
 import Layout from "~/components/Layout/Layout";
+import z from "zod";
 import CategoryDropDown from "~/components/harvests/CategoryDropDown";
 
 function AssetLabel({ label, caption }: { label: string; caption?: string }) {
@@ -21,6 +22,14 @@ function ItemLayout({ children }: { children: React.ReactNode }) {
     <div className="grid grid-cols-2 items-center gap-[50px]">{children}</div>
   );
 }
+
+export const harvestsSchema = z.object({
+  date: z.date(),
+  name: z.string().min(1),
+  crop: z.string().min(1),
+  size: z.string().min(1),
+  unit: z.string().min(1),
+});
 
 export default function Page() {
   return (

@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import { buttonVariants } from "~/components/ui/Button";
 import { UserAuthForm } from "./user-auth-form";
 
@@ -39,7 +39,7 @@ export default function AuthenticationPage() {
         >
           Login
         </Link>
-        <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
+        <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="relative z-20 flex items-center text-lg font-medium">
             <svg
@@ -72,23 +72,23 @@ export default function AuthenticationPage() {
               <h1 className="text-2xl font-semibold tracking-tight">
                 Create an account
               </h1>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Enter your email below to create your account
               </p>
             </div>
             <UserAuthForm />
-            <p className="text-muted-foreground px-8 text-center text-sm">
+            <p className="px-8 text-center text-sm text-muted-foreground">
               By clicking continue, you agree to our{" "}
               <Link
                 href="/terms"
-                className="hover:text-primary underline underline-offset-4"
+                className="underline underline-offset-4 hover:text-primary"
               >
                 Terms of Service
               </Link>{" "}
               and{" "}
               <Link
                 href="/privacy"
-                className="hover:text-primary underline underline-offset-4"
+                className="underline underline-offset-4 hover:text-primary"
               >
                 Privacy Policy
               </Link>

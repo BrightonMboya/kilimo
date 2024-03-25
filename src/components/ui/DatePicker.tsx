@@ -4,7 +4,7 @@ import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 
-import { cn } from "../../lib/utils";
+import { cn } from "../../utils/utils";
 import Button from "./Button";
 import { Calendar } from "./calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
@@ -19,7 +19,7 @@ export function DatePicker() {
           variant={"outline"}
           className={cn(
             "w-[350px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />

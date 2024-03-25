@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { buttonVariants } from "~/components/ui/Button";
 import { Toaster } from "~/components/ui/Toaster";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import SignUpComponent from "./SignupComponent";
 
 export default function Page() {
@@ -21,7 +21,7 @@ export default function Page() {
         >
           Login
         </Link>
-        <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
+        <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
           <div className="absolute inset-0 bg-zinc-900 " />
           <Image src="/phoneLady.webp" alt="hero" layout="fill" />
 
