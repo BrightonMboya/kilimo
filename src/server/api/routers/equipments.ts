@@ -7,7 +7,7 @@ import { protectedProcedure, createTRPCRouter } from "../trpc";
 import z from "zod";
 import { equipmentSchema } from "~/pages/dashboard/equipments/new";
 
-export const equipments = createTRPCRouter({
+const equipments = createTRPCRouter({
   create: protectedProcedure
     .input(
       equipmentSchema.merge(
@@ -61,3 +61,6 @@ export const equipments = createTRPCRouter({
       }
     }),
 });
+
+
+export default equipments

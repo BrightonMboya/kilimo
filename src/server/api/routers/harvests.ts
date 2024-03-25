@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { harvestsSchema } from "~/pages/dashboard/harvests/new";
 
-export const harvests = createTRPCRouter({
+const harvests = createTRPCRouter({
   create: protectedProcedure
     .input(
       harvestsSchema.merge(
@@ -74,3 +74,6 @@ export const harvests = createTRPCRouter({
       }
     }),
 });
+
+
+export default harvests

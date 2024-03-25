@@ -4,7 +4,7 @@ import z from "zod";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
-export const organization = createTRPCRouter({
+const organization = createTRPCRouter({
   signUp: publicProcedure
     .input(
       z.object({
@@ -139,3 +139,5 @@ export const organization = createTRPCRouter({
       }
     }),
 });
+
+export default organization;

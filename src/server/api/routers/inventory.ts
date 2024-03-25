@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { inventorySchema } from "~/pages/dashboard/inventory/new";
 
-export const inventory = createTRPCRouter({
+const inventory = createTRPCRouter({
   create: protectedProcedure
     .input(inventorySchema)
     .mutation(async ({ ctx, input }) => {
@@ -19,3 +19,6 @@ export const inventory = createTRPCRouter({
       }
     }),
 });
+
+
+export default inventory

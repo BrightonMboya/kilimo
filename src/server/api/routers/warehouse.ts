@@ -7,7 +7,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { warehouseSchema } from "~/pages/dashboard/warehouses/new";
 
-export const warehouses = createTRPCRouter({
+const warehouses = createTRPCRouter({
   create: protectedProcedure
     .input(warehouseSchema.merge(organizationIdSchema))
     .mutation(async ({ ctx, input }) => {
@@ -59,3 +59,6 @@ export const warehouses = createTRPCRouter({
       }
     }),
 });
+
+
+export default warehouses
