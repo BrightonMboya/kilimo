@@ -12,12 +12,13 @@ datasource db {
 }
 
 model Organization {
-  id       String     @id @default(cuid())
-  name     String
-  country  String
-  email    String     @unique
-  farmers  Farmers[]
-  harvests Harvests[]
+  id         String       @id @default(cuid())
+  name       String
+  country    String
+  email      String       @unique
+  farmers    Farmers[]
+  harvests   Harvests[]
+  Warehouses Warehouses[]
 }
 
 model Farmers {
@@ -75,11 +76,13 @@ model Equipments {
 }
 
 model Warehouses {
-  id          String  @id @default(cuid())
-  name        String
-  description String?
-  maxCapacity Int
-  unit        String
+  id             String       @id @default(cuid())
+  name           String
+  description    String
+  maxCapacity    Int
+  unit           String
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
 }
 
 model Inventory {
