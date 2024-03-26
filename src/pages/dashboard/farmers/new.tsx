@@ -17,39 +17,18 @@ import { Icons } from "~/components/ui/icons";
 import Layout from "~/components/Layout/Layout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { useToast } from "~/hooks/useToast";
+import { ItemLayout, AssetLabel } from "~/components/Layout/ItemLayout";
 
-export const schema = z.object({
-  fullName: z.string(),
-  phoneNumber: z.string(),
+export const farmersSchema = z.object({
+  fullName: z.string().min(1),
+  phoneNumber: z.string().min(1),
   farmSize: z.number(),
   quantityCanSupply: z.number(),
-  province: z.string(),
-  cropTheySell: z.string(),
-  description: z.string(),
+  province: z.string().min(1),
+  description: z.string().min(1),
 });
 
-export type ValidationSchema = z.infer<typeof schema>;
-
-export function AssetLabel({
-  label,
-  caption,
-}: {
-  label: string;
-  caption?: string;
-}) {
-  return (
-    <div className="max-w-[400px] ">
-      <h3 className="text-base font-medium">{label}</h3>
-      <h3 className="text-sm">{caption}</h3>
-    </div>
-  );
-}
-
-export function ItemLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-2 items-center gap-[50px]">{children}</div>
-  );
-}
+export type ValidationSchema = z.infer<typeof farmersSchema>;
 
 export default function Page() {
   const router = useRouter();
@@ -58,14 +37,13 @@ export default function Page() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ValidationSchema>({ resolver: zodResolver(schema) });
+  } = useForm<ValidationSchema>({ resolver: zodResolver(farmersSchema) });
 
-  const { isLoading, mutateAsync } = api.organization.addFarmer.useMutation({
+  const { isLoading, mutateAsync } = api.farmers.addFarmer.useMutation({
     onSuccess: () => {
       router.push("/agri/dashboard/farmers");
     },
     onError: (error) => {
-      console.log("I have started toooh");
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -80,15 +58,15 @@ export default function Page() {
   const { user } = useUser();
 
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
-    type Input = inferProcedureInput<AppRouter["organization"]["addFarmer"]>;
+    type Input = inferProcedureInput<AppRouter["farmers"]["addFarmer"]>;
     const input: Input = {
       ...data,
       gender,
-      email: user?.primaryEmailAddress?.emailAddress as unknown as string,
+      organizationEmail: user?.primaryEmailAddress
+        ?.emailAddress as unknown as string,
     };
 
     try {
-      console.log("I have started mutating");
       mutateAsync(input);
     } catch (cause) {
       toast({
@@ -121,14 +99,6 @@ export default function Page() {
         <ItemLayout>
           <AssetLabel label="Gender" caption="Gender of the farmer " />
           <GenderDropDown setGender={setGender} />
-        </ItemLayout>
-
-        <ItemLayout>
-          <AssetLabel
-            label="Crops Produce"
-            caption="What crops does this farmer produce"
-          />
-          <Input placeholder="Pineapples" {...register("cropTheySell")} />
         </ItemLayout>
 
         <ItemLayout>
@@ -175,7 +145,7 @@ export default function Page() {
             label="Province"
             caption="Which province is this farmer from"
           />
-          <Input placeholder="Kasumbalesa" {...register("province")} />
+          <Input placeholder="Arusha" {...register("province")} />
         </ItemLayout>
 
         <ItemLayout>

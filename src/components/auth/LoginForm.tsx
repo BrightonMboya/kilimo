@@ -16,8 +16,8 @@ export function LoginForm() {
 
         <SignIn
           afterSignInUrl="/dashboard/farmers"
-          // routing="path"
-          // path="/auth/sign-in"
+          routing="path"
+          path="/auth/sign-in"
           signUpUrl="/auth/sign-up"
         />
         {/* <SignUp /> */}

@@ -26,7 +26,7 @@ model Farmers {
   fullName       String
   gender         String
   phoneNumber    String
-  farmSize       String
+  farmSize       Int
   latitude       Float?
   longitude      Float?
   province       String
