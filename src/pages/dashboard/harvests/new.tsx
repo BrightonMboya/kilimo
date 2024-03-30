@@ -27,7 +27,7 @@ export default function Page() {
     control,
     register,
     handleSubmit,
-    formState: errors,
+    formState: { errors },
   } = useForm<HarvestSchemaType>({
     resolver: zodResolver(harvestsSchema),
   });
@@ -35,6 +35,7 @@ export default function Page() {
   const onSubmit: SubmitHandler<HarvestSchemaType> = async (data) => {
     console.log(data);
   };
+  console.log(errors);
   return (
     <main className="mt-[40px] pl-[30px]">
       <h3 className="text-2xl font-medium ">Untitled Harvest</h3>
