@@ -31,7 +31,7 @@ model Farmers {
   longitude      Float?
   province       String
   nationalId     FarmersNationalId?
-  profilePictyre FarmersProfilePictures?
+  profilePicture FarmersProfilePictures?
   organizationId String
   organization   Organization            @relation(fields: [organizationId], references: [id])
   harvests       Harvests[]

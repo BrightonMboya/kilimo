@@ -6,19 +6,18 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { api } from "~/utils/api";
 import { Button, Input } from "~/components/ui";
 import { Textarea } from "~/components/ui/TextArea";
-import { ToastAction } from "~/components/ui/Toast";
 import { Toaster } from "~/components/ui/Toaster";
-import { Icons } from "~/components/ui/icons";
 import Layout from "~/components/Layout/HomeLayout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
-import { AssetLabel, ItemLayout, ValidationSchema, schema } from "../new";
+import { AssetLabel, ItemLayout } from "~/components/Layout/ItemLayout";
+import { ValidationSchema, farmersSchema } from "../new";
 
 export default function Page() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ValidationSchema>({ resolver: zodResolver(schema) });
+  } = useForm<ValidationSchema>({ resolver: zodResolver(farmersSchema) });
 
   const [gender, setGender] = useState("");
   const router = useRouter();
@@ -30,6 +29,7 @@ export default function Page() {
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {};
   return (
     <>
+      {isLoading && <h3>Loading....</h3>}
       {!isLoading && (
         <main className="mt-[40px] pl-[30px]">
           <h3 className="text-2xl font-medium ">New Farmer</h3>
@@ -60,13 +60,13 @@ export default function Page() {
               <GenderDropDown setGender={setGender} />
             </ItemLayout>
 
-            <ItemLayout>
+            {/* <ItemLayout>
               <AssetLabel
                 label="Crops Produce"
                 caption="What crops does this farmer produce"
               />
               <Input placeholder="Pineapples" {...register("cropTheySell")} />
-            </ItemLayout>
+            </ItemLayout> */}
 
             <ItemLayout>
               <AssetLabel

@@ -82,17 +82,17 @@ export const columns: ColumnDef<Farmers>[] = [
     ),
   },
   {
-    accessorKey: "cropTheySell",
-    header: "Crop Produce",
+    accessorKey: "phoneNumber",
+    header: "Phone Number",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("cropTheySell")}</div>
+      <div className="capitalize">{row.getValue("phoneNumber")}</div>
     ),
   },
   {
-    accessorKey: "quantityCanSupply",
-    header: "Quantity Produce",
+    accessorKey: "province",
+    header: "Province",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("quantityCanSupply")}</div>
+      <div className="capitalize">{row.getValue("province")}</div>
     ),
   },
   {
@@ -109,22 +109,6 @@ export const columns: ColumnDef<Farmers>[] = [
       <div className="capitalize">{row.getValue("province")}</div>
     ),
   },
-
-  //   {
-  //     accessorKey: "email",
-  //     header: ({ column }) => {
-  //       return (
-  //         <Button
-  //           variant="ghost"
-  //           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-  //         >
-  //           Email
-  //           <CaretSortIcon className="ml-2 h-4 w-4" />
-  //         </Button>
-  //       );
-  //     },
-  //     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  //   },
 
   {
     id: "actions",
@@ -150,7 +134,7 @@ export const columns: ColumnDef<Farmers>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href={`/agri/dashboard/farmers/edit/${farmer.id}`}>
+              <Link href={`/dashboard/farmers/edit/${farmer.id}`}>
                 Edit Farmer
               </Link>
             </DropdownMenuItem>
@@ -280,7 +264,7 @@ export default function farmersTable({ data }: { data: Farmers[] }) {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
+        <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>

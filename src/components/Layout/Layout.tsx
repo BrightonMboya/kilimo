@@ -11,17 +11,17 @@ type Props = {
 export default function AgriLayout({ children }: Props) {
   return (
     <main className={monsterrat.className}>
-      <SignedIn>
+      {/* <SignedIn> */}
         <section>
           <div className="flex space-x-[100px] ">
             <SideBar />
             <main className="">{children}</main>
           </div>
         </section>
-      </SignedIn>
-      <SignedOut>
+      {/* </SignedIn> */}
+      {/* <SignedOut>
         <LoginForm />
-      </SignedOut>
+      </SignedOut> */}
     </main>
   );
 }

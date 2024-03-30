@@ -41,7 +41,7 @@ export default function Page() {
 
   const { isLoading, mutateAsync } = api.farmers.addFarmer.useMutation({
     onSuccess: () => {
-      router.push("/agri/dashboard/farmers");
+      router.push("/dashboard/farmers");
     },
     onError: (error) => {
       toast({

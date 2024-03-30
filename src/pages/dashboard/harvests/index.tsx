@@ -6,7 +6,11 @@ import { Header, NoAsset } from "~/components/harvests";
 export default function Index() {
   return (
     <main className="pl-5">
-      <Header caption="Green Giraffe Harvests" />
+      <Header
+        caption="Your company Harvests"
+        title="View all harvests"
+        link="/dashboard/harvests/new"
+      />
       <NoAsset
         bigTitle="You don't have any harvest"
         smallTitle="Start recording your harvest for traceability and record keeping"
