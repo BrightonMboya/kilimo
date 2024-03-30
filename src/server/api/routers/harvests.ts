@@ -41,14 +41,22 @@ const harvests = createTRPCRouter({
   fetchByOrganization: protectedProcedure
     .input(
       z.object({
-        organizationId: z.string(),
+        organizationEmail: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
       try {
+        const organizationId = await useOrganizationId(input.organizationEmail);
         return await ctx.db.harvests.findMany({
           where: {
-            organizationId: input.organizationId,
+            organizationId: organizationId?.id,
+          },
+          include: {
+            Farmers: {
+              select: {
+                fullName: true,
+              },
+            },
           },
         });
       } catch (cause) {
