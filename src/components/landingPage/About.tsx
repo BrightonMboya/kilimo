@@ -90,11 +90,11 @@ export default function About() {
                               y2="178.431"
                               gradientUnits="userSpaceOnUse"
                             >
-                              <stop stop-color="white" />
+                              <stop stopColor="white" />
                               <stop
                                 offset="1"
-                                stop-color="white"
-                                stop-opacity="0"
+                                stopColor="white"
+                                stopOpacity="0"
                               />
                             </linearGradient>
                           </defs>
@@ -126,11 +126,11 @@ export default function About() {
                               y2="133.937"
                               gradientUnits="userSpaceOnUse"
                             >
-                              <stop stop-color="white" />
+                              <stop stopColor="white" />
                               <stop
                                 offset="1"
-                                stop-color="white"
-                                stop-opacity="0"
+                                stopColor="white"
+                                stopOpacity="0"
                               />
                             </linearGradient>
                           </defs>
@@ -162,11 +162,11 @@ export default function About() {
                               y2="256.79"
                               gradientUnits="userSpaceOnUse"
                             >
-                              <stop stop-color="white" />
+                              <stop stopColor="white" />
                               <stop
                                 offset="1"
-                                stop-color="white"
-                                stop-opacity="0"
+                                stopColor="white"
+                                stopOpacity="0"
                               />
                             </linearGradient>
                           </defs>

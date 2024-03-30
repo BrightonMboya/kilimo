@@ -1,8 +1,5 @@
 import Image from "next/legacy/image";
-import Link from "next/link";
-
 import { Toaster } from "~/components/ui/Toaster";
-import SignUpComponent from "./SignupComponent";
 import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
@@ -33,7 +30,6 @@ export default function Page() {
             </blockquote>
           </div>
         </div>
-        {/* <SignUpComponent /> */}
         <SignUp path="/auth/sign-up" routing="path" signInUrl="/auth/sign-in" />
       </div>
     </>
