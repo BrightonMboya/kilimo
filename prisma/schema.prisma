@@ -55,7 +55,8 @@ model Harvests {
   name           String
   qrCodeLink     String
   crop           String
-  size           String
+  size           Int
+  inputsUsed     String
   unit           String
   Organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String

@@ -1,23 +1,23 @@
 import React, { type ReactElement } from "react";
-
 import Button from "~/components/ui/Button";
-import { DatePicker } from "~/components/ui/DatePicker";
-import Input from "~/components/ui/Input";
-import { Textarea } from "~/components/ui/TextArea";
 import Layout from "~/components/Layout/Layout";
 import z from "zod";
-import FarmerPicker from "~/components/harvests/FarmersPicker";
-import { AssetLabel, ItemLayout } from "~/components/Layout/ItemLayout";
-import { Controller, useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import NewHarvestForm from "~/components/harvests/NewHarvestForm";
+import { api } from "~/utils/api";
+import { useToast } from "~/hooks/useToast";
+import { Toaster } from "~/components/ui/Toaster";
+import { useUser } from "@clerk/nextjs";
 
 export const harvestsSchema = z.object({
   date: z.date(),
   farmerId: z.string().min(1),
   name: z.string().min(1),
   crop: z.string().min(1),
-  size: z.string().min(1),
+  size: z.number(),
   unit: z.string().min(1),
+  inputsUsed: z.string().min(1),
 });
 
 export type HarvestSchemaType = z.infer<typeof harvestsSchema>;
@@ -27,75 +27,62 @@ export default function Page() {
     control,
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<HarvestSchemaType>({
     resolver: zodResolver(harvestsSchema),
   });
 
+  const { user } = useUser();
+
+  const { toast } = useToast();
+
+  const { mutateAsync, isLoading } = api.harvests.create.useMutation({
+    onSuccess: () => {
+      toast({
+        description: "Succesfully added a new harvest",
+      });
+      reset();
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Failed to create a new harvest",
+      });
+    },
+  });
+
   const onSubmit: SubmitHandler<HarvestSchemaType> = async (data) => {
-    console.log(data);
+    try {
+      mutateAsync({
+        ...data,
+        organizationEmail: user?.primaryEmailAddress
+          ?.emailAddress as unknown as string,
+      });
+    } catch (cause) {
+      console.log(cause);
+      toast({
+        variant: "destructive",
+        description: "Failed to create a new harvest",
+      });
+    }
   };
+
   console.log(errors);
+
   return (
     <main className="mt-[40px] pl-[30px]">
+      <Toaster />
       <h3 className="text-2xl font-medium ">Untitled Harvest</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <section className="relative mt-[50px] flex flex-col space-y-[30px] ">
-          <ItemLayout>
-            <AssetLabel
-              label="Farmer Name"
-              caption="Choose the name of the farmer from the drop down list"
-            />
-            <Controller
-              control={control}
-              name="farmerId"
-              render={({ field }) => <FarmerPicker field={field} />}
-            />
-          </ItemLayout>
-
-          <ItemLayout>
-            <AssetLabel
-              label="Crop Name"
-              caption="What is the name of the crop harvested?"
-            />
-            <Input placeholder="Kapenta Siavonga" />
-          </ItemLayout>
-
-          <ItemLayout>
-            <AssetLabel
-              label="Date of Harvest"
-              caption="When was this harvested"
-            />
-            <DatePicker />
-          </ItemLayout>
-
-          <ItemLayout>
-            <AssetLabel
-              label="Quantity"
-              caption="What was the quantity of the harvest, the measurement unit can be specified in the description below"
-            />
-
-            <Input placeholder="100" />
-          </ItemLayout>
-
-          <ItemLayout>
-            <AssetLabel
-              label="Inputs Used"
-              caption="List of the inputs used in this harvest"
-            />
-            <Input placeholder="npk fertilizer, potassium fertilizer" />
-          </ItemLayout>
-
-          <ItemLayout>
-            <AssetLabel
-              label="Description"
-              caption="Add additional details of the harvest like unit of measurement"
-            />
-
-            <Textarea placeholder="Add a description of the harvest" />
-          </ItemLayout>
-        </section>
-        <Button className="mt-[50px] w-[100px]">Save</Button>
+        <NewHarvestForm register={register} control={control} errors={errors} />
+        <Button
+          className="mt-[50px] w-[100px]"
+          type="submit"
+          disabled={isLoading}
+        >
+          Save
+        </Button>
       </form>
     </main>
   );

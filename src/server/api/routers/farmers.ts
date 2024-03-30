@@ -74,6 +74,7 @@ const farmers = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
+       
         const organizationId = await ctx.db.organization.findUnique({
           where: {
             email: input.organizationEmail,

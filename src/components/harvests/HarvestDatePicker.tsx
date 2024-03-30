@@ -5,15 +5,26 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 
 import { cn } from "../../utils/utils";
-import Button from "./Button";
-import { Calendar } from "./calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import Button from "~/components/ui/Button";
+import { Calendar } from "~/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import { ControllerRenderProps } from "react-hook-form";
+import { HarvestSchemaType } from "~/pages/dashboard/harvests/new";
 
-export function DatePicker() {
+interface Props {
+  field: ControllerRenderProps<HarvestSchemaType, "date">;
+}
+
+export function HarvestDatePicker({ field }: Props) {
   const [date, setDate] = React.useState<Date>();
+  const [open, setOpen] = React.useState<boolean>(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
@@ -30,9 +41,12 @@ export function DatePicker() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={(e) => {
+            setDate(e);
+            setOpen(false);
+            field.onChange(e);
+          }}
           initialFocus
-          
         />
       </PopoverContent>
     </Popover>

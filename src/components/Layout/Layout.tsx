@@ -13,7 +13,7 @@ export default function AgriLayout({ children }: Props) {
     <main className={monsterrat.className}>
       <SignedIn>
         <section>
-          <div className="flex space-x-[100px] ">
+          <div className="flex space-x-[50px] ">
             <SideBar />
             <main className="">{children}</main>
           </div>

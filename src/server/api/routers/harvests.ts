@@ -2,19 +2,20 @@ import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { harvestsSchema } from "~/pages/dashboard/harvests/new";
+import useOrganizationId from "~/hooks/useOrganizationId";
 
 const harvests = createTRPCRouter({
   create: protectedProcedure
     .input(
       harvestsSchema.merge(
         z.object({
-          organizationId: z.string().min(1),
-          farmerId: z.string().min(1),
+          organizationEmail: z.string(),
         }),
       ),
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const organizationId = await useOrganizationId(input.organizationEmail);
         // start by creating the qrCode and store it on the s3 bucket
         const qrCodeLink = "";
         const newHarvest = await ctx.db.harvests.create({
@@ -24,8 +25,9 @@ const harvests = createTRPCRouter({
             qrCodeLink,
             crop: input.crop,
             unit: input.unit,
+            inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organizationId: input.organizationId,
+            organizationId: organizationId?.id!,
             size: input.size,
           },
         });
@@ -75,5 +77,4 @@ const harvests = createTRPCRouter({
     }),
 });
 
-
-export default harvests
+export default harvests;

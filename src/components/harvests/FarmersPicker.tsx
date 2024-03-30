@@ -66,6 +66,7 @@ export default function FarmersPicker({ field }: Props) {
                   onChange={field.onChange}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
+                    field.onChange(farmer.id);
                     setOpen(false);
                   }}
                 >
