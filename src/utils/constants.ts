@@ -10,6 +10,6 @@ export const FAILED_TO_CREATE = new TRPCError({
   message: "Failed to perform this operation",
 });
 
-export const organizationIdSchema = z.object({
-  organizationId: z.string(),
+export const organizationEmailSchema = z.object({
+  organizationEmail: z.string(),
 });

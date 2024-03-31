@@ -1,7 +1,7 @@
 import {
   FAILED_TO_CREATE,
   NOT_FOUND_ERROR,
-  organizationIdSchema,
+  organizationEmailSchema,
 } from "~/utils/constants";
 import { protectedProcedure, createTRPCRouter } from "../trpc";
 import z from "zod";
@@ -28,12 +28,12 @@ const equipments = createTRPCRouter({
     }),
 
   fetchByOrganization: protectedProcedure
-    .input(organizationIdSchema)
+    .input(organizationEmailSchema)
     .query(async ({ ctx, input }) => {
       try {
         return await ctx.db.equipments.findMany({
           where: {
-            id: input.organizationId,
+            id: input.organizationEmail,
           },
         });
       } catch (cause) {

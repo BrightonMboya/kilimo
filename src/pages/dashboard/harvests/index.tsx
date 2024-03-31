@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import Layout from "~/components/Layout/Layout";
 import { Header, NoAsset } from "~/components/harvests";
 import HarvestsTable from "~/components/harvests/HarvestTable";
+import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 import { api } from "~/utils/api";
 
 export default function Index() {
@@ -29,6 +30,7 @@ export default function Index() {
         />
       )}
       {data!?.length >= 0 && <HarvestsTable data={data} />}
+      {isLoading && <LoadingSkeleton />}
     </main>
   );
 }
