@@ -1,14 +1,19 @@
-import { Controller, UseFormRegister, Control, FieldErrors } from "react-hook-form";
+import {
+  Controller,
+  UseFormRegister,
+  Control,
+  FieldErrors,
+} from "react-hook-form";
 import { AssetLabel, ItemLayout } from "../Layout/ItemLayout";
 import { Input } from "../ui";
 import { HarvestDatePicker } from "./HarvestDatePicker";
-import { HarvestSchemaType } from "~/pages/dashboard/harvests/new";
+import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
 import FarmersPicker from "./FarmersPicker";
 
 interface Props {
   register: UseFormRegister<HarvestSchemaType>;
   control: Control<HarvestSchemaType>;
-  errors: FieldErrors<HarvestSchemaType>
+  errors: FieldErrors<HarvestSchemaType>;
 }
 
 export default function NewHarvestForm({ register, errors, control }: Props) {

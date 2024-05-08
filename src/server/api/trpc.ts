@@ -7,46 +7,12 @@
  * need to use are documented accordingly near the end.
  */
 import { initTRPC, TRPCError } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import {
-  getAuth,
-  type SignedInAuthObject,
-  type SignedOutAuthObject,
-} from "@clerk/nextjs/server";
 
 import { db } from "~/server/db";
-import { NextApiRequest } from "next";
-
-/**
- * 1. CONTEXT
- *
- * This section defines the "contexts" that are available in the backend API.
- *
- * These allow you to access things when processing a request, like the database, the session, etc.
- */
-
-type CreateContextOptions = {
-  auth: SignedInAuthObject | SignedOutAuthObject;
-};
-
-/**
- * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
- * it from here.
- *
- * Examples of things you may need it for:
- * - testing, so we don't have to mock Next.js' req/res
- * - tRPC's `createSSGHelpers`, where we don't have req/res
- *
- * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
- */
-const createInnerTRPCContext = (_opts: CreateContextOptions) => {
-  return {
-    db,
-    auth: _opts.auth,
-  };
-};
+import { getUser } from "~/app/auth/actions";
+import { createClient } from "~/utils/supabase/server";
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -54,13 +20,22 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  const auth = getAuth(_opts?.req as NextApiRequest);
-  return createInnerTRPCContext({
-    auth,
-  });
-};
 
+export const createTRPCContext = async (opts: { headers: Headers }) => {
+  // const headers = opts.headers;
+  // const authToken = headers.get("authorization");
+  const user = await getUser();
+  const supabase = createClient()
+
+  // const { user } = authToken ? await getUserAsAdmin(authToken) : { user: null };
+
+  return {
+    ...opts,
+    db,
+    user,
+    supabase
+  };
+};
 /**
  * 2. INITIALIZATION
  *
@@ -76,8 +51,9 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError
+          ? error.cause.flatten()
+          : null,
       },
     };
   },
@@ -105,15 +81,19 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure;
-const isAuthed = t.middleware(({ next, ctx }) => {
-  if (!ctx.auth.userId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
   }
+
   return next({
     ctx: {
-      auth: ctx.auth,
+      user: ctx.user,
     },
   });
 });
 
-export const protectedProcedure = t.procedure.use(isAuthed);
+export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);

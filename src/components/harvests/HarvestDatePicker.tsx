@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { ControllerRenderProps } from "react-hook-form";
-import { HarvestSchemaType } from "~/pages/dashboard/harvests/new";
+import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
 
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "date">;

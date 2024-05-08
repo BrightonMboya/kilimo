@@ -1,7 +1,7 @@
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
-import { harvestsSchema } from "~/pages/dashboard/harvests/new";
+import { harvestsSchema } from "~/app/(app)/dashboard/harvests/new/page";
 import useOrganizationId from "~/hooks/useOrganizationId";
 
 const harvests = createTRPCRouter({

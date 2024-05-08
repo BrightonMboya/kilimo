@@ -21,7 +21,7 @@ import { api } from "~/utils/api";
 import { useUser } from "@clerk/nextjs";
 import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
-import { type HarvestSchemaType } from "~/pages/dashboard/harvests/new";
+import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
 
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "farmerId">;

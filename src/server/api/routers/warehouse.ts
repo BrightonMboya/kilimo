@@ -5,7 +5,7 @@ import {
 } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
-import { warehouseSchema } from "~/pages/dashboard/warehouses/new";
+import { warehouseSchema } from "~/app/(app)/dashboard/warehouses/page";
 
 const warehouses = createTRPCRouter({
   create: protectedProcedure
