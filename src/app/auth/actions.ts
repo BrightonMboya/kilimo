@@ -77,7 +77,7 @@ export const signUp = async (formData: FormData) => {
   // then we add the info on the organization_table
   console.log(data);
   if (data.user !== null && !error) {
-    const res = await db.organizations.create({
+    const res = await db.organization.create({
       data: {
         name: organization_name,
         id: data?.user?.id,

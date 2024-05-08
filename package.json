@@ -10,7 +10,15 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "update-types-local": "npx supabase gen types typescript --local > src/server/supabase/supabaseTypes.ts",
+    "update-types-remote": "npx supabase gen types typescript --project-id \"<YOUR_PROJECT_ID>\" --schema public > src/server/supabase/supabaseTypes.ts",
+    "prepare:local": "pnpm update-types-local && pnpm prisma db pull && pnpm prisma generate && pnpm prisma-case-format --file prisma/schema.prisma  && pnpm prisma generate",
+    "prepare:remote": "pnpm update-types-remote && pnpm prisma db pull && pnpm prisma generate && pnpm prisma-case-format --file prisma/schema.prisma  && pnpm prisma generate",
+    "db:reset": "npx supabase db reset",
+    "db:start": "npx supabase start",
+    "db:stop": "npx supabase stop",
+    "db:diff": "npx supabase db diff -f"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.7",
