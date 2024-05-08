@@ -1,12 +1,13 @@
+"use client";
 import {
   Controller,
   UseFormRegister,
   Control,
   FieldErrors,
 } from "react-hook-form";
-import { AssetLabel, ItemLayout } from "../Layout/ItemLayout";
-import { Input } from "../ui";
-import { EquipmentSchemaType } from "~/pages/dashboard/equipments/new";
+import { AssetLabel, ItemLayout } from "~/components/Layout/ItemLayout";
+import { Input } from "~/components/ui";
+import { EquipmentSchemaType } from "./schema";
 
 interface Props {
   errors: FieldErrors<EquipmentSchemaType>;

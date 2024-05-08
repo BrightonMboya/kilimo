@@ -1,12 +1,12 @@
-import React, { type ReactElement } from "react";
+"use client";
+
+import React from "react";
 import { useRouter } from "next/router";
 import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppRouter } from "~/server/api/root";
 import { inferProcedureInput } from "@trpc/server";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
-
 import { api } from "~/utils/api";
 import Button from "~/components/ui/Button";
 import Input from "~/components/ui/Input";
@@ -14,21 +14,10 @@ import { Textarea } from "~/components/ui/TextArea";
 import { ToastAction } from "~/components/ui/Toast";
 import { Toaster } from "~/components/ui/Toaster";
 import { Icons } from "~/components/ui/icons";
-import Layout from "~/components/Layout/Layout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { useToast } from "~/hooks/useToast";
 import { ItemLayout, AssetLabel } from "~/components/Layout/ItemLayout";
-
-export const farmersSchema = z.object({
-  fullName: z.string().min(1),
-  phoneNumber: z.string().min(1),
-  farmSize: z.number(),
-  quantityCanSupply: z.number(),
-  province: z.string().min(1),
-  description: z.string().min(1),
-});
-
-export type ValidationSchema = z.infer<typeof farmersSchema>;
+import { farmersSchema, ValidationSchema } from "../_components/schema";
 
 export default function Page() {
   const router = useRouter();
@@ -167,7 +156,3 @@ export default function Page() {
     </main>
   );
 }
-
-Page.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};

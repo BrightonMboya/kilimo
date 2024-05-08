@@ -1,28 +1,15 @@
-import type { ReactElement } from "react";
-
-import Layout from "~/components/Layout/Layout";
-import { Header, NoAsset } from "~/components/harvests";
-import z from "zod";
+"use client";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useToast } from "~/hooks/useToast";
 import { useUser } from "@clerk/nextjs";
 import { api } from "~/utils/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "~/components/ui/Button";
-import NewEquipmentForm from "~/components/equipments/NewEquipmentForm";
-
-export const equipmentSchema = z.object({
-  name: z.string().min(1),
-  type: z.string().min(1),
-  leased: z.boolean(),
-  dateAcquired: z.date(),
-  purchasePrice: z.string().min(1),
-  estimatedValue: z.string().min(1),
-  brand: z.string().min(1),
-  status: z.string().min(1),
-});
-
-export type EquipmentSchemaType = z.infer<typeof equipmentSchema>;
+import NewEquipmentForm from "../_components/NewEquipmentForm";
+import {
+  type EquipmentSchemaType,
+  equipmentSchema,
+} from "../_components/schema";
 
 export default function Index() {
   const {
@@ -70,7 +57,3 @@ export default function Index() {
     </main>
   );
 }
-
-Index.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};

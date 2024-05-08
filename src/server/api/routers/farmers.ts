@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { farmersSchema } from "~/pages/dashboard/farmers/new";
+import { farmersSchema } from "~/app/(app)/dashboard/farmers/new/page";
 import z from "zod";
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 
@@ -74,7 +74,6 @@ const farmers = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
-       
         const organizationId = await ctx.db.organization.findUnique({
           where: {
             email: input.organizationEmail,

@@ -3,9 +3,9 @@ import {
   NOT_FOUND_ERROR,
   organizationEmailSchema,
 } from "~/utils/constants";
-import { protectedProcedure, createTRPCRouter } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
-import { equipmentSchema } from "~/pages/dashboard/equipments/new";
+import { equipmentSchema } from "~/app/(app)/dashboard/equipments/new/page";
 
 const equipments = createTRPCRouter({
   create: protectedProcedure
@@ -62,5 +62,4 @@ const equipments = createTRPCRouter({
     }),
 });
 
-
-export default equipments
+export default equipments;

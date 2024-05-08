@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, type ReactElement } from "react";
 import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,10 +9,9 @@ import { api } from "~/utils/api";
 import { Button, Input } from "~/components/ui";
 import { Textarea } from "~/components/ui/TextArea";
 import { Toaster } from "~/components/ui/Toaster";
-import Layout from "~/components/Layout/HomeLayout";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
 import { AssetLabel, ItemLayout } from "~/components/Layout/ItemLayout";
-import { ValidationSchema, farmersSchema } from "../new";
+import { ValidationSchema, farmersSchema } from "../_components/schema";
 
 export default function Page() {
   const {
@@ -136,7 +137,3 @@ export default function Page() {
     </>
   );
 }
-
-Page.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
-};
