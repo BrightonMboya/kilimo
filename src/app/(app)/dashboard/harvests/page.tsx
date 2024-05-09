@@ -1,17 +1,15 @@
-import { useUser } from "@clerk/nextjs";
+"use client";
 import type { ReactElement } from "react";
 
 import Layout from "~/components/Layout/Layout";
 import { Header, NoAsset } from "~/components/harvests";
 import HarvestsTable from "~/components/harvests/HarvestTable";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 
 export default function Index() {
-  const { user } = useUser();
   const { data, isLoading } = api.harvests.fetchByOrganization.useQuery({
-    organizationEmail: user?.primaryEmailAddress
-      ?.emailAddress as unknown as string,
+    organizationEmail: ""
   });
 
   return (

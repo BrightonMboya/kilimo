@@ -1,15 +1,14 @@
 import {
   FAILED_TO_CREATE,
   NOT_FOUND_ERROR,
-  organizationIdSchema,
 } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
-import { warehouseSchema } from "~/app/(app)/dashboard/warehouses/page";
+import { warehouseSchema } from "~/app/(app)/dashboard/warehouses/_components/schema";
 
 const warehouses = createTRPCRouter({
   create: protectedProcedure
-    .input(warehouseSchema.merge(organizationIdSchema))
+    .input(warehouseSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         return await ctx.db.warehouses.create({

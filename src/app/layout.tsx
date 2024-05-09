@@ -1,5 +1,8 @@
 import { Montserrat } from "next/font/google";
 import "~/styles/globals.css";
+import { headers } from "next/headers";
+import { TRPCReactProvider } from "~/trpc/react";
+
 
 // export const metadata = {
 //   title: 'Next.js',
@@ -18,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={montserrat.className}>
-      <body>{children}</body>
+      <body>
+        <TRPCReactProvider headers={headers()}>{children}</TRPCReactProvider>
+       </body>
     </html>
   );
 }

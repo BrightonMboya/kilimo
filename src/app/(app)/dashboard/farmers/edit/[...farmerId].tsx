@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import { Button, Input } from "~/components/ui";
 import { Textarea } from "~/components/ui/TextArea";
 import { Toaster } from "~/components/ui/Toaster";

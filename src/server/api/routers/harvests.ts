@@ -1,8 +1,7 @@
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
-import { harvestsSchema } from "~/app/(app)/dashboard/harvests/new/page";
-import useOrganizationId from "~/hooks/useOrganizationId";
+import { harvestsSchema } from "~/app/(app)/dashboard/harvests/_components/schema";
 
 const harvests = createTRPCRouter({
   create: protectedProcedure
@@ -15,7 +14,7 @@ const harvests = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const organizationId = await useOrganizationId(input.organizationEmail);
+        // const organizationId = await useOrganizationId(input.organizationEmail);
         // start by creating the qrCode and store it on the s3 bucket
         const qrCodeLink = "";
         const newHarvest = await ctx.db.harvests.create({
@@ -27,7 +26,7 @@ const harvests = createTRPCRouter({
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organizationId: organizationId?.id!,
+            organizationId: "",
             size: input.size,
           },
         });
@@ -46,10 +45,10 @@ const harvests = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
-        const organizationId = await useOrganizationId(input.organizationEmail);
+        // const organizationId = await useOrganizationId(input.organizationEmail);
         return await ctx.db.harvests.findMany({
           where: {
-            organizationId: organizationId?.id,
+            organizationId: "",
           },
           include: {
             Farmers: {

@@ -9,8 +9,6 @@ export default {
         montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
       },
       colors: {
-        green: "#46783E",
-        gold: "#CCB801",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

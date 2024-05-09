@@ -1,15 +1,13 @@
-import { useUser } from "@clerk/nextjs";
+"use client";
 import type { ReactElement } from "react";
 import Layout from "~/components/Layout/Layout";
 import { Header, NoAsset } from "~/components/harvests";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 
 export default function Index() {
-  const { user } = useUser();
   const { isLoading, data } = api.equipments.fetchByOrganization.useQuery({
-    organizationEmail: user?.primaryEmailAddress
-      ?.emailAddress as unknown as string,
+    organizationEmail: ""
   });
   return (
     <main className="pl-5">

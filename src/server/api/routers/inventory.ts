@@ -1,7 +1,6 @@
-import { FAILED_TO_CREATE, organizationIdSchema } from "~/utils/constants";
+import { FAILED_TO_CREATE } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import z from "zod";
-import { inventorySchema } from "~/app/(app)/dashboard/inventory/page";
+import { inventorySchema } from "~/app/(app)/dashboard/inventory/_components/schema";
 
 const inventory = createTRPCRouter({
   create: protectedProcedure

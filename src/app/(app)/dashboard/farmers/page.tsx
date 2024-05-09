@@ -1,7 +1,8 @@
-import type { ReactElement } from "react";
-import { useUser } from "@clerk/nextjs";
+"use client";
 
-import { api } from "~/utils/api";
+import type { ReactElement } from "react";
+
+import { api } from "~/trpc/react";
 
 import FarmersTable from "~/components/farmers/farmers-table";
 import Header from "~/components/harvests/Header";
@@ -9,16 +10,14 @@ import Layout from "~/components/Layout/Layout";
 import { NoAsset } from "~/components/harvests";
 
 export default function Page() {
-  const { user } = useUser();
   const { data, isLoading } = api.farmers.fetchByOrganization.useQuery({
-    organizationEmail: user?.primaryEmailAddress
-      ?.emailAddress as unknown as string,
+    organizationEmail: "",
   });
 
   return (
     <main className="pl-5">
       <Header
-        caption={user?.username as unknown as string}
+        caption="Farmers"
         link="/dashboard/farmers/new"
         title="New Farmers"
       />

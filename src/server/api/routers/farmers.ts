@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { farmersSchema } from "~/app/(app)/dashboard/farmers/new/page";
+import { farmersSchema } from "~/app/(app)/dashboard/farmers/_components/schema";
 import z from "zod";
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 

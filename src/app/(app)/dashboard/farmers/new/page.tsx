@@ -2,20 +2,18 @@
 
 import React from "react";
 import { useRouter } from "next/router";
-import { useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppRouter } from "~/server/api/root";
 import { inferProcedureInput } from "@trpc/server";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import Button from "~/components/ui/Button";
 import Input from "~/components/ui/Input";
 import { Textarea } from "~/components/ui/TextArea";
 import { ToastAction } from "~/components/ui/Toast";
-import { Toaster } from "~/components/ui/Toaster";
 import { Icons } from "~/components/ui/icons";
 import { GenderDropDown } from "~/components/farmers/GenderDropDown";
-import { useToast } from "~/hooks/useToast";
+import { useToast } from "~/utils/hooks/useToast";
 import { ItemLayout, AssetLabel } from "~/components/Layout/ItemLayout";
 import { farmersSchema, ValidationSchema } from "../_components/schema";
 
@@ -44,15 +42,14 @@ export default function Page() {
   });
 
   const [gender, setGender] = React.useState("");
-  const { user } = useUser();
+
 
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
     type Input = inferProcedureInput<AppRouter["farmers"]["addFarmer"]>;
     const input: Input = {
       ...data,
       gender,
-      organizationEmail: user?.primaryEmailAddress
-        ?.emailAddress as unknown as string,
+      organizationEmail: ""
     };
 
     try {
@@ -70,7 +67,6 @@ export default function Page() {
   return (
     <main className="mt-[40px] pl-[30px]">
       <h3 className="text-2xl font-medium ">New Farmer</h3>
-      <Toaster />
       <form
         className="relative mt-[50px] flex flex-col space-y-[30px] "
         onSubmit={handleSubmit(onSubmit)}

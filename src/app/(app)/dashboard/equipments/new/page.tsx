@@ -1,8 +1,7 @@
 "use client";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useToast } from "~/hooks/useToast";
-import { useUser } from "@clerk/nextjs";
-import { api } from "~/utils/api";
+import { useToast } from "~/utils/hooks/useToast";
+import { api } from "~/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "~/components/ui/Button";
 import NewEquipmentForm from "../_components/NewEquipmentForm";
@@ -35,7 +34,7 @@ export default function Index() {
     },
   });
   const { toast } = useToast();
-  const { user } = useUser();
+
   const onSubmit: SubmitHandler<EquipmentSchemaType> = (data) => {
     console.log(data);
   };

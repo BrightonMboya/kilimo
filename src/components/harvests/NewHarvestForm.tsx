@@ -1,3 +1,4 @@
+"use client";
 import {
   Controller,
   UseFormRegister,
