@@ -14,9 +14,8 @@ datasource db {
 model Organization {
   id           String       @id @default(cuid())
   name         String
-  emailAddress String
-  country      String
-  email        String       @unique
+  country      String?
+  emailAddress String       @unique
   farmers      Farmers[]
   harvests     Harvests[]
   Warehouses   Warehouses[]

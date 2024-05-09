@@ -1,6 +1,5 @@
 import Image from "next/legacy/image";
 import { Toaster } from "~/components/ui/Toaster";
-import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
   return (
@@ -30,7 +29,6 @@ export default function Page() {
             </blockquote>
           </div>
         </div>
-        <SignUp path="/auth/sign-up" routing="path" signInUrl="/auth/sign-in" />
       </div>
     </>
   );

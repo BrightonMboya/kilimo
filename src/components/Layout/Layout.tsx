@@ -1,20 +1,20 @@
 import * as React from "react";
-
 import SideBar from "./SideBar";
-import LoginForm from "../auth/LoginPage";
+import Header from "./Header";
 
 type Props = {
   children: React.ReactNode;
 };
-export default function AgriLayout({ children }: Props) {
+export default function Layout({ children }: Props) {
   return (
-    <main>
-      <section>
-        <div className="flex space-x-[50px] ">
-          <SideBar />
-          <main className="">{children}</main>
-        </div>
-      </section>
-    </main>
+    <div className="flex">
+      <aside>
+        <SideBar />
+      </aside>
+      <div className=" w-full">
+        <Header />
+        <main className="mt-10 md:mt-0">{children}</main>
+      </div>
+    </div>
   );
 }

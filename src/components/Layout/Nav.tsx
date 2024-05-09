@@ -6,7 +6,6 @@ import { RiMenu3Line } from "react-icons/ri";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/legacy/image";
-import { UserButton } from "@clerk/nextjs";
 
 const Nav = () => {
   const [showNav, setShowNav] = useState(false);
@@ -32,7 +31,7 @@ const Nav = () => {
           className={
             !showNav
               ? "hidden"
-              : "bg-green absolute left-0  top-0 flex h-[400px] w-full flex-col items-center justify-center gap-5 text-lg font-medium text-white"
+              : "bg-[#46783E] absolute left-0  top-0 flex h-[400px] w-full flex-col items-center justify-center gap-5 text-lg font-medium text-white"
           }
         >
           <li>
@@ -62,7 +61,7 @@ const Nav = () => {
         </ul>
 
         {/* for freaking wide screens */}
-        <ul className=" md:bg-green hidden text-xl text-white md:h-[100px] md:items-center md:justify-between md:space-x-5 md:px-7 md:text-lg lg:flex">
+        <ul className=" md:bg-[#46783E] hidden text-xl text-white md:h-[100px] md:items-center md:justify-between md:space-x-5 md:px-7 md:text-lg lg:flex">
           <div>
             <li>
               <Link href="/">
@@ -106,7 +105,7 @@ const Nav = () => {
               </Link>
             </li>
             <li>
-              <UserButton />
+              
             </li>
           </div>
         </ul>

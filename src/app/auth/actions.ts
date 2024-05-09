@@ -36,7 +36,7 @@ export const signIn = async (formData: FormData) => {
     return redirect("/auth/sign-in?message=Could not authenticate user");
   }
 
-  return redirect("/dashboard/products");
+  return redirect("/dashboard/farmers");
 };
 
 export const signOut = async () => {
@@ -92,5 +92,5 @@ export const signUp = async (formData: FormData) => {
     return redirect(`/auth/sign-up?message=${error.message}`);
   }
 
-  return redirect("/dashboard/accounting");
+  return redirect("/dashboard/farmers");
 };
