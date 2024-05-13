@@ -12,18 +12,20 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  // console.log(user, ">>>>>>>");
-  if (!user) {
-    return redirect("/auth/sign-in");
-  }
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
+  // // console.log(user, ">>>>>>>");
+  // if (!user) {
+  //   return redirect("/auth/sign-in");
+  // }
   return (
     <html lang="en">
       <body className="">
         <Layout>
-          <main className="min-h-screen bg-[#F5F6FA]/40 ">{children}</main>
+          <main className="min-h-screen bg-[#F5F6FA]/40 pl-[70px]">
+            {children}
+          </main>
         </Layout>
       </body>
     </html>

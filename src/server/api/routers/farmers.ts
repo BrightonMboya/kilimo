@@ -15,22 +15,14 @@ const farmers = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const organizationId = await ctx.db.organization.findUnique({
-          where: {
-            email: input.organizationEmail,
-          },
-          select: {
-            id: true,
-          },
-        });
-        return await ctx.db.farmers.create({
+        const res = await ctx.db.farmers.create({
           data: {
             fullName: input.fullName,
             gender: input.gender,
             phoneNumber: input.phoneNumber,
             farmSize: input.farmSize,
             province: input.province,
-            organizationId: organizationId?.id as unknown as string,
+            organizationId: "",
           },
         });
       } catch (cause) {
@@ -40,24 +32,11 @@ const farmers = createTRPCRouter({
     }),
 
   fetchByOrganization: protectedProcedure
-    .input(
-      z.object({
-        organizationEmail: z.string(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const organizationId = await ctx.db.organization.findUnique({
-        where: {
-          email: input.organizationEmail,
-        },
-        select: {
-          id: true,
-        },
-      });
+    .query(async ({ ctx }) => {
       try {
         return await ctx.db.farmers.findMany({
           where: {
-            organizationId: organizationId?.id,
+            organization_id: ctx?.user.id,
           },
         });
       } catch (cause) {

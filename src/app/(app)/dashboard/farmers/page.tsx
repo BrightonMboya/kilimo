@@ -4,25 +4,25 @@ import type { ReactElement } from "react";
 
 import { api } from "~/trpc/react";
 
-import FarmersTable from "~/components/farmers/farmers-table";
+import FarmersTable from "./_components/farmers-table";
 import Header from "~/components/harvests/Header";
 import Layout from "~/components/Layout/Layout";
-import { NoAsset } from "~/components/harvests";
+import NoData from "~/components/data-ui/NoData";
+import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 
 export default function Page() {
-  const { data, isLoading } = api.farmers.fetchByOrganization.useQuery({
-    organizationEmail: "",
-  });
+  const { data, isLoading } = api.farmers.fetchByOrganization.useQuery();
+  console.log(data);
 
   return (
-    <main className="pl-5">
+    <main className="pl-[70px]">
       <Header
         caption="Farmers"
         link="/dashboard/farmers/new"
         title="New Farmers"
       />
       {data?.length === 0 && (
-        <NoAsset
+        <NoData
           bigTitle="You haven't added your Farmers yet"
           smallTitle="It's easier to manage, your farmers. Go ahead and them now"
           c2a="Add Farmers"
@@ -30,8 +30,12 @@ export default function Page() {
         />
       )}
 
+      {isLoading && <LoadingSkeleton />}
+
       {/* @ts-ignore */}
-      {data!?.length >= 0 && <FarmersTable data={data} />}
+      {data!?.length != 0 && data !== null && !isLoading && (
+        <FarmersTable data={data} />
+      )}
     </main>
   );
 }
