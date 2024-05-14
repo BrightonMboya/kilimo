@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { ControllerRenderProps } from "react-hook-form";
-import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
+import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "date">;
@@ -29,7 +29,7 @@ export function HarvestDatePicker({ field }: Props) {
         <Button
           variant={"outline"}
           className={cn(
-            "w-[350px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal",
             !date && "text-muted-foreground",
           )}
         >

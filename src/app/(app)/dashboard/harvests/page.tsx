@@ -16,7 +16,7 @@ export default function Index() {
     <main className="pl-5">
       <Header
         caption="Your company Harvests"
-        title="View all harvests"
+       
         link="/dashboard/harvests/new"
       />
       {data?.length === 0 && (

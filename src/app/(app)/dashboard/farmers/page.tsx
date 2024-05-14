@@ -5,7 +5,7 @@ import type { ReactElement } from "react";
 import { api } from "~/trpc/react";
 
 import FarmersTable from "./_components/farmers-table";
-import Header from "~/components/harvests/Header";
+import Header from "./_components/Header";
 import Layout from "~/components/Layout/Layout";
 import NoData from "~/components/data-ui/NoData";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";

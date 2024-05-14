@@ -3,7 +3,7 @@ import Link from "next/link";
 
 interface Props {
   caption: string;
-  title: string;
+  title?: string;
   link: string;
 }
 

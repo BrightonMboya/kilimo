@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
-
 import Button from "~/components/ui/Button";
 import {
   Command,
@@ -18,10 +17,9 @@ import {
 } from "~/components/ui/popover";
 import { cn } from "~/utils/utils";
 import { api } from "~/utils/api";
-import { useUser } from "@clerk/nextjs";
 import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
-import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
+import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "farmerId">;
@@ -30,17 +28,14 @@ interface Props {
 export default function FarmersPicker({ field }: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
-  const { user } = useUser();
-  const { data, isLoading } = api.farmers.farmersNamesAndIds.useQuery({
-    organizationEmail: user?.primaryEmailAddress
-      ?.emailAddress as unknown as string,
-  });
+
+  const { data, isLoading } = api.farmers.farmersNamesAndIds.useQuery();
 
   return (
     <div className="z-[999] w-full bg-white">
       {isLoading && <Spinner />}
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild className="w-full">
           <Button
             variant="outline"
             role="combobox"
@@ -55,7 +50,7 @@ export default function FarmersPicker({ field }: Props) {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command>
+          <Command className="w-full"> 
             <CommandInput placeholder="Search farmer.." className="h-9" />
             <CommandEmpty>No Farmer Found.</CommandEmpty>
             <CommandGroup>

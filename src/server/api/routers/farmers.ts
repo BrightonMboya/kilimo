@@ -46,24 +46,11 @@ const farmers = createTRPCRouter({
     }),
 
   farmersNamesAndIds: protectedProcedure
-    .input(
-      z.object({
-        organizationEmail: z.string(),
-      }),
-    )
     .query(async ({ ctx, input }) => {
       try {
-        const organizationId = await ctx.db.organization.findUnique({
-          where: {
-            email: input.organizationEmail,
-          },
-          select: {
-            id: true,
-          },
-        });
         const farmers = await ctx.db.farmers.findMany({
           where: {
-            organizationId: organizationId?.id,
+            organization_id: ctx?.user?.id,
           },
           select: {
             id: true,

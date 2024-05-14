@@ -9,7 +9,7 @@ import { api } from "~/trpc/react";
 import { Button, Input } from "~/components/ui";
 import { Textarea } from "~/components/ui/TextArea";
 import { Toaster } from "~/components/ui/Toaster";
-import { GenderDropDown } from "~/components/farmers/GenderDropDown";
+import { GenderDropDown } from "~/app/(app)/dashboard/farmers/_components/GenderDropDown";
 import { AssetLabel, ItemLayout } from "~/components/Layout/ItemLayout";
 import { ValidationSchema, farmersSchema } from "../_components/schema";
 

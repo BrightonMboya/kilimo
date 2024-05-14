@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { type ReactElement } from "react";
 import Button from "~/components/ui/Button";
 import Layout from "~/components/Layout/Layout";
@@ -8,9 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import NewHarvestForm from "~/components/harvests/NewHarvestForm";
 import { api } from "~/trpc/react";
 import { useToast } from "~/utils/hooks/useToast";
-import { harvestsSchema, type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
-
-
+import {
+  harvestsSchema,
+  type HarvestSchemaType,
+} from "~/app/(app)/dashboard/harvests/_components/schema";
 
 export default function Page() {
   const {
@@ -23,8 +24,8 @@ export default function Page() {
     resolver: zodResolver(harvestsSchema),
   });
 
- 
   const { toast } = useToast();
+  const utils = api.useUtils();
 
   const { mutateAsync, isLoading } = api.harvests.create.useMutation({
     onSuccess: () => {
@@ -33,6 +34,8 @@ export default function Page() {
       });
       reset();
     },
+    onSettled: () => {},
+    onMutate: (data) => {},
     onError: () => {
       toast({
         variant: "destructive",
@@ -45,7 +48,7 @@ export default function Page() {
     try {
       mutateAsync({
         ...data,
-        organizationEmail: ""
+        organizationEmail: "",
       });
     } catch (cause) {
       console.log(cause);
@@ -56,16 +59,14 @@ export default function Page() {
     }
   };
 
-  console.log(errors);
 
   return (
-    <main className="mt-[40px] pl-[30px]">
-     
+    <main className="pt-[40px] max-w-[80%]">
       <h3 className="text-2xl font-medium ">Untitled Harvest</h3>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} >
         <NewHarvestForm register={register} control={control} errors={errors} />
         <Button
-          className="mt-[50px] w-[100px]"
+          className="mt-[50px] w-[300px] text-base"
           type="submit"
           disabled={isLoading}
         >

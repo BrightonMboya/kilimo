@@ -8,7 +8,7 @@ import {
 import { AssetLabel, ItemLayout } from "../Layout/ItemLayout";
 import { Input } from "../ui";
 import { HarvestDatePicker } from "./HarvestDatePicker";
-import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/new/page";
+import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 import FarmersPicker from "./FarmersPicker";
 
 interface Props {

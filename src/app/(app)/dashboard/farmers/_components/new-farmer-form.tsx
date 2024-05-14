@@ -3,7 +3,7 @@ import Button from "~/components/ui/Button";
 import Input from "~/components/ui/Input";
 import { Textarea } from "~/components/ui/TextArea";
 import { Icons } from "~/components/ui/icons";
-import { GenderDropDown } from "~/components/farmers/GenderDropDown";
+import { GenderDropDown } from "./GenderDropDown";
 import {
   type UseFormRegister,
   type UseFormHandleSubmit,
