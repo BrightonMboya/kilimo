@@ -33,9 +33,9 @@ export default function Page() {
       {isLoading && <LoadingSkeleton />}
 
       {/* @ts-ignore */}
-      {data!?.length != 0 && data !== null && !isLoading && (
+      {/* {data!?.length != 0 && data !== null && !isLoading && (
         <FarmersTable data={data} />
-      )}
+      )} */}
     </main>
   );
 }

@@ -84,7 +84,7 @@ export default function Page() {
   };
   return (
     <main className="max-w-[80%] pb-10 pt-[40px]">
-      <h3 className="text-2xl font-medium ">New Farmer</h3>
+      <h3 className="text-sm font-medium">New Farmer</h3>
       <Toaster />
       <NewFarmerForm
         handleSubmit={handleSubmit}

@@ -15,7 +15,7 @@ export default function SideBar() {
   const activeLinkClass = "text-white bg-primary";
 
   return (
-    <section className="fixed z-[1000]  min-h-screen ">
+    <section className="hidden lg:block md:fixed z-[1000]  min-h-screen ">
       <div className="flex h-screen max-h-screen w-[200px] flex-col gap-4 border-r-[1px] border-r-gray-300 bg-white p-4 ">
         <div className="flex items-center gap-2 font-semibold text-gray-900 ">
           <span>Kilimo App</span>

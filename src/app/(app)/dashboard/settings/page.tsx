@@ -6,12 +6,11 @@ import { TabsTrigger, TabsList, TabsContent, Tabs } from "~/components/ui/Tabs";
 import GeneralSettings from "./_components/GeneralSettings";
 import DangerZone from "./_components/DangerZone";
 import TeamSettings from "./_components/TeamSettings";
-import { Toaster } from "~/components/ui/toaster";
 
 export default function Page() {
   return (
     <div className="container mx-auto py-12">
-      <Toaster />
+    
       <h1 className="mb-8 text-4xl">Account Settings</h1>
       {/* <Tabs defaultValue="general">
         <TabsList className="border-b">

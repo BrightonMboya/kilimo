@@ -6,9 +6,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
+        // montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
+        sans: ['var(--font-geist-sans)'],
       },
       colors: {
+        light: "#7EA178",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

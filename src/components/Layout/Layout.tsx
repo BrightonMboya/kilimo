@@ -1,5 +1,5 @@
 import * as React from "react";
-import SideBar from "./SideBar";
+import SideBar from "./sidebar/SideBar";
 import Header from "./Header";
 
 type Props = {
@@ -8,12 +8,9 @@ type Props = {
 export default function Layout({ children }: Props) {
   return (
     <>
-      <div className="flex">
-        <aside>
-          <SideBar />
-        </aside>
-        <div className="ml-[200px] w-full">
-          <Header />
+      <div className="lg:flex">
+        <SideBar />
+        <div className=" w-full">
           <main className="mt-10 md:mt-0">{children}</main>
         </div>
       </div>
