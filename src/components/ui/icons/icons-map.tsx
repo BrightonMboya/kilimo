@@ -1,5 +1,5 @@
 import { CalendarIcon } from "@radix-ui/react-icons";
-// import { Spinner } from "./spinner";
+import { LeafyGreen } from "lucide-react";
 
 import { tw } from "~/utils/utils";
 
@@ -48,6 +48,9 @@ import {
   BookingsIcon,
   GiveCustodyIcon,
   TakeCustodyIcon,
+  Farmers,
+  ShoppingCart,
+  CurrencyDollar
 } from "../icons/library";
 
 /** The possible options for icons to be rendered in the button */
@@ -88,7 +91,12 @@ export type IconType =
   | "kit"
   | "bookings"
   | "give-custody"
-  | "take-custody";
+  | "take-custody"
+  | "shoppingCart"
+  | "harvest" 
+  | "currencyDollar"
+  | "farmers";
+
 
 type IconsMap = {
   [key in IconType]: JSX.Element;
@@ -130,6 +138,10 @@ export const iconsMap: IconsMap = {
   scanQR: <ScanQRIcon />,
   switch: <SwitchIcon />,
   kit: <KitIcon />,
+  farmers: <Farmers />,
+  shoppingCart: <ShoppingCart />,
+  harvest: <LeafyGreen />,
+  currencyDollar: <CurrencyDollar />,
   "give-custody": <GiveCustodyIcon />,
   "take-custody": <TakeCustodyIcon />,
 };

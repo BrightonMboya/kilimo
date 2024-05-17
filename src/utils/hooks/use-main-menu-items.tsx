@@ -1,4 +1,5 @@
 import Icon from "~/components/ui/icons/icons";
+
 // import { useUserIsSelfService } from "./user-user-is-self-service";
 
 export function useMainMenuItems() {
@@ -9,39 +10,37 @@ export function useMainMenuItems() {
       label: "Dashboard",
     },
     {
-      icon: <Icon icon="asset" />,
-      to: "assets",
-      label: "Assets",
+      icon: <Icon icon="farmers" />,
+      to: "farmers",
+      label: "Farmers",
     },
     {
-      icon: <Icon icon="kit" />,
-      to: "kits",
-      label: "Kits",
+      icon: <Icon icon="harvest" />,
+      to: "harvests",
+      label: "Harvests",
     },
     {
-      icon: <Icon icon="category" />,
-      to: "categories",
-      label: "Categories",
+      icon: <Icon icon="shoppingCart" />,
+      to: "orders",
+      label: "Orders",
     },
     {
-      icon: <Icon icon="tag" />,
-      to: "tags",
-      label: "Tags",
+      icon: <Icon icon="currencyDollar" />,
+      to: "sales",
+      label: "Sales",
+    },
+
+    {
+      icon: <Icon icon="settings" />,
+      to: "settings",
+      label: "Settings",
+      end: true,
     },
     {
-      icon: <Icon icon="location" />,
-      to: "locations",
-      label: "Locations",
-    },
-    {
-      icon: <Icon icon="calendar" />,
-      to: "calendar",
-      label: "Calendar",
-    },
-    {
-      icon: <Icon icon="bookings" />,
-      to: "bookings",
-      label: "Bookings (beta)",
+      icon: <Icon icon="scanQR" />,
+      to: "scanner",
+      label: "Billing",
+      end: true,
     },
   ];
   const menuItemsBottom = [

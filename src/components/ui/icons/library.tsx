@@ -21,6 +21,65 @@ export function LogoutIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function Farmers(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={20}
+      height={20}
+      fill="none"
+      {...props}
+    >
+      <path
+        stroke="#667085"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.667}
+        d="M14.216 12.934a2.5 2.5 0 0 1 3.902 2.267c-1 .35-2.062.485-3.118.399a4.996 4.996 0 0 0-5-4.975 4.996 4.996 0 0 0-4.215 2.31m9.214 2.664.001.026c0 .188-.01.373-.03.555A9.953 9.953 0 0 1 10 17.5a9.952 9.952 0 0 1-4.97-1.32A5.052 5.052 0 0 1 5 15.6m0 0a7.484 7.484 0 0 1-3.116-.398 2.5 2.5 0 0 1 3.901-2.267M5 15.599a4.977 4.977 0 0 1 .785-2.664m6.715-7.31a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm5 2.5a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm-11.25 0a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Z"
+      />
+    </svg>
+  );
+}
+
+export function ShoppingCart(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={20}
+      height={20}
+      fill="none"
+      {...props}
+    >
+      <path
+        stroke="#667085"
+        strokeWidth={1.667}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2 2.574h1.144c.42 0 .788.283.896.69l.316 1.185m0 0A49.599 49.599 0 0 1 18 5.967a49.17 49.17 0 0 1-2.412 5.89H6.332M4.356 4.448l1.976 7.407m0 0a2.475 2.475 0 0 0-2.476 2.476h12.996M5.094 16.807a.619.619 0 1 1-1.238 0 .619.619 0 0 1 1.238 0Zm10.52 0a.619.619 0 1 1-1.238 0 .619.619 0 0 1 1.238 0Z"
+      />
+    </svg>
+  );
+}
+
+export function CurrencyDollar(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={20}
+      height={20}
+      fill="none"
+      {...props}
+    >
+      <path
+        stroke="#667085"
+        strokeWidth={1.667}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10 5v10m-2.5-2.348.732.549c.976.732 2.559.732 3.536 0 .976-.733.976-1.92 0-2.652C11.28 10.182 10.64 10 10 10c-.604 0-1.208-.183-1.67-.55-.92-.732-.92-1.918 0-2.65.922-.733 2.418-.733 3.34 0l.345.274M17.5 10a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+      />
+    </svg>
+  );
+}
 export function HomeIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

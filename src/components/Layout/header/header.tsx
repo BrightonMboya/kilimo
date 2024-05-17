@@ -2,8 +2,6 @@ import { Heading, SubHeading } from "~/components/ui/heading";
 
 import { tw } from "~/utils/utils";
 
-// import { Breadcrumbs } from "../breadcrumbs";
-
 export interface HeaderData {
   /** Heading/title that will be rendered on top of the view */
   title: string;
@@ -39,14 +37,8 @@ export default function Header({
     <header className={tw("-mx-4 bg-white", classNames)}>
       {!hideBreadcrumbs && (
         <>
-          {/* <div className="flex w-full items-center justify-between border-b border-gray-200 px-4 py-2 md:min-h-[67px] md:py-3">
-       
-            {children && (
-              <div className="hidden shrink-0 gap-3 md:flex">{children}</div>
-            )}
-          </div> */}
           {children && (
-            <div className="flex w-full items-center justify-between border-b border-gray-200 px-4 py-2 md:hidden">
+            <div className="flex w-full items-center justify-between border-b border-gray-200 px-4 py-2 ">
               <div className="header-buttons flex flex-1 shrink-0 gap-3">
                 {children}
               </div>
@@ -62,7 +54,6 @@ export default function Header({
           {subHeading ? (
             <SubHeading>{subHeading}</SubHeading>
           ) : (
-         
             <SubHeading>{subHeading}</SubHeading>
           )}
         </div>
