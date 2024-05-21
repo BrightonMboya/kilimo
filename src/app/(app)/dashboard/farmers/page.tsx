@@ -21,7 +21,7 @@ export default function Page() {
           </Link>
         </div>
       </Header>
-      {!isLoading && data?.length != 0 && <FarmersTable data={data} />}
+      {!isLoading && data?.length != 0 && <FarmersTable data={data!} />}
 
       {!isLoading && data?.length == 0 && (
         <EmptyState

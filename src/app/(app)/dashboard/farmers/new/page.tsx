@@ -12,7 +12,7 @@ import Header from "~/components/Layout/header/header";
 import { ToastAction } from "~/components/ui/Toast";
 import { useToast } from "~/utils/hooks/useToast";
 
-import { farmersSchema, ValidationSchema } from "../_components/schema";
+import { farmersSchema, FarmersValidationSchema as ValidationSchema } from "../_components/schema";
 import NewFarmerForm from "../_components/new-farmer-form";
 import { Toaster } from "~/components/ui/Toaster";
 

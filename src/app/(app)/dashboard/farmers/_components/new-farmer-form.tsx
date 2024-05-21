@@ -2,25 +2,23 @@ import Button from "~/components/ui/Button";
 import {
   type UseFormRegister,
   type UseFormHandleSubmit,
-  type UseFormSetError,
   type SubmitHandler,
   type FieldErrors,
 } from "react-hook-form";
-import { type ValidationSchema } from "./schema";
+import { type FarmersValidationSchema as ValidationSchema } from "./schema";
 import React from "react";
 import FormRow from "~/components/shared/FormRow";
 import { Card } from "~/components/shared/empty/Card";
 import Input from "~/components/shared/Input";
 
-interface Props {
+export interface FarmerFormProps {
   handleSubmit: UseFormHandleSubmit<ValidationSchema>;
   onSubmit: SubmitHandler<ValidationSchema>;
   errors: FieldErrors<ValidationSchema>;
   register: UseFormRegister<ValidationSchema>;
   isLoading: boolean;
-
 }
-export default function NewFarmerForm(props: Props) {
+export default function NewFarmerForm(props: FarmerFormProps) {
   return (
     <Card className="w-full md:w-min">
       <form

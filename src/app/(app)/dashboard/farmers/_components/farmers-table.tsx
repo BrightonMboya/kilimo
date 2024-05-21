@@ -40,16 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-
-export type Farmers = {
-  id: string;
-  phoneNumber: string;
-  fullName: string;
-  farmSize: number;
-  quantityCanSupply: number;
-  cropTheySell: string;
-  province: string;
-};
+import type { Farmers } from "@prisma/client";
 
 export const columns: ColumnDef<Farmers>[] = [
   {
@@ -96,6 +87,20 @@ export const columns: ColumnDef<Farmers>[] = [
     ),
   },
   {
+    accessorKey: "crops",
+    header: "Crops",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("crops")}</div>
+    ),
+  },
+  {
+    accessorKey: "quantityCanSupply",
+    header: "Quantity Can Supply (Kg)",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("quantityCanSupply")}</div>
+    ),
+  },
+  {
     accessorKey: "farmSize",
     header: "Farm Size(acres)",
     cell: ({ row }) => (
@@ -132,9 +137,14 @@ export const columns: ColumnDef<Farmers>[] = [
               Copy farmer name
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Details</DropdownMenuItem>
+            {/* <DropdownMenuItem>View Details</DropdownMenuItem> */}
             <DropdownMenuItem>
-              <Link href={`/dashboard/farmers/edit/${farmer.id}`}>
+              <Link
+                href={{
+                  pathname: `/dashboard/farmers/edit`,
+                  query: { id: farmer.id },
+                }}
+              >
                 Edit Farmer
               </Link>
             </DropdownMenuItem>

@@ -116,28 +116,7 @@ const organization = createTRPCRouter({
     }),
 
   // fetching individual details of the farmer
-  fetchFarmerById: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      try {
-        const farmer = await ctx.db.organizationFarmers.findFirst({
-          where: {
-            id: input.id,
-          },
-        });
-        return farmer;
-      } catch (cause) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch Farmers",
-          cause,
-        });
-      }
-    }),
+ 
 });
 
 export default organization;

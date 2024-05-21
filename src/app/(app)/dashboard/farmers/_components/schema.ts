@@ -13,4 +13,4 @@ export const farmersSchema = z.object({
   quantityCanSupply: z.number(),
 });
 
-export type ValidationSchema = z.infer<typeof farmersSchema>;
+export type FarmersValidationSchema = z.infer<typeof farmersSchema>;

@@ -22,19 +22,20 @@ model Organization {
 }
 
 model Farmers {
-  id              String       @id @default(cuid())
-  fullName        String
+  id                String       @id @default(cuid())
+  fullName          String
   // gender          String
-  phoneNumber     String?
-  farmSize        Int
-  province        String
-  country         String
-  crops           String
+  phoneNumber       String?
+  farmSize          Int
+  province          String
+  country           String
+  crops             String
+  quantityCanSupply Int
   // nationalId      FarmersNationalId?
   // profilePicture  FarmersProfilePictures?
-  organization_id String
-  organization    Organization @relation(fields: [organization_id], references: [id])
-  harvests        Harvests[]
+  organization_id   String
+  organization      Organization @relation(fields: [organization_id], references: [id])
+  harvests          Harvests[]
 }
 
 // model FarmersNationalId {

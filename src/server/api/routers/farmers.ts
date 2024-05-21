@@ -20,6 +20,7 @@ const farmers = createTRPCRouter({
             province: input.province,
             country: input.country,
             crops: input.crops,
+            quantityCanSupply: input.quantityCanSupply,
             organization_id: ctx?.user.id,
           },
         });
@@ -32,6 +33,33 @@ const farmers = createTRPCRouter({
       }
     }),
 
+  editFarmer: protectedProcedure.input(farmersSchema.merge(z.object({ id: z.string() }))).mutation(
+    async ({ ctx, input }) => {
+      try {
+        return await ctx.db.farmers.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            fullName: input.fullName,
+            phoneNumber: input.phoneNumber!,
+            farmSize: input.farmSize,
+            province: input.province,
+            country: input.country,
+            crops: input.crops,
+            quantityCanSupply: input.quantityCanSupply,
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to edit farmer",
+        });
+      }
+    },
+  ),
+
   fetchByOrganization: protectedProcedure
     .query(async ({ ctx }) => {
       try {
@@ -42,7 +70,7 @@ const farmers = createTRPCRouter({
         });
       } catch (cause) {
         console.log(cause);
-         throw new TRPCError({
+        throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to load farmers",
         });
@@ -65,6 +93,29 @@ const farmers = createTRPCRouter({
       } catch (cause) {
         console.log(cause);
         throw NOT_FOUND_ERROR;
+      }
+    }),
+
+  fetchFarmerById: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      try {
+        const farmer = await ctx.db.farmers.findFirst({
+          where: {
+            id: input.id,
+          },
+        });
+        return farmer;
+      } catch (cause) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch Farmers",
+          cause,
+        });
       }
     }),
 });
