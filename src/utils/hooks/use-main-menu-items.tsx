@@ -11,28 +11,28 @@ export function useMainMenuItems() {
     },
     {
       icon: <Icon icon="farmers" />,
-      to: "farmers",
+      to: "/dashboard/farmers",
       label: "Farmers",
     },
     {
       icon: <Icon icon="harvest" />,
-      to: "harvests",
+      to: "/dashboard/harvests",
       label: "Harvests",
     },
     {
       icon: <Icon icon="shoppingCart" />,
-      to: "orders",
+      to: "/dashboard/orders",
       label: "Orders",
     },
     {
       icon: <Icon icon="currencyDollar" />,
-      to: "sales",
+      to: "/dashboard/sales",
       label: "Sales",
     },
 
     {
       icon: <Icon icon="settings" />,
-      to: "settings",
+      to: "/dashboard/settings",
       label: "Settings",
       end: true,
     },

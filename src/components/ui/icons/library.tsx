@@ -31,7 +31,7 @@ export function Farmers(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <path
-        stroke="#667085"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.667}
@@ -51,7 +51,7 @@ export function ShoppingCart(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <path
-        stroke="#667085"
+        stroke="currentColor"
         strokeWidth={1.667}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -71,7 +71,7 @@ export function CurrencyDollar(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <path
-        stroke="#667085"
+        stroke="currentColor"
         strokeWidth={1.667}
         strokeLinecap="round"
         strokeLinejoin="round"
