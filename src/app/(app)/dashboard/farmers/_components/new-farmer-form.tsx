@@ -1,9 +1,4 @@
-import { ItemLayout, AssetLabel } from "~/components/Layout/ItemLayout";
 import Button from "~/components/ui/Button";
-import Input from "~/components/ui/Input";
-import { Textarea } from "~/components/ui/TextArea";
-import { Icons } from "~/components/ui/icons";
-import { GenderDropDown } from "./GenderDropDown";
 import {
   type UseFormRegister,
   type UseFormHandleSubmit,
@@ -13,6 +8,9 @@ import {
 } from "react-hook-form";
 import { type ValidationSchema } from "./schema";
 import React from "react";
+import FormRow from "~/components/shared/FormRow";
+import { Card } from "~/components/shared/empty/Card";
+import Input from "~/components/shared/Input";
 
 interface Props {
   handleSubmit: UseFormHandleSubmit<ValidationSchema>;
@@ -20,140 +18,129 @@ interface Props {
   errors: FieldErrors<ValidationSchema>;
   register: UseFormRegister<ValidationSchema>;
   isLoading: boolean;
-  setGender: React.Dispatch<React.SetStateAction<string>>;
+
 }
-export default function NewFarmerForm({
-  handleSubmit,
-  onSubmit,
-  errors,
-  register,
-  setGender,
-  isLoading,
-}: Props) {
+export default function NewFarmerForm(props: Props) {
   return (
-    <h3>
-      Forms are tricky. They are one of the most common things you'll build in a
-      web application, but also one of the most complex.
-    </h3>
-    // <form
-    //   className="relative mt-[50px] flex flex-col space-y-[50px] "
-    //   onSubmit={handleSubmit(onSubmit)}
-    // >
-    //   <ItemLayout>
-    //     <AssetLabel label="Full Name" />
-    //     <div>
-    //       <Input placeholder="John Doe" {...register("fullName")} />
-    //       {errors.fullName && (
-    //         <p className="pt-3 text-sm text-red-500">
-    //           Farmer's full name is required
-    //         </p>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
+    <Card className="w-full md:w-min">
+      <form
+        className="flex w-full flex-col gap-2"
+        onSubmit={props.handleSubmit(props.onSubmit)}
+      >
+        <div className="flex items-start justify-between border-b pb-5">
+          <div className=" ">
+            <h2 className="mb-1 text-[18px] font-semibold">Basic fields</h2>
+            <p>Enter the basic information about the farmer.</p>
+          </div>
+        </div>
 
-    //   <ItemLayout>
-    //     <AssetLabel label="Phone Number" />
-    //     <Input placeholder="+260780348912" {...register("phoneNumber")} />
-    //   </ItemLayout>
+        <FormRow rowLabel={"Full Name"} className="border-b-0 pb-[10px]">
+          <Input
+            label="Full Name"
+            hideLabel
+            {...props.register("fullName")}
+            error={props.errors.fullName?.message}
+            autoFocus
+            className="w-full"
+          />
+        </FormRow>
 
-    //   <ItemLayout>
-    //     <AssetLabel label="Gender"
-    //     // caption="Gender of the farmer"
-    //     />
-    //     <div>
-    //       <GenderDropDown setGender={setGender} />
-    //       {errors?.gender && (
-    //         <p className="pt-3 text-sm text-red-500">
-    //           Farmer's gender is required
-    //         </p>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
+        <FormRow rowLabel={"Phone Number"} className="border-b-0 pb-[10px]">
+          <Input
+            label="Phone Number"
+            hideLabel
+            {...props.register("phoneNumber")}
+            error={props.errors.phoneNumber?.message}
+            autoFocus
+            className="w-full"
+          />
+        </FormRow>
+        <FormRow rowLabel={"Country"} className="border-b-0 pb-[10px]">
+          <Input
+            label="Country"
+            hideLabel
+            {...props.register("country")}
+            error={props.errors.country?.message}
+            autoFocus
+            className="w-full"
+          />
+        </FormRow>
 
-    //   <ItemLayout>
-    //     <AssetLabel
-    //       label="Quantity"
-    //       // caption="Quantity in kg this farmer produce on a single harvest"
-    //     />
-    //     <div>
-    //       <Input
-    //         placeholder="50"
-    //         {...register("quantityCanSupply", { valueAsNumber: true })}
-    //         type="number"
-    //       />
-    //       {errors?.quantityCanSupply?.message && (
-    //         <span className="text-sm text-red-500">
-    //           <p>
-    //             You can give an estimate of the harvest of this farmer for easy
-    //             forecasting and analysis
-    //           </p>
-    //         </span>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
+        <FormRow
+          rowLabel={"Farm Size"}
+          className="border-b-0 pb-[10px]"
+          subHeading={
+            <p>What is the estimated farm size of this farmer in acres</p>
+          }
+        >
+          <Input
+            label="Farm Size"
+            hideLabel
+            {...props.register("farmSize", { valueAsNumber: true })}
+            error={props.errors.farmSize?.message}
+            autoFocus
+            className="w-full"
+            type="number"
+          />
+        </FormRow>
 
-    //   <ItemLayout>
-    //     <AssetLabel
-    //       label="Farm Size"
-    //       // caption="What is the farm size of this farmer in Acres"
-    //     />
+        <FormRow
+          rowLabel={"Province"}
+          className="border-b-0 pb-[10px]"
+          subHeading={<p>What is the province or region of this farmer</p>}
+        >
+          <Input
+            label="Provinve"
+            hideLabel
+            {...props.register("province")}
+            error={props.errors.province?.message}
+            autoFocus
+            className="w-full"
+          />
+        </FormRow>
 
-    //     <div>
-    //       <Input
-    //         placeholder="30"
-    //         {...register("farmSize", { valueAsNumber: true })}
-    //         type="number"
-    //       />
-    //       {errors?.farmSize?.message && (
-    //         <span className="text-sm text-red-500">
-    //           <p>What is the estimated farm size of this farmer in acres</p>
-    //         </span>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
+        <FormRow
+          rowLabel={"Crops"}
+          className="border-b-0 pb-[10px]"
+          subHeading={<p>What are the crops this farmer is growing</p>}
+        >
+          <Input
+            label="Crops"
+            hideLabel
+            {...props.register("crops")}
+            error={props.errors.crops?.message}
+            autoFocus
+            className="w-full"
+          />
+        </FormRow>
+        <FormRow
+          rowLabel={"Quantity the crops are produced"}
+          className="border-b-0 pb-[10px]"
+          subHeading={
+            <p>
+              What is the quantity of crops this farmer can harvest in a single
+              season in kilograms.
+            </p>
+          }
+        >
+          <Input
+            label="quantityCanSupply"
+            hideLabel
+            {...props.register("quantityCanSupply", { valueAsNumber: true })}
+            error={props.errors.quantityCanSupply?.message}
+            autoFocus
+            type="number"
+            className="w-full"
+          />
+        </FormRow>
 
-    //   <ItemLayout>
-    //     <AssetLabel label="Country" caption="" />
-    //     <div>
-    //       <Input placeholder="Rwanda" />
-    //       {errors?.country && (
-    //         <p className="pt-3 text-sm text-red-500">
-    //           What is the country of this farmer
-    //         </p>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
-
-    //   <ItemLayout>
-    //     <AssetLabel
-    //       label="Province"
-    //       // caption="Which province is this farmer from"
-    //     />
-    //     <div>
-    //       <Input placeholder="Musanze" {...register("province")} />
-    //       {errors.province && (
-    //         <p className="pt-3 text-sm text-red-500">
-    //           Please enter the province in which this farmer is located
-    //         </p>
-    //       )}
-    //     </div>
-    //   </ItemLayout>
-
-    //   <ItemLayout>
-    //     <AssetLabel
-    //       label="Notes"
-    //       // caption="Enter additional details about this farmer"
-    //     />
-
-    //     <Textarea
-    //       placeholder="Add short notes about this farmer"
-    //       {...register("description")}
-    //     />
-    //   </ItemLayout>
-    //   <Button className="mt-[50px] w-full" type="submit">
-    //     {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-    //     Save
-    //   </Button>
-    // </form>
+        <FormRow className="border-y-0 pb-0 pt-5" rowLabel="">
+          <div className="ml-auto"></div>
+        </FormRow>
+        <Button type="submit" disabled={props.isLoading}>
+          Save
+        </Button>
+      </form>
+    </Card>
   );
 }

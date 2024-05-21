@@ -7,6 +7,7 @@ import { AppRouter } from "~/server/api/root";
 import { inferProcedureInput } from "@trpc/server";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { api } from "~/trpc/react";
+import Header from "~/components/Layout/header/header";
 
 import { ToastAction } from "~/components/ui/Toast";
 import { useToast } from "~/utils/hooks/useToast";
@@ -46,7 +47,9 @@ export default function Page() {
       ]);
       return { prevData };
     },
-    onSettled: () => {},
+    onSettled: () => {
+      utils.farmers.fetchByOrganization.invalidate();
+    },
     onError: (error, data, ctx) => {
       utils.farmers.fetchByOrganization.setData(undefined, ctx?.prevData);
       toast({
@@ -59,15 +62,11 @@ export default function Page() {
     },
   });
 
-  const [gender, setGender] = React.useState("");
-
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
     router.push("/dashboard/farmers");
     type Input = inferProcedureInput<AppRouter["farmers"]["addFarmer"]>;
     const input: Input = {
       ...data,
-      gender,
-      organizationEmail: "",
     };
 
     try {
@@ -83,15 +82,17 @@ export default function Page() {
     }
   };
   return (
-    <main className="max-w-[80%] pb-10 pt-[40px]">
-      <h3 className="text-sm font-medium">New Farmer</h3>
+    <main className="pb-10 ">
+      <Header
+        title="New Farmer"
+        subHeading="Add a new farmer to your organization"
+      />
       <Toaster />
       <NewFarmerForm
         handleSubmit={handleSubmit}
         register={register}
         onSubmit={onSubmit}
         errors={errors}
-        setGender={setGender}
         isLoading={isLoading}
       />
     </main>

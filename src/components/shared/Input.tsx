@@ -77,7 +77,7 @@ const Input = forwardRef(function Input(
   const inputClasses = tw(
     "w-full max-w-full border border-gray-300 px-[14px] py-2 text-[16px] text-gray-900 shadow outline-none placeholder:text-gray-500 focus:border-primary-300 focus:ring-[0] disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-50 disabled:text-gray-500",
     /** Add some border for error */
-    error ? "border-error-300 focus:border-error-300 focus:ring-error-100" : "",
+    error ? "border-red-500 focus:border-red-500 focus:ring-red-100" : "",
 
     /** Add or remove classes depending on weather we use an icon or addOn */
     icon || addOn
@@ -139,7 +139,7 @@ const Input = forwardRef(function Input(
 
       {/* Error */}
       {!hideErrorText && error && (
-        <div className="text-error-500 text-sm">{error}</div>
+        <div className="text-red-500 text-sm">{error}</div>
       )}
     </label>
   );

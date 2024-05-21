@@ -1,5 +1,4 @@
 "use client";
-
 import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

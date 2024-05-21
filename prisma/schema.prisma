@@ -22,33 +22,32 @@ model Organization {
 }
 
 model Farmers {
-  id              String                  @id @default(cuid())
+  id              String       @id @default(cuid())
   fullName        String
-  gender          String
+  // gender          String
   phoneNumber     String?
   farmSize        Int
-  latitude        Float?
-  longitude       Float?
   province        String
   country         String
-  nationalId      FarmersNationalId?
-  profilePicture  FarmersProfilePictures?
+  crops           String
+  // nationalId      FarmersNationalId?
+  // profilePicture  FarmersProfilePictures?
   organization_id String
-  organization    Organization            @relation(fields: [organization_id], references: [id])
+  organization    Organization @relation(fields: [organization_id], references: [id])
   harvests        Harvests[]
 }
 
-model FarmersNationalId {
-  id        String  @id @default(cuid())
-  farmer    Farmers @relation(fields: [farmersId], references: [id])
-  farmersId String  @unique
-}
+// model FarmersNationalId {
+//   id        String  @id @default(cuid())
+//   farmer    Farmers @relation(fields: [farmersId], references: [id])
+//   farmersId String  @unique
+// }
 
-model FarmersProfilePictures {
-  id        String  @id @default(cuid())
-  farmer    Farmers @relation(fields: [farmersId], references: [id])
-  farmersId String  @unique
-}
+// model FarmersProfilePictures {
+//   id        String  @id @default(cuid())
+//   farmer    Farmers @relation(fields: [farmersId], references: [id])
+//   farmersId String  @unique
+// }
 
 model Harvests {
   id             String       @id @default(cuid())

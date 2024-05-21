@@ -2,32 +2,33 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { farmersSchema } from "~/app/(app)/dashboard/farmers/_components/schema";
 import z from "zod";
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
+import { TRPCClientError } from "@trpc/client";
+import { TRPCError } from "@trpc/server";
 
 const farmers = createTRPCRouter({
   addFarmer: protectedProcedure
     .input(
-      farmersSchema.merge(
-        z.object({
-          gender: z.string(),
-          organizationEmail: z.string(),
-        }),
-      ),
+      farmersSchema,
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const res = await ctx.db.farmers.create({
+        return await ctx.db.farmers.create({
           data: {
             fullName: input.fullName,
-            gender: input.gender,
-            phoneNumber: input.phoneNumber,
+            phoneNumber: input.phoneNumber!,
             farmSize: input.farmSize,
             province: input.province,
-            organizationId: "",
+            country: input.country,
+            crops: input.crops,
+            organization_id: ctx?.user.id,
           },
         });
       } catch (cause) {
         console.log(cause);
-        throw FAILED_TO_CREATE;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create farmer",
+        });
       }
     }),
 
@@ -41,7 +42,10 @@ const farmers = createTRPCRouter({
         });
       } catch (cause) {
         console.log(cause);
-        throw NOT_FOUND_ERROR;
+         throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to load farmers",
+        });
       }
     }),
 

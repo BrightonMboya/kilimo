@@ -1,12 +1,13 @@
 import Button from "~/components/ui/Button";
-import { Card } from "~/app/(app)/dashboard/inventory/_components/Card";
+import { Card } from "./Card";
+import Link from "next/link";
+
 export interface CustomEmptyState {
-  customContent?: {
+  customContent: {
     title: string;
     text: string;
     newButtonRoute: string;
     newButtonContent: string;
-    buttonProps?: any;
   };
   modelName?: {
     singular: string;
@@ -54,19 +55,13 @@ export const EmptyState = ({ customContent, modelName }: CustomEmptyState) => {
             Clear Search
           </ClearSearch>
         )} */}
-          <Button
-            to={
-              customContent?.newButtonRoute
-                ? customContent.newButtonRoute
-                : "new"
-            }
-            icon="plus"
-            {...(customContent?.buttonProps || undefined)}
-          >
-            {customContent?.newButtonContent
-              ? customContent.newButtonContent
-              : `New whatever`}
-          </Button>
+          <Link href={customContent?.newButtonRoute}>
+            <Button>
+              {customContent?.newButtonContent
+                ? customContent.newButtonContent
+                : `New whatever`}
+            </Button>
+          </Link>
         </div>
       </div>
     </Card>
