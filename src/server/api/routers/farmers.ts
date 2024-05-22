@@ -33,7 +33,9 @@ const farmers = createTRPCRouter({
       }
     }),
 
-  editFarmer: protectedProcedure.input(farmersSchema.merge(z.object({ id: z.string() }))).mutation(
+  editFarmer: protectedProcedure.input(
+    farmersSchema.merge(z.object({ id: z.string() })),
+  ).mutation(
     async ({ ctx, input }) => {
       try {
         return await ctx.db.farmers.update({
@@ -114,6 +116,30 @@ const farmers = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to fetch Farmers",
+          cause,
+        });
+      }
+    }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        await ctx.db.farmers.delete({
+          where: {
+            id: input.id,
+          },
+        });
+        return true;
+      } catch (cause) {
+        console.log(cause);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete farmer",
           cause,
         });
       }

@@ -60,7 +60,7 @@ model Harvests {
   unit           String
   Organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
-  Farmers        Farmers      @relation(fields: [farmersId], references: [id])
+  Farmers        Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
   farmersId      String
 }
 
