@@ -68,6 +68,36 @@ const harvests = createTRPCRouter({
         throw NOT_FOUND_ERROR;
       }
     }),
+
+    editHarvest: protectedProcedure
+      .input(
+        harvestsSchema
+        .merge(z.object({ id: z.string() })),
+      )
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const updatedHarvest = await ctx.db.harvests.update({    
+            where: {
+              id: input.id,
+            },
+            data: {
+              date: input.date,
+              name: input.name,
+              crop: input.crop,
+              unit: input.unit,
+              inputsUsed: input.inputsUsed,
+              farmersId: input.farmerId,
+              organizationId: ctx?.user?.id,
+              size: input.size,
+            },
+          });
+          return updatedHarvest;
+        } catch (cause) {
+          console.log(cause);
+          throw FAILED_TO_CREATE;
+        }
+      }),
 });
+
 
 export default harvests;

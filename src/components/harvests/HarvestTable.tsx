@@ -144,7 +144,12 @@ export const columns: ColumnDef<Harvests>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>View Details</DropdownMenuItem>
             <DropdownMenuItem>
-              <Link href={`/dashboard/harvests/edit/${harvest.id}`}>
+              <Link
+                href={{
+                  pathname: `/dashboard/harvests/edit/`,
+                  query: {harvestId: harvest.id},
+                }}
+              >
                 Edit this harvest
               </Link>
             </DropdownMenuItem>
