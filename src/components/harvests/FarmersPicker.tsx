@@ -20,6 +20,7 @@ import { api } from "~/utils/api";
 import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
+import { ScrollArea } from "../ui/scroll-area";
 
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "farmerId">;
@@ -32,7 +33,7 @@ export default function FarmersPicker({ field }: Props) {
   const { data, isLoading } = api.farmers.farmersNamesAndIds.useQuery();
 
   return (
-    <div className="z-[999] w-full bg-white">
+    <div className=" w-full bg-white">
       {isLoading && <Spinner />}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild className="w-full">
@@ -50,32 +51,34 @@ export default function FarmersPicker({ field }: Props) {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command className="w-full"> 
-            <CommandInput placeholder="Search farmer.." className="h-9" />
-            <CommandEmpty>No Farmer Found.</CommandEmpty>
-            <CommandGroup>
-              {data?.map((farmer) => (
-                <CommandItem
-                  key={farmer.id}
-                  value={farmer.id}
-                  onChange={field.onChange}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    field.onChange(farmer.id);
-                    setOpen(false);
-                  }}
-                >
-                  {farmer.fullName}
-                  <CheckIcon
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      value === farmer.id ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+          <ScrollArea>
+            <Command className="w-full">
+              <CommandInput placeholder="Search farmer.." className="h-9" />
+              <CommandEmpty>No Farmer Found.</CommandEmpty>
+              <CommandGroup>
+                {data?.map((farmer) => (
+                  <CommandItem
+                    key={farmer.id}
+                    value={farmer.id}
+                    onChange={field.onChange}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : currentValue);
+                      field.onChange(farmer.id);
+                      setOpen(false);
+                    }}
+                  >
+                    {farmer.fullName}
+                    <CheckIcon
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        value === farmer.id ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </ScrollArea>
         </PopoverContent>
       </Popover>
     </div>

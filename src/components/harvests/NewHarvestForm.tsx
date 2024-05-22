@@ -6,41 +6,51 @@ import {
   FieldErrors,
 } from "react-hook-form";
 import { AssetLabel, ItemLayout } from "../Layout/ItemLayout";
-import { Input } from "../ui";
+import Input from "~/components/shared/Input";
 import { HarvestDatePicker } from "./HarvestDatePicker";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 import FarmersPicker from "./FarmersPicker";
+import { Card } from "../shared/empty/Card";
+import Button from "../ui/Button";
+import FormRow from "../shared/FormRow";
 
 interface Props {
   register: UseFormRegister<HarvestSchemaType>;
   control: Control<HarvestSchemaType>;
   errors: FieldErrors<HarvestSchemaType>;
+  isLoading: boolean;
 }
 
-export default function NewHarvestForm({ register, errors, control }: Props) {
+export default function NewHarvestForm({
+  register,
+  errors,
+  control,
+  isLoading,
+}: Props) {
   return (
-    <section className="relative mt-[50px] flex flex-col space-y-[30px] ">
-      <ItemLayout>
-        <AssetLabel
-          label="Harvest Name"
-          caption="Give this harvest a descriptive name"
-        />
-        <div>
+    <Card className="w-full md:w-min">
+      <section className=" ">
+        <FormRow
+          rowLabel="Harvest Name"
+          className="border-b-0 pb-[10px]"
+          subHeading={<p>Give this harvest a descriptive name</p>}
+        >
           <Input
-            placeholder="2023 Mbeya Avocado Harvest"
+            label="Harvest Name"
+            className="w-full"
+            hideLabel
             {...register("name")}
+            error={errors?.name?.message}
           />
-          {errors?.name && (
-            <p className="text-sm text-red-500">Harvest Name is required</p>
-          )}
-        </div>
-      </ItemLayout>
-      <ItemLayout>
-        <AssetLabel
-          label="Farmer Name"
-          caption="Choose the name of the farmer from the drop down list"
-        />
-        <div>
+        </FormRow>
+
+        <FormRow
+          rowLabel="Farmer's Name"
+          subHeading={
+            <p>Choose the name of the farmer from the drop down list</p>
+          }
+          className="border-b-0 pb-[10px]"
+        >
           <Controller
             control={control}
             name="farmerId"
@@ -49,25 +59,27 @@ export default function NewHarvestForm({ register, errors, control }: Props) {
           {errors?.farmerId && (
             <p className="text-sm text-red-500">Farmers Name is required</p>
           )}
-        </div>
-      </ItemLayout>
+        </FormRow>
 
-      <ItemLayout>
-        <AssetLabel
-          label="Crop Name"
-          caption="What is the name of the crop harvested?"
-        />
-        <div>
-          <Input placeholder="Kapenta Siavonga" {...register("crop")} />
-          {errors?.crop && (
-            <p className="text-sm text-red-500">Crop Name is required</p>
-          )}
-        </div>
-      </ItemLayout>
+        <FormRow
+          subHeading={<p>What is the name of the crop harvested?</p>}
+          className="border-b-0 pb-[10px]"
+          rowLabel="Crop Name"
+        >
+          <Input
+            error={errors?.crop?.message}
+            label="Crop Name"
+            hideLabel
+            {...register("crop")}
+            className="w-full"
+          />
+        </FormRow>
 
-      <ItemLayout>
-        <AssetLabel label="Date of Harvest" caption="When was this harvested" />
-        <div>
+        <FormRow
+          subHeading={<p>When was this harvested</p>}
+          className="border-b-0 pb-[10px]"
+          rowLabel="Harvest Date"
+        >
           <Controller
             control={control}
             name="date"
@@ -79,60 +91,63 @@ export default function NewHarvestForm({ register, errors, control }: Props) {
               When was this harvest happen?
             </p>
           )}
-        </div>
-      </ItemLayout>
+        </FormRow>
 
-      <ItemLayout>
-        <AssetLabel
-          label="Quantity"
-          caption="What was the quantity of the harvest, the measurement unit can be specified in the description below"
-        />
-        <div>
+        <FormRow
+          subHeading={
+            <p>
+              What was the quantity of the harvest, the measurement unit can be
+              specified in the description below
+            </p>
+          }
+          className="border-b-0 pb-[10px]"
+          rowLabel="Quantity"
+        >
           <Input
-            placeholder="100"
             type="number"
+            error={errors?.size?.message}
+            label="Quantity"
+            hideLabel
+            className="w-full"
             {...register("size", { valueAsNumber: true })}
           />
-          {errors?.size && (
-            <p className="text-sm text-red-500">
-              What is the size of this harvest
-            </p>
-          )}
-        </div>
-      </ItemLayout>
+        </FormRow>
 
-      <ItemLayout>
-        <AssetLabel
-          label="Units"
-          caption="Is this harvest recorded in tonnes, kg, or sacks"
-        />
-        <div>
-          <Input placeholder="Kg" {...register("unit")} />
-          {errors?.unit && (
-            <p className="text-sm text-red-500">
-              Enter the units used in the harvest
-            </p>
-          )}
-        </div>
-      </ItemLayout>
-
-      <ItemLayout>
-        <AssetLabel
-          label="Inputs Used"
-          caption="List of the inputs used in this harvest"
-        />
-        <div>
+        <FormRow
+          subHeading={<p>Is this harvest recorded in tonnes, kg, or sack</p>}
+          className="border-b-0 pb-[10px]"
+          rowLabel="Units"
+        >
           <Input
-            placeholder="npk fertilizer, potassium fertilizer"
+            label="Units"
+            hideLabel
+            className="w-full"
+            error={errors?.unit?.message}
+            {...register("unit")}
+          />
+        </FormRow>
+
+        <FormRow
+          subHeading={<p>List of the inputs used in this harvest</p>}
+          className="border-b-0 pb-[10px]"
+          rowLabel="Inputs Used"
+        >
+          <Input
+            className="w-full"
+            error={errors?.inputsUsed?.message}
+            label="Inputs Used"
+            hideLabel
             {...register("inputsUsed")}
           />
-          {errors?.inputsUsed && (
-            <p className="text-sm text-red-500">
-              Enter the units used in the harvest
-            </p>
-          )}
-        </div>
-      </ItemLayout>
-    </section>
+        </FormRow>
+      </section>
+      <Button
+        className="mt-[50px] w-[300px] text-base"
+        type="submit"
+        disabled={isLoading}
+      >
+        Save
+      </Button>
+    </Card>
   );
 }

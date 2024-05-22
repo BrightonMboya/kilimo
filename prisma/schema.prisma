@@ -54,7 +54,6 @@ model Harvests {
   id             String       @id @default(cuid())
   date           DateTime
   name           String
-  qrCodeLink     String
   crop           String
   size           Int
   inputsUsed     String

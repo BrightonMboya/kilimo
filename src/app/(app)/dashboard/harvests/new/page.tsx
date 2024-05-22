@@ -1,8 +1,8 @@
 "use client";
 import React, { type ReactElement } from "react";
-import Button from "~/components/ui/Button";
+
 import Layout from "~/components/Layout/Layout";
-import z from "zod";
+import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import NewHarvestForm from "~/components/harvests/NewHarvestForm";
@@ -26,6 +26,7 @@ export default function Page() {
 
   const { toast } = useToast();
   const utils = api.useUtils();
+  const router = useRouter();
 
   const { mutateAsync, isLoading } = api.harvests.create.useMutation({
     onSuccess: () => {
@@ -34,9 +35,23 @@ export default function Page() {
       });
       reset();
     },
-    onSettled: () => {},
-    onMutate: (data) => {},
-    onError: () => {
+    onSettled: () => {
+      utils.harvests.fetchByOrganization.invalidate();
+       router.push(`/dashboard/harvests`);
+    },
+    // onMutate: (data) => {
+    //   utils.harvests.fetchByOrganization.cancel();
+    //   const prevData = utils.harvests.fetchByOrganization.getData();
+    //   utils.harvests.fetchByOrganization.setData(undefined, (old) => [
+    //     // @ts-ignore
+    //     ...old,
+    //     data,
+    //   ]);
+
+    //   return { prevData };
+    // },
+    onError: (cause, data, ctx) => {
+      // utils.harvests.fetchByOrganization.setData(undefined, ctx?.prevData);
       toast({
         variant: "destructive",
         description: "Failed to create a new harvest",
@@ -45,10 +60,10 @@ export default function Page() {
   });
 
   const onSubmit: SubmitHandler<HarvestSchemaType> = async (data) => {
+   
     try {
       mutateAsync({
         ...data,
-        organizationEmail: "",
       });
     } catch (cause) {
       console.log(cause);
@@ -59,19 +74,16 @@ export default function Page() {
     }
   };
 
-
   return (
-    <main className="pt-[40px] max-w-[80%]">
+    <main className="pt-[40px]">
       <h3 className="text-2xl font-medium ">Untitled Harvest</h3>
-      <form onSubmit={handleSubmit(onSubmit)} >
-        <NewHarvestForm register={register} control={control} errors={errors} />
-        <Button
-          className="mt-[50px] w-[300px] text-base"
-          type="submit"
-          disabled={isLoading}
-        >
-          Save
-        </Button>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <NewHarvestForm
+          register={register}
+          control={control}
+          errors={errors}
+          isLoading={isLoading}
+        />
       </form>
     </main>
   );

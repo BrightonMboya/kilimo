@@ -6,27 +6,19 @@ import { harvestsSchema } from "~/app/(app)/dashboard/harvests/_components/schem
 const harvests = createTRPCRouter({
   create: protectedProcedure
     .input(
-      harvestsSchema.merge(
-        z.object({
-          organizationEmail: z.string(),
-        }),
-      ),
+      harvestsSchema,
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        // const organizationId = await useOrganizationId(input.organizationEmail);
-        // start by creating the qrCode and store it on the s3 bucket
-        const qrCodeLink = "";
         const newHarvest = await ctx.db.harvests.create({
           data: {
             date: input.date,
             name: input.name,
-            qrCodeLink,
             crop: input.crop,
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organizationId: "",
+            organizationId: ctx?.user?.id,
             size: input.size,
           },
         });
@@ -38,17 +30,11 @@ const harvests = createTRPCRouter({
     }),
 
   fetchByOrganization: protectedProcedure
-    .input(
-      z.object({
-        organizationEmail: z.string(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       try {
-        // const organizationId = await useOrganizationId(input.organizationEmail);
         return await ctx.db.harvests.findMany({
           where: {
-            organizationId: "",
+            organizationId: ctx.user?.id,
           },
           include: {
             Farmers: {
