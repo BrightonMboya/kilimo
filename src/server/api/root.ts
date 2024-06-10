@@ -6,6 +6,7 @@ import {
   harvests,
   inventory,
   organization,
+  reports,
   warehouses,
 } from "./routers";
 
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   inventory,
   farmers,
   auth,
+  reports,
 });
 
 // export type definition of API

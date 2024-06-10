@@ -21,7 +21,7 @@ export default function Sidebar() {
         className="flex items-center justify-between border-b bg-white p-4 md:hidden"
       >
         <Link href="." title="Home" className="block h-[32px]">
-          <img src="/logo-full-color(x2).png" alt="logo" className="h-full" />
+          {/* <img src="/logo-full-color(x2).png" alt="logo" className="h-full" /> */}
         </Link>
         <div className="flex items-center space-x-4">
           <MenuButton />
@@ -46,11 +46,11 @@ export default function Sidebar() {
               className="logo flex items-center"
               onClick={toggleMobileNav}
             >
-              <img
+              {/* <img
                 src="/logo-full-color(x2).png"
                 alt="Shelf Logo"
                 className="mx-1.5 inline h-[32px]"
-              />
+              /> */}
             </Link>
           </div>
 

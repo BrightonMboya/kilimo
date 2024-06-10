@@ -5,7 +5,6 @@ import {
   Control,
   FieldErrors,
 } from "react-hook-form";
-import { AssetLabel, ItemLayout } from "../Layout/ItemLayout";
 import Input from "~/components/shared/Input";
 import { HarvestDatePicker } from "./HarvestDatePicker";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";

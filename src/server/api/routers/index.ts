@@ -5,3 +5,4 @@ export { default as equipments } from "./equipments";
 export { default as organization } from "./organization";
 export { default as farmers } from "./farmers";
 export { default as auth } from "./auth";
+export { default as reports } from "./reports";

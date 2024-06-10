@@ -2,6 +2,7 @@ import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { harvestsSchema } from "~/app/(app)/dashboard/harvests/_components/schema";
+import { TRPCError } from "@trpc/server";
 
 const harvests = createTRPCRouter({
   create: protectedProcedure
@@ -97,6 +98,30 @@ const harvests = createTRPCRouter({
           throw FAILED_TO_CREATE;
         }
       }),
+
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const deletedHarvest = await ctx.db.harvests.delete({
+          where: {
+            id: input.id,
+          },
+        });
+        return deletedHarvest;
+      } catch (cause) {
+        console.log(cause);
+         throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete farmer",
+          cause,
+        });
+      }
+    }),
 });
 
 

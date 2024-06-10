@@ -20,6 +20,11 @@ export function useMainMenuItems() {
       label: "Harvests",
     },
     {
+      icon: <Icon icon="reports" />,
+      to: "/dashboard/reports",
+      label: "Reports",
+    },
+    {
       icon: <Icon icon="shoppingCart" />,
       to: "/dashboard/orders",
       label: "Orders",

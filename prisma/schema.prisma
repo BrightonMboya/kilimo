@@ -19,6 +19,7 @@ model Organization {
   farmers      Farmers[]
   harvests     Harvests[]
   Warehouses   Warehouses[]
+  reports      Reports[]
 }
 
 model Farmers {
@@ -62,6 +63,7 @@ model Harvests {
   organizationId String
   Farmers        Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
   farmersId      String
+  reports        Reports[]
 }
 
 model Equipments {
@@ -97,4 +99,18 @@ model Inventory {
   estimatedValuePerUnit String
   Warehouses            Warehouses @relation(fields: [warehousesId], references: [id])
   warehousesId          String
+}
+
+
+// so to be able to track the report across the supply chain, you can have another table say "report events"
+// that will link to the reports table and it will contains the different events associated with tracking the report
+
+model Reports {
+  id             String        @id @default(cuid())
+  name           String
+  dateCreated    DateTime
+  Harvests       Harvests      @relation(fields: [harvestsId], references: [id])
+  harvestsId     String
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String
 }

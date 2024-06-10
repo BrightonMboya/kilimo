@@ -1,5 +1,5 @@
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { LeafyGreen } from "lucide-react";
+import { LeafyGreen, Clipboard } from "lucide-react";
 
 import { tw } from "~/utils/utils";
 
@@ -50,7 +50,7 @@ import {
   TakeCustodyIcon,
   Farmers,
   ShoppingCart,
-  CurrencyDollar
+  CurrencyDollar,
 } from "../icons/library";
 
 /** The possible options for icons to be rendered in the button */
@@ -95,7 +95,8 @@ export type IconType =
   | "shoppingCart"
   | "harvest" 
   | "currencyDollar"
-  | "farmers";
+  | "farmers"
+  | "reports";
 
 
 type IconsMap = {
@@ -144,6 +145,7 @@ export const iconsMap: IconsMap = {
   currencyDollar: <CurrencyDollar />,
   "give-custody": <GiveCustodyIcon />,
   "take-custody": <TakeCustodyIcon />,
+  "reports": <Clipboard />,
 };
 
 export default iconsMap;
