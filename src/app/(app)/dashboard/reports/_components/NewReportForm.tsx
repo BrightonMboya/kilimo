@@ -7,8 +7,12 @@ import {
   UseFormRegister,
   Control,
   FieldErrors,
+  useFieldArray,
+  useForm,
 } from "react-hook-form";
 import { reportSchema, type IReportSchema } from "./schema";
+import { HarvestDatePicker } from "~/components/harvests/HarvestDatePicker";
+import TrackingEventsForm from "./TrackingEventsForm";
 
 interface Props {
   register: UseFormRegister<IReportSchema>;
@@ -17,12 +21,17 @@ interface Props {
   isLoading: boolean;
 }
 
-export default function NewReportForm({
-  register,
-  errors,
-  control,
-  isLoading,
-}: Props) {
+export default function NewReportForm({ isLoading }: Props) {
+  const {
+    register,
+    formState: { errors },
+    control,
+  } = useForm();
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "trackingEvents",
+  });
+
   return (
     <Card className="w-full md:w-min">
       <section className=" ">
@@ -40,7 +49,48 @@ export default function NewReportForm({
           />
         </FormRow>
 
-        <FormRow></FormRow>
+        <FormRow
+          rowLabel="Harvest Name"
+          subHeading={<p>Each treaceability report should include a harvest</p>}
+          className="border-b-0 pb-[10px]"
+        >
+          <Controller
+            control={control}
+            name="harvestId"
+            render={({ field }) => <p>some harvest picker component</p>}
+          />
+        </FormRow>
+        <FormRow
+          subHeading={<p>Let's begin the traceability with a date</p>}
+          className="pb-[10px]"
+          rowLabel="Date"
+        >
+          <Controller
+            control={control}
+            name="dateCreated"
+            render={({ field }) => <HarvestDatePicker field={field} />}
+          />
+
+          {errors?.dateCreated && (
+            <p className="text-sm text-red-500">
+              When was this report created?
+            </p>
+          )}
+        </FormRow>
+
+        <FormRow
+          children={null}
+          rowLabel="Tracking Events"
+          subHeading={
+            <p>
+              Tracking events are helps you to track the different processes
+              that occurs your supply chain
+            </p>
+          }
+          className="border-b-0"
+        />
+
+        <TrackingEventsForm />
       </section>
     </Card>
   );

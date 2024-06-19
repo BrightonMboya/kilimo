@@ -24,7 +24,7 @@ export default function Page() {
         <EmptyState
           customContent={{
             title: "No Reports found",
-            text: "What are you waiting for? Create your first Report now!",
+            text: "Reports are the core of your food traceability, Create your first Report now!",
             newButtonRoute: "/dashboard/reports/new",
             newButtonContent: "New Report",
           }}

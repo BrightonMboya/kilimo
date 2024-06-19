@@ -12,14 +12,15 @@ datasource db {
 }
 
 model Organization {
-  id           String       @id @default(cuid())
-  name         String
-  country      String?
-  emailAddress String       @unique
-  farmers      Farmers[]
-  harvests     Harvests[]
-  Warehouses   Warehouses[]
-  reports      Reports[]
+  id                   String                 @id @default(cuid())
+  name                 String
+  country              String?
+  emailAddress         String                 @unique
+  farmers              Farmers[]
+  harvests             Harvests[]
+  Warehouses           Warehouses[]
+  reports              Reports[]
+  ReportTrackingEvents ReportTrackingEvents[]
 }
 
 model Farmers {
@@ -101,16 +102,27 @@ model Inventory {
   warehousesId          String
 }
 
-
 // so to be able to track the report across the supply chain, you can have another table say "report events"
 // that will link to the reports table and it will contains the different events associated with tracking the reports
 
 model Reports {
-  id             String        @id @default(cuid())
-  name           String
+  id                   String                 @id @default(cuid())
+  name                 String
+  dateCreated          DateTime
+  Harvests             Harvests               @relation(fields: [harvestsId], references: [id])
+  harvestsId           String
+  Organization         Organization?          @relation(fields: [organizationId], references: [id])
+  organizationId       String
+  ReportTrackingEvents ReportTrackingEvents[]
+}
+
+model ReportTrackingEvents {
+  id             String       @id @default(cuid())
+  eventName      String
   dateCreated    DateTime
-  Harvests       Harvests      @relation(fields: [harvestsId], references: [id])
-  harvestsId     String
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  description    String
+  reportId       String
+  reports        Reports      @relation(fields: [reportId], references: [id])
+  Organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
 }
