@@ -70,52 +70,52 @@ const harvests = createTRPCRouter({
       }
     }),
 
-    editHarvest: protectedProcedure
-      .input(
-        harvestsSchema
+  editHarvest: protectedProcedure
+    .input(
+      harvestsSchema
         .merge(z.object({ id: z.string() })),
-      )
-      .mutation(async ({ ctx, input }) => {
-        try {
-          const updatedHarvest = await ctx.db.harvests.update({    
-            where: {
-              id: input.id,
-            },
-            data: {
-              date: input.date,
-              name: input.name,
-              crop: input.crop,
-              unit: input.unit,
-              inputsUsed: input.inputsUsed,
-              farmersId: input.farmerId,
-              organizationId: ctx?.user?.id,
-              size: input.size,
-            },
-          });
-          return updatedHarvest;
-        } catch (cause) {
-          console.log(cause);
-          throw FAILED_TO_CREATE;
-        }
-      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const updatedHarvest = await ctx.db.harvests.update({
+          where: {
+            id: input.id,
+          },
+          data: {
+            date: input.date,
+            name: input.name,
+            crop: input.crop,
+            unit: input.unit,
+            inputsUsed: input.inputsUsed,
+            farmersId: input.farmerId,
+            organizationId: ctx?.user?.id,
+            size: input.size,
+          },
+        });
+        return updatedHarvest;
+      } catch (cause) {
+        console.log(cause);
+        throw FAILED_TO_CREATE;
+      }
+    }),
 
   delete: protectedProcedure
     .input(
       z.object({
-        id: z.string(),
+        harvestId: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
         const deletedHarvest = await ctx.db.harvests.delete({
           where: {
-            id: input.id,
+            id: input.harvestId,
           },
         });
         return deletedHarvest;
       } catch (cause) {
         console.log(cause);
-         throw new TRPCError({
+        throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete farmer",
           cause,
@@ -123,6 +123,5 @@ const harvests = createTRPCRouter({
       }
     }),
 });
-
 
 export default harvests;

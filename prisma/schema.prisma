@@ -103,7 +103,7 @@ model Inventory {
 
 
 // so to be able to track the report across the supply chain, you can have another table say "report events"
-// that will link to the reports table and it will contains the different events associated with tracking the report
+// that will link to the reports table and it will contains the different events associated with tracking the reports
 
 model Reports {
   id             String        @id @default(cuid())
