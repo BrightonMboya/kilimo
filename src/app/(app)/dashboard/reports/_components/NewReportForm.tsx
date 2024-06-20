@@ -8,11 +8,11 @@ import {
   Control,
   FieldErrors,
   useFieldArray,
-  useForm,
 } from "react-hook-form";
 import { reportSchema, type IReportSchema } from "./schema";
-import { HarvestDatePicker } from "~/components/harvests/HarvestDatePicker";
+import { DatePicker } from "~/components/ui/DatePicker";
 import TrackingEventsForm from "./TrackingEventsForm";
+import Button from "~/components/ui/Button";
 
 interface Props {
   register: UseFormRegister<IReportSchema>;
@@ -21,12 +21,8 @@ interface Props {
   isLoading: boolean;
 }
 
-export default function NewReportForm({ isLoading }: Props) {
-  const {
-    register,
-    formState: { errors },
-    control,
-  } = useForm();
+export default function NewReportForm(props: Props) {
+  const { control, register, errors } = props;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "trackingEvents",
@@ -34,7 +30,7 @@ export default function NewReportForm({ isLoading }: Props) {
 
   return (
     <Card className="w-full md:w-min">
-      <section className=" ">
+      <section className="">
         <FormRow
           rowLabel="Report Name"
           className="border-b-0 pb-[10px]"
@@ -45,11 +41,11 @@ export default function NewReportForm({ isLoading }: Props) {
             className="w-full"
             hideLabel
             {...register("name")}
-            error={errors?.name?.message}
+            // error={errors?.name?.message}
           />
         </FormRow>
 
-        <FormRow
+        {/* <FormRow
           rowLabel="Harvest Name"
           subHeading={<p>Each treaceability report should include a harvest</p>}
           className="border-b-0 pb-[10px]"
@@ -59,7 +55,7 @@ export default function NewReportForm({ isLoading }: Props) {
             name="harvestId"
             render={({ field }) => <p>some harvest picker component</p>}
           />
-        </FormRow>
+        </FormRow> */}
         <FormRow
           subHeading={<p>Let's begin the traceability with a date</p>}
           className="pb-[10px]"
@@ -68,7 +64,7 @@ export default function NewReportForm({ isLoading }: Props) {
           <Controller
             control={control}
             name="dateCreated"
-            render={({ field }) => <HarvestDatePicker field={field} />}
+            render={({ field }) => <DatePicker field={field} />}
           />
 
           {errors?.dateCreated && (
@@ -90,7 +86,18 @@ export default function NewReportForm({ isLoading }: Props) {
           className="border-b-0"
         />
 
-        <TrackingEventsForm />
+        <TrackingEventsForm
+          fields={fields}
+          append={append}
+          remove={remove}
+          register={register}
+          control={control}
+          errors={errors}
+        />
+
+        <Button className="mt-10 w-full" type="submit">
+          Create Report
+        </Button>
       </section>
     </Card>
   );

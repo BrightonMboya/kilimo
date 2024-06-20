@@ -1,44 +1,35 @@
+"use client";
 import {
   Controller,
   type FieldErrors,
   type UseFormRegister,
-  useFieldArray,
   type UseFieldArrayRemove,
-  useForm,
   type Control,
+  FieldArrayWithId,
+  UseFieldArrayAppend,
 } from "react-hook-form";
 import { HarvestDatePicker } from "~/components/harvests/HarvestDatePicker";
 import FormRow from "~/components/shared/FormRow";
 import Input from "~/components/shared/Input";
-import {
-  type ITrackingEventsSchema,
-  trackingEventsSchema,
-  defaultReportEventsObjects,
-} from "./schema";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { defaultReportEventsObjects, type IReportSchema } from "./schema";
 import Button from "~/components/ui/Button";
 import { Trash2 } from "lucide-react";
 
-export default function TrackingEventsForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-  } = useForm<ITrackingEventsSchema>({
-    resolver: zodResolver(trackingEventsSchema),
-    defaultValues: {
-      trackingEvents: [{ ...defaultReportEventsObjects }],
-    },
-  });
-  const { fields, append, remove } = useFieldArray({
-    //^?
-    control,
-    name: "trackingEvents",
-  });
+interface TrackingEventsFormProps {
+  remove: UseFieldArrayRemove;
+  fields: any;
+  append: UseFieldArrayAppend<IReportSchema>;
+  register: UseFormRegister<IReportSchema>;
+  control: Control<IReportSchema>;
+  errors: FieldErrors<IReportSchema>;
+}
+
+export default function TrackingEventsForm(props: TrackingEventsFormProps) {
+  const { remove, fields, append, register, control, errors } = props;
+  
 
   let eventIndex: number;
-  const fieldSections = fields.map((field, idx) => {
+  const fieldSections = fields.map((field: { id: any }, idx: number) => {
     const { id } = field;
     eventIndex = idx;
     return (
@@ -54,7 +45,7 @@ export default function TrackingEventsForm() {
   });
   return (
     <>
-      <form>
+      <section>
         {fieldSections}
         <div>
           <Button
@@ -66,31 +57,17 @@ export default function TrackingEventsForm() {
           >
             Add Tracking Event
           </Button>
-
-          {/* <Button
-            className="mt-10 w-[200px]"
-            type="button"
-            onClick={() => {
-              remove(eventIndex);
-            }}
-          >
-            Remove
-          </Button> */}
         </div>
-
-        <Button className="mt-10 w-full" type="submit">
-          Save & Next
-        </Button>
-      </form>
+      </section>
     </>
   );
 }
 
 interface EventFormProps {
   idx: number;
-  control: Control<ITrackingEventsSchema>;
-  register: UseFormRegister<ITrackingEventsSchema>;
-  errors: FieldErrors<ITrackingEventsSchema>;
+  control: Control<IReportSchema>;
+  register: UseFormRegister<IReportSchema>;
+  errors: FieldErrors<IReportSchema>;
   remove: UseFieldArrayRemove;
 }
 

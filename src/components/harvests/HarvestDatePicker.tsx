@@ -13,10 +13,9 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { ControllerRenderProps } from "react-hook-form";
-import { HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 
 interface Props {
-  field: ControllerRenderProps<HarvestSchemaType, "date">;
+  field: ControllerRenderProps<any>;
 }
 
 export function HarvestDatePicker({ field }: Props) {
