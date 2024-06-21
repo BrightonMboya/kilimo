@@ -8,12 +8,14 @@ import Header from "~/components/Layout/header/header";
 import { EmptyState } from "~/components/shared/empty/empty-state";
 import SuperLink from "~/components/shared/SuperLink";
 import ReportsTable from "./_components/ReportsTable";
-
+import {Toaster} from "~/components/ui/Toaster";
 
 export default function Page() {
-  const { data, isLoading, isError } = api.reports.fetchByOrganization.useQuery();
+  const { data, isLoading, isError } =
+    api.reports.fetchByOrganization.useQuery();
   return (
     <main className="">
+      <Toaster />
       <Header classNames="" title="Reports">
         <div className="w-full lg:flex lg:justify-end">
           <SuperLink href="/dashboard/reports/new">

@@ -87,6 +87,40 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       const report = row.original;
       const { toast } = useToast();
       const utils = api.useUtils();
+      const finishedTrackingHandler =
+        api.reports.markAsFinishedTracking.useMutation({
+          onSuccess: () => {
+            toast({
+              description: "Report marked as complete",
+            });
+          },
+          onMutate: (report) => {
+            utils.reports.fetchByOrganization.invalidate();
+            const prevData = utils.reports.fetchByOrganization.getData();
+            const newData = prevData?.map((r) => {
+              if (r.id === report.reportId) {
+                return { ...r, finishedTracking: true };
+              }
+              return r;
+            });
+            utils.reports.fetchByOrganization.setData(undefined, newData);
+            return { prevData };
+          },
+          onSettled: () => {
+            utils.reports.fetchByOrganization.invalidate();
+             toast({
+               description: "Report marked as complete",
+             });
+          },
+          onError: (error, data, ctx) => {
+            utils.reports.fetchByOrganization.setData(undefined, ctx?.prevData);
+            toast({
+              description: "Failed to mark the tracking as complete",
+              variant: "destructive",
+              duration: 3000,
+            });
+          },
+        });
       const { mutateAsync, isLoading } = api.reports.delete.useMutation({
         onSuccess: () => {
           toast({
@@ -155,7 +189,13 @@ export const columns: ColumnDef<ReportsTableData>[] = [
               </Link>
             </DropdownMenuItem>
 
-            <DropdownMenuItem>Mark the report as complete</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                finishedTrackingHandler.mutateAsync({ reportId: report.id });
+              }}
+            >
+              Mark the report as complete
+            </DropdownMenuItem>
             <DropdownMenuItem>Download the report as PDF</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

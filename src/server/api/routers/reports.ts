@@ -97,6 +97,24 @@ const reports = createTRPCRouter({
       }
     }),
 
+  markAsFinishedTracking: protectedProcedure
+    .input(z.object({ reportId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.db.reports.update({
+          where: {
+            id: input.reportId,
+          },
+          data: {
+            finishedTracking: true,
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw FAILED_TO_CREATE;
+      }
+    }),
+
   delete: protectedProcedure
     .input(z.object({ reportId: z.string() }))
     .mutation(async ({ ctx, input }) => {}),
