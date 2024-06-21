@@ -3,7 +3,6 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { reportSchema } from "~/app/(app)/dashboard/reports/_components/schema";
 import z from "zod";
 
-
 const reports = createTRPCRouter({
   fetchByOrganization: protectedProcedure
     .query(async ({ ctx }) => {
@@ -16,9 +15,9 @@ const reports = createTRPCRouter({
             Harvests: {
               select: {
                 name: true,
-              }
-            }
-          }
+              },
+            },
+          },
         });
       } catch (cause) {
         console.log(cause);
@@ -53,9 +52,54 @@ const reports = createTRPCRouter({
       }
     }),
 
-    delete: protectedProcedure
+  fetchById: protectedProcedure
     .input(z.object({ reportId: z.string() }))
-    .mutation(async ({ctx, input}) => {})
+    .query(async ({ ctx, input }) => {
+      try {
+        return await ctx.db.reports.findFirst({
+          where: {
+            organization_id: ctx?.user.id,
+            id: input.reportId,
+          },
+          include: {
+            Harvests: {
+              select: {
+                name: true,
+                crop: true,
+                inputsUsed: true,
+                Farmers: {
+                  select: {
+                    fullName: true,
+                    country: true,
+                    province: true,
+                  },
+                },
+              },
+            },
+            ReportTrackingEvents: {
+              select: {
+                id: true,
+                eventName: true,
+                dateCreated: true,
+                description: true,
+              },
+            },
+            Organization: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw NOT_FOUND_ERROR;
+      }
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ reportId: z.string() }))
+    .mutation(async ({ ctx, input }) => {}),
 });
 
 export default reports;

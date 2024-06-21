@@ -23,7 +23,7 @@ export default function Page() {
   });
   const { toast } = useToast();
   const router = useRouter();
-  console.log(data);
+  
 
   const {
     register,

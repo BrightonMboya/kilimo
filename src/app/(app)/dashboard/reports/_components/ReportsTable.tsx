@@ -68,7 +68,7 @@ export default function ReportsTable({ data }: {data: ReportsTableData[]}) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter harvest..."
+          placeholder="Filter reports..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
