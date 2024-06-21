@@ -193,6 +193,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
               onClick={() => {
                 finishedTrackingHandler.mutateAsync({ reportId: report.id });
               }}
+              className="cursor-pointer"
             >
               Mark the report as complete
             </DropdownMenuItem>

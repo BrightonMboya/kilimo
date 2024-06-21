@@ -15,11 +15,15 @@ import {
 
 interface Props {
   field: any;
+  defaultDate?: Date;
 }
 
-export function DatePicker({ field }: Props) {
-  const [date, setDate] = React.useState<Date>();
+export function DatePicker({ field, defaultDate }: Props) {
+  const [date, setDate] = React.useState<Date>(
+   defaultDate ? defaultDate : new Date()
+  );
   const [open, setOpen] = React.useState<boolean>(false);
+ 
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

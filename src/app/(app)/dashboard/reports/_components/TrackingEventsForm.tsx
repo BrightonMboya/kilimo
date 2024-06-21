@@ -25,7 +25,6 @@ interface TrackingEventsFormProps {
 
 export default function TrackingEventsForm(props: TrackingEventsFormProps) {
   const { remove, fields, append, register, control, errors } = props;
-  
 
   let eventIndex: number;
   const fieldSections = fields.map((field: { id: any }, idx: number) => {
@@ -68,6 +67,7 @@ interface EventFormProps {
   register: UseFormRegister<IReportSchema>;
   errors: FieldErrors<IReportSchema>;
   remove: UseFieldArrayRemove;
+
 }
 
 function EventsForm(props: EventFormProps) {
@@ -95,9 +95,10 @@ function EventsForm(props: EventFormProps) {
         <Controller
           control={control}
           name={`trackingEvents.${idx}.dateCreated`}
+          // defaultValue={new Date(`Tue Jun 18 2024 00:00:00 GMT+0300`)}
           render={({ field }) => (
             <div className="w-full">
-              <DatePicker field={field} />
+              <DatePicker field={field} defaultDate={new Date(field.value)} />
             </div>
           )}
         />
