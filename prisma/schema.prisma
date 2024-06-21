@@ -53,18 +53,18 @@ model Farmers {
 // }
 
 model Harvests {
-  id             String       @id @default(cuid())
-  date           DateTime
-  name           String
-  crop           String
-  size           Int
-  inputsUsed     String
-  unit           String
-  Organization   Organization @relation(fields: [organization_id], references: [id])
+  id              String       @id @default(cuid())
+  date            DateTime
+  name            String
+  crop            String
+  size            Int
+  inputsUsed      String
+  unit            String
+  Organization    Organization @relation(fields: [organization_id], references: [id])
   organization_id String
-  Farmers        Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
-  farmersId      String
-  reports        Reports[]
+  Farmers         Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
+  farmersId       String
+  reports         Reports[]
 }
 
 model Equipments {
@@ -80,13 +80,13 @@ model Equipments {
 }
 
 model Warehouses {
-  id             String       @id @default(cuid())
-  name           String
-  description    String
-  maxCapacity    Int
-  unit           String
-  inventory      Inventory[]
-  Organization   Organization @relation(fields: [organization_id], references: [id])
+  id              String       @id @default(cuid())
+  name            String
+  description     String
+  maxCapacity     Int
+  unit            String
+  inventory       Inventory[]
+  Organization    Organization @relation(fields: [organization_id], references: [id])
   organization_id String
 }
 
@@ -109,10 +109,11 @@ model Reports {
   id                   String                 @id @default(cuid())
   name                 String
   dateCreated          DateTime
+  finishedTracking     Boolean                @default(false)
   Harvests             Harvests               @relation(fields: [harvestsId], references: [id])
   harvestsId           String
   Organization         Organization           @relation(fields: [organization_id], references: [id])
-  organization_id      String 
+  organization_id      String
   ReportTrackingEvents ReportTrackingEvents[]
 }
 

@@ -14,14 +14,12 @@ export const reportSchema = z.object({
   ),
 });
 
-
 export const defaultReportEventsObjects = {
   eventName: "",
   description: "",
   harvestId: "",
   dateCreated: new Date(),
-  
-}
+};
 
 export const trackingEventsSchema = z.object({
   trackingEvents: z.array(
@@ -31,7 +29,19 @@ export const trackingEventsSchema = z.object({
       description: z.string().min(1),
     }),
   ),
-})
+});
+
+export type ReportsTableData = {
+  id: string;
+  name: string;
+  dateCreated: Date;
+  finishedTracking: false;
+  Harvests: {
+    name: string;
+  };
+  harvestId: string;
+  organization_id: string;
+};
 
 export type ITrackingEventsSchema = z.infer<typeof trackingEventsSchema>;
 export type IReportSchema = z.infer<typeof reportSchema>;

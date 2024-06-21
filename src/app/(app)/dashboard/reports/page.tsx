@@ -6,18 +6,19 @@ import Button from "~/components/ui/Button";
 import Link from "next/link";
 import Header from "~/components/Layout/header/header";
 import { EmptyState } from "~/components/shared/empty/empty-state";
+import SuperLink from "~/components/shared/SuperLink";
+import ReportsTable from "./_components/ReportsTable";
 
 
 export default function Page() {
- 
-  const { data, isLoading } = api.reports.fetchByOrganization.useQuery();
+  const { data, isLoading, isError } = api.reports.fetchByOrganization.useQuery();
   return (
     <main className="">
       <Header classNames="" title="Reports">
         <div className="w-full lg:flex lg:justify-end">
-          <Link href="/dashboard/reports/new">
+          <SuperLink href="/dashboard/reports/new">
             <Button className="w-full lg:w-fit ">New Report</Button>
-          </Link>
+          </SuperLink>
         </div>
       </Header>
       {!isLoading && data?.length === 0 && (
@@ -31,6 +32,7 @@ export default function Page() {
         />
       )}
       {isLoading && <LoadingSkeleton />}
+      {!isLoading && data!?.length != 0 && <ReportsTable data={data!} />}
     </main>
   );
 }
