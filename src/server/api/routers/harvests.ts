@@ -19,7 +19,7 @@ const harvests = createTRPCRouter({
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organizationId: ctx?.user?.id,
+            organization_id: ctx?.user?.id,
             size: input.size,
           },
         });
@@ -35,7 +35,7 @@ const harvests = createTRPCRouter({
       try {
         return await ctx.db.harvests.findMany({
           where: {
-            organizationId: ctx.user?.id,
+            organization_id: ctx.user?.id,
           },
           include: {
             Farmers: {
@@ -88,7 +88,7 @@ const harvests = createTRPCRouter({
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organizationId: ctx?.user?.id,
+            organization_id: ctx?.user?.id,
             size: input.size,
           },
         });
@@ -120,6 +120,24 @@ const harvests = createTRPCRouter({
           message: "Failed to delete farmer",
           cause,
         });
+      }
+    }),
+
+  harvestsNamesAndId: protectedProcedure
+    .query(async ({ ctx }) => {
+      try {
+        return await ctx.db.harvests.findMany({
+          where: {
+            organization_id: ctx.user?.id,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw NOT_FOUND_ERROR;
       }
     }),
 });

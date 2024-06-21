@@ -6,7 +6,7 @@ import {
   FieldErrors,
 } from "react-hook-form";
 import Input from "~/components/shared/Input";
-import { HarvestDatePicker } from "./HarvestDatePicker";
+import { DatePicker } from "../ui/DatePicker";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
 import FarmersPicker from "./FarmersPicker";
 import { Card } from "../shared/empty/Card";
@@ -82,7 +82,7 @@ export default function NewHarvestForm({
           <Controller
             control={control}
             name="date"
-            render={({ field }) => <HarvestDatePicker field={field} />}
+            render={({ field }) => <DatePicker field={field} />}
           />
 
           {errors?.date && (

@@ -5,15 +5,14 @@ import {
   type UseFormRegister,
   type UseFieldArrayRemove,
   type Control,
-  FieldArrayWithId,
   UseFieldArrayAppend,
 } from "react-hook-form";
-import { HarvestDatePicker } from "~/components/harvests/HarvestDatePicker";
 import FormRow from "~/components/shared/FormRow";
 import Input from "~/components/shared/Input";
 import { defaultReportEventsObjects, type IReportSchema } from "./schema";
 import Button from "~/components/ui/Button";
 import { Trash2 } from "lucide-react";
+import { DatePicker } from "~/components/ui/DatePicker";
 
 interface TrackingEventsFormProps {
   remove: UseFieldArrayRemove;
@@ -98,7 +97,7 @@ function EventsForm(props: EventFormProps) {
           name={`trackingEvents.${idx}.dateCreated`}
           render={({ field }) => (
             <div className="w-full">
-              <HarvestDatePicker field={field} />
+              <DatePicker field={field} />
             </div>
           )}
         />

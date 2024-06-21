@@ -13,6 +13,7 @@ import { reportSchema, type IReportSchema } from "./schema";
 import { DatePicker } from "~/components/ui/DatePicker";
 import TrackingEventsForm from "./TrackingEventsForm";
 import Button from "~/components/ui/Button";
+import HarvestPicker from "./HarvestPicker";
 
 interface Props {
   register: UseFormRegister<IReportSchema>;
@@ -22,7 +23,7 @@ interface Props {
 }
 
 export default function NewReportForm(props: Props) {
-  const { control, register, errors } = props;
+  const { control, register, errors, isLoading } = props;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "trackingEvents",
@@ -45,7 +46,7 @@ export default function NewReportForm(props: Props) {
           />
         </FormRow>
 
-        {/* <FormRow
+        <FormRow
           rowLabel="Harvest Name"
           subHeading={<p>Each treaceability report should include a harvest</p>}
           className="border-b-0 pb-[10px]"
@@ -53,9 +54,9 @@ export default function NewReportForm(props: Props) {
           <Controller
             control={control}
             name="harvestId"
-            render={({ field }) => <p>some harvest picker component</p>}
+            render={({ field }) => <HarvestPicker field={field} />}
           />
-        </FormRow> */}
+        </FormRow>
         <FormRow
           subHeading={<p>Let's begin the traceability with a date</p>}
           className="pb-[10px]"
@@ -95,7 +96,9 @@ export default function NewReportForm(props: Props) {
           errors={errors}
         />
 
-        <Button className="mt-10 w-full" type="submit">
+        <Button className="mt-10 w-full" type="submit"
+        disabled={isLoading}
+        >
           Create Report
         </Button>
       </section>
