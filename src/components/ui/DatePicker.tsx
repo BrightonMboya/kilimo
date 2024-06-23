@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
 import { cn } from "../../utils/utils";
 import Button from "~/components/ui/Button";
@@ -18,12 +18,24 @@ interface Props {
   defaultDate?: Date;
 }
 
+function isValidDate(date: Date) {
+  return date instanceof Date && !isNaN(date.getTime());
+}
+
 export function DatePicker({ field, defaultDate }: Props) {
+  const initialDate = defaultDate ? new Date(defaultDate) : new Date();
   const [date, setDate] = React.useState<Date>(
-   defaultDate ? defaultDate : new Date()
+    isValidDate(initialDate) ? initialDate : new Date(),
   );
   const [open, setOpen] = React.useState<boolean>(false);
- 
+
+  React.useEffect(() => {
+    const fieldValue = field.value;
+    const parsedDate = new Date(fieldValue);
+    if (isValidDate(parsedDate)) {
+      setDate(parsedDate);
+    }
+  }, [field.value]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -44,9 +56,11 @@ export function DatePicker({ field, defaultDate }: Props) {
           mode="single"
           selected={date}
           onSelect={(e) => {
-            setDate(e);
-            setOpen(false);
-            field.onChange(e);
+            if (isValidDate(e)) {
+              setDate(e);
+              setOpen(false);
+              field.onChange(e);
+            }
           }}
           initialFocus
         />

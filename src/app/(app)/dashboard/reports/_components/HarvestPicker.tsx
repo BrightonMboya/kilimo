@@ -28,12 +28,22 @@ interface Props {
 
 export default function HarvestPicker({ field }: Props) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState(field.value || "");
 
   const { data, isLoading } = api.harvests.harvestsNamesAndId.useQuery();
 
+  React.useEffect(() => {
+    if (field.value) {
+      setValue(field.value);
+    }
+  }, [field.value]);
+
+  const selectedHarvestName = value
+    ? data?.find((harvest) => harvest.id === value)?.name
+    : "Select harvest...";
+
   return (
-    <div className=" w-full bg-white">
+    <div className="w-full bg-white">
       {isLoading && <Spinner />}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild className="w-full">
@@ -43,10 +53,7 @@ export default function HarvestPicker({ field }: Props) {
             aria-expanded={open}
             className="w-full justify-between p-0 px-2 text-sm text-gray-500"
           >
-            {value
-              ? data?.find((harvest) => harvest.id === value)?.name
-              : "Select harvest..."}
-
+            {selectedHarvestName}
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

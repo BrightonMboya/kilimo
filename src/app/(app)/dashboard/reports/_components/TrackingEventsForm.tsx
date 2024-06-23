@@ -95,7 +95,6 @@ function EventsForm(props: EventFormProps) {
         <Controller
           control={control}
           name={`trackingEvents.${idx}.dateCreated`}
-          // defaultValue={new Date(`Tue Jun 18 2024 00:00:00 GMT+0300`)}
           render={({ field }) => (
             <div className="w-full">
               <DatePicker field={field} defaultDate={new Date(field.value)} />

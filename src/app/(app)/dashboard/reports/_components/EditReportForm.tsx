@@ -58,7 +58,7 @@ const EditReportForm = (props: Props) => {
   return (
     <>
       {isLoading && <LoadingSkeleton />}
-      {!isLoading && !isError && data && (
+      {!isLoading && !isError && data?.ReportTrackingEvents && (
         <Card className="w-full md:w-min">
           <section>
             <FormRow
@@ -84,6 +84,7 @@ const EditReportForm = (props: Props) => {
               <Controller
                 control={control}
                 name="harvestId"
+            
                 render={({ field }) => <HarvestPicker field={field} />}
               />
             </FormRow>
@@ -131,7 +132,6 @@ const EditReportForm = (props: Props) => {
               control={control}
               errors={errors}
             />
-
             <Button className="mt-10 w-full" type="submit">
               Save Changes
             </Button>

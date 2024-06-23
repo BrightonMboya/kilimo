@@ -20,18 +20,20 @@ export default function Page() {
   } = useForm<IReportSchema>({
     resolver: zodResolver(reportSchema),
   });
+  console.log(errors);
   const onSubmit: SubmitHandler<IReportSchema> = (data) => {
-       
     console.log(data);
   };
   return (
-    <EditReportForm
-      register={register}
-      control={control}
-      setValue={setValue}
-      errors={errors}
-      reportId="clxo9vo3p0001qfyxmjv4o5xu"
-      onSubmit={onSubmit}
-    />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <EditReportForm
+        register={register}
+        control={control}
+        setValue={setValue}
+        errors={errors}
+        reportId="clxo9vo3p0001qfyxmjv4o5xu"
+        onSubmit={onSubmit}
+      />
+    </form>
   );
 }
