@@ -55,7 +55,7 @@ export function DatePicker({ field, defaultDate }: Props) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={(e) => {
+          onSelect={(e: any) => {
             if (isValidDate(e)) {
               setDate(e);
               setOpen(false);

@@ -42,7 +42,7 @@ export default function Page() {
     onSettled: () => {
       utils.reports.fetchByOrganization.invalidate();
       router.push(`/dashboard/reports`);
-    }
+    },
   });
 
   const onSubmit: SubmitHandler<IReportSchema> = async (
@@ -52,7 +52,6 @@ export default function Page() {
       mutateAsync(data);
     } catch (cause) {
       console.log(cause);
-      console.log("I am in the catch block");
     }
   };
   return (

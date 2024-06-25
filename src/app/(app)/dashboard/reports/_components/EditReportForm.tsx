@@ -18,7 +18,7 @@ import Button from "~/components/ui/Button";
 import HarvestPicker from "./HarvestPicker";
 import { useEffect } from "react";
 import { api } from "~/trpc/react";
-import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
+import LoadingSkeleton, { Spinner } from "~/components/ui/LoadingSkeleton";
 
 interface Props {
   register: UseFormRegister<IReportSchema>;
@@ -27,10 +27,11 @@ interface Props {
   reportId: string;
   errors: FieldErrors<IReportSchema>;
   onSubmit: SubmitHandler<IReportSchema>;
+  isMutating: boolean;
 }
 
 const EditReportForm = (props: Props) => {
-  const { control, register, setValue, errors, reportId } = props;
+  const { control, register, setValue, errors, reportId, isMutating } = props;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "trackingEvents",
@@ -60,6 +61,7 @@ const EditReportForm = (props: Props) => {
       {isLoading && <LoadingSkeleton />}
       {!isLoading && !isError && data?.ReportTrackingEvents && (
         <Card className="w-full md:w-min">
+          <h3 className="text-lg">{`Editing the ${data?.name} Report`}</h3>
           <section>
             <FormRow
               rowLabel="Report Name"
@@ -84,7 +86,6 @@ const EditReportForm = (props: Props) => {
               <Controller
                 control={control}
                 name="harvestId"
-            
                 render={({ field }) => <HarvestPicker field={field} />}
               />
             </FormRow>
@@ -132,7 +133,12 @@ const EditReportForm = (props: Props) => {
               control={control}
               errors={errors}
             />
-            <Button className="mt-10 w-full" type="submit">
+            <Button
+              className="mt-10 w-full"
+              type="submit"
+              disabled={isMutating}
+            >
+              {isMutating && <Spinner />}
               Save Changes
             </Button>
           </section>

@@ -52,6 +52,55 @@ const reports = createTRPCRouter({
       }
     }),
 
+  edit: protectedProcedure
+    .input(reportSchema.merge(
+      z.object({
+        id: z.string(),
+      }),
+    ))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.db.reports.update({
+          where: {
+            id: input.id,
+            organization_id: ctx?.user?.id,
+          },
+          data: {
+            name: input.name,
+            dateCreated: input.dateCreated,
+            harvestsId: input.harvestId,
+            organization_id: ctx.user?.id,
+            ReportTrackingEvents: {
+              update: input.trackingEvents
+                .filter((event) => event.id)
+                .map((event) => ({
+                  where: {
+                    id: event.id,
+                    organization_id: ctx.user?.id,
+                  },
+                  data: {
+                    eventName: event.eventName,
+                    dateCreated: event.dateCreated,
+                    description: event.description,
+                  },
+                })),
+              create: input.trackingEvents
+                .filter((event) => !event.id)
+                .map((event) => ({
+                  eventName: event.eventName,
+                  dateCreated: event.dateCreated,
+                  description: event.description,
+                  organization_id: ctx.user?.id,
+                })),
+            },
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw FAILED_TO_CREATE;
+      }
+    }),
+
   fetchById: protectedProcedure
     .input(z.object({ reportId: z.string() }))
     .query(async ({ ctx, input }) => {

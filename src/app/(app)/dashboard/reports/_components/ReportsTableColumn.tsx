@@ -181,7 +181,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             <DropdownMenuItem>
               <Link
                 href={{
-                  pathname: `/dashboard/report/edit/`,
+                  pathname: `/dashboard/reports/edit/`,
                   query: { reportId: report.id },
                 }}
               >

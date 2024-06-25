@@ -51,7 +51,7 @@ export default function HarvestPicker({ field }: Props) {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between p-0 px-2 text-sm text-gray-500"
+            className="w-full justify-between p-0 px-2 text-sm"
           >
             {selectedHarvestName}
             <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
