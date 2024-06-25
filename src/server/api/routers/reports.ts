@@ -1,4 +1,8 @@
-import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
+import {
+  FAILED_TO_CREATE,
+  FAILED_TO_MUTATE,
+  NOT_FOUND_ERROR,
+} from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { reportSchema } from "~/app/(app)/dashboard/reports/_components/schema";
 import z from "zod";
@@ -167,6 +171,21 @@ const reports = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ reportId: z.string() }))
     .mutation(async ({ ctx, input }) => {}),
+
+  deleteTrackingEvent: protectedProcedure
+    .input(z.object({ eventId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        return await ctx.db.reportTrackingEvents.delete({
+          where: {
+            id: input.eventId,
+          },
+        });
+      } catch (cause) {
+        console.log(cause);
+        throw FAILED_TO_MUTATE;
+      }
+    }),
 });
 
 export default reports;

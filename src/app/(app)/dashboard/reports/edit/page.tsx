@@ -29,7 +29,7 @@ export default function Page() {
   console.log(errors);
 
   const { isLoading, mutateAsync } = api.reports.edit.useMutation({
-    onSuccess: () => {
+    onSuccess: (report) => {
       reset();
       router.push(`/dashboard/reports/view/?reportId=${report?.id}`);
     },
