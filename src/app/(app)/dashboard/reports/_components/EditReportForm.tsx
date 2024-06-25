@@ -52,7 +52,8 @@ const EditReportForm = (props: Props) => {
           eventName: event.eventName,
           dateCreated: new Date(event.dateCreated),
           description: event.description,
-          eventId: event.id
+          eventId: event.id,
+          id: event.id,
         })),
       );
     }

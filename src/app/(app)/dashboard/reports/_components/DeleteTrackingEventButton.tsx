@@ -50,12 +50,18 @@ export default function DeleteTrackingEventButton(props: Props) {
   const { isLoading, mutateAsync } =
     api.reports.deleteTrackingEvent.useMutation({
       onMutate: () => {},
-      onError: () => {},
+      onError: (err, event, ctx) => {
+        console.log(err);
+        toast({
+          description: "Failed to delete the tracking event, please try again",
+          variant: "destructive",
+        });
+      },
       onSettled: () => {
         utils.reports.fetchById.invalidate(),
-        toast({
-          description: "Deleted the event succesfully",
-        });
+          toast({
+            description: "Deleted the event succesfully",
+          });
         setIsOpen(false);
       },
       //   onSuccess: () => {

@@ -14,6 +14,7 @@ import Button from "~/components/ui/Button";
 import { Trash2 } from "lucide-react";
 import { DatePicker } from "~/components/ui/DatePicker";
 import DeleteTrackingEventButton from "./DeleteTrackingEventButton";
+import { v4 as uuidv4 } from "uuid";
 
 interface TrackingEventsFormProps {
   remove: UseFieldArrayRemove;
@@ -41,7 +42,7 @@ export default function EditTrackingEvents(props: TrackingEventsFormProps) {
           register={register}
           errors={errors}
           remove={remove}
-          eventId={eventId}
+          eventId={field.eventId || field.id}
         />
       );
     },
@@ -55,7 +56,11 @@ export default function EditTrackingEvents(props: TrackingEventsFormProps) {
             className="mt-10 w-[200px]"
             type="button"
             onClick={() => {
-              append({ ...defaultReportEventsObjects });
+              append({
+                ...defaultReportEventsObjects,
+                id: uuidv4(),
+                isItNew: true,
+              });
             }}
           >
             Add Tracking Event

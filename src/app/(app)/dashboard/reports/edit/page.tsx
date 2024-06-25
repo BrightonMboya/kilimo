@@ -1,5 +1,4 @@
 "use client";
-
 import EditReportForm from "../_components/EditReportForm";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,13 +28,20 @@ export default function Page() {
   console.log(errors);
 
   const { isLoading, mutateAsync } = api.reports.edit.useMutation({
-    onSuccess: (report) => {
-      reset();
-      router.push(`/dashboard/reports/view/?reportId=${report?.id}`);
+    onSuccess: () => {
+       toast({
+         description: "Report edited succesfully",
+         // title: "Succesfully edited the report"
+       });
     },
     onSettled: (report) => {
+      toast({
+        description: "Report edited succesfully",
+        // title: "Succesfully edited the report"
+      })
       utils.reports.fetchByOrganization.invalidate();
-      
+      reset();
+      router.push(`/dashboard/reports/view/?reportId=${report?.id}`);
     },
     // onMutate: (report) => {
     //   utils.reports.fetchByOrganization.invalidate();
@@ -46,12 +52,16 @@ export default function Page() {
       toast({
         title: "Failed to edit the report",
         description: "Check the all the required fields and try again",
+        variant: "destructive"
       });
     },
   });
 
   const onSubmit: SubmitHandler<IReportSchema> = (data) => {
     try {
+      // const existingEvents = data?.trackingEvents.filter((event) => !event.id);
+      // const newEvents = data?.trackingEvents.filter((event) => event.id);
+      // console.log(newEvents)
       type Input = inferProcedureInput<AppRouter["reports"]["edit"]>;
       const input: Input = {
         ...data,

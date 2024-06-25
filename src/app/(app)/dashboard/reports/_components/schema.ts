@@ -10,6 +10,8 @@ export const reportSchema = z.object({
       eventName: z.string().min(1),
       dateCreated: z.date(),
       description: z.string().min(1),
+      id: z.string().optional(),
+      isItNew: z.boolean().optional(),
     }),
   ),
 });
@@ -19,6 +21,7 @@ export const defaultReportEventsObjects = {
   description: "",
   harvestId: "",
   dateCreated: new Date(),
+  isItNew: "",
 };
 
 export const trackingEventsSchema = z.object({

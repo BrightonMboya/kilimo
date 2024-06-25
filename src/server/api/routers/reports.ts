@@ -64,6 +64,11 @@ const reports = createTRPCRouter({
     ))
     .mutation(async ({ ctx, input }) => {
       try {
+        const newEvents = input.trackingEvents.filter((event) => event.isItNew);
+        const oldEvents = input.trackingEvents.filter((event) => !event.isItNew);
+        console.log(oldEvents)
+        console.log(newEvents, "new ones")
+
         return await ctx.db.reports.update({
           where: {
             id: input.id,
@@ -75,8 +80,7 @@ const reports = createTRPCRouter({
             harvestsId: input.harvestId,
             organization_id: ctx.user?.id,
             ReportTrackingEvents: {
-              update: input.trackingEvents
-                .filter((event) => event.id)
+              update: oldEvents
                 .map((event) => ({
                   where: {
                     id: event.id,
@@ -88,14 +92,15 @@ const reports = createTRPCRouter({
                     description: event.description,
                   },
                 })),
-              create: input.trackingEvents
-                .filter((event) => !event.id)
-                .map((event) => ({
-                  eventName: event.eventName,
-                  dateCreated: event.dateCreated,
-                  description: event.description,
-                  organization_id: ctx.user?.id,
-                })),
+              createMany: {
+                data: newEvents
+                  .map((event) => ({
+                    eventName: event.eventName,
+                    dateCreated: event.dateCreated,
+                    description: event.description,
+                    organization_id: ctx.user?.id,
+                  })),
+              },
             },
           },
         });
