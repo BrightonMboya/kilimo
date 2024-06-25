@@ -197,7 +197,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             >
               Mark the report as complete
             </DropdownMenuItem>
-            <DropdownMenuItem>Download the report as PDF</DropdownMenuItem>
+            {/* <DropdownMenuItem>Download the report as PDF</DropdownMenuItem> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
