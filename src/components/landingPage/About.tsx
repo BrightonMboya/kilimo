@@ -4,26 +4,27 @@ import BlurImage from "~/components/ui/BlurImage";
 
 export default function About() {
   return (
-    <section className="bg-gray-1 dark:bg-dark-2 flex flex-col items-center justify-center pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
+    <section className="bg-gray-1 flex flex-col items-center justify-center pb-8 pl-5 pt-10 lg:pb-[70px] lg:pt-[120px]">
       <div className="container">
         <div className="wow fadeInUp" data-wow-delay=".2s">
           <div className="-mx-4 flex flex-wrap items-center">
-            <div className="w-full px-4 lg:w-1/2">
-              <div className="mb-12 max-w-[540px] lg:mb-0">
-                <h2 className="text-dark mb-5 text-3xl font-bold leading-tight sm:text-[40px] sm:leading-[1.2] dark:text-white">
+            <div className="w-full px-4 lg:w-1/2 lg:px-0">
+              <div className="mb-12 lg:mb-0 ">
+                <h2 className="mb-5 max-w-none text-balance text-3xl font-extrabold text-black md:text-4xl lg:text-5xl">
                   Manage your Agribusiness the Smart Way.
                 </h2>
-                <p className="text-body-color dark:text-dark-6 mb-10 text-base leading-relaxed">
-                  Recording your company data in excel sheet doesnt scale well enough and soon
-                  you will be having bunches of excel sheet that is hard to keep track of.
+                <p className="text-body-color  mb-10 text-base leading-relaxed lg:text-lg">
+                  Recording your company data in excel sheet doesnt scale well
+                  enough and soon you will be having bunches of excel sheet that
+                  is hard to keep track of.
                   <br />
                   <br />
-                  At Yuwe, we cover that for you and you can focus on the core operations of your business
-                  to increase revenue and growth. 
+                  At Jani, we cover that for you and you can focus on the core
+                  operations of your business to increase revenue and growth.
                 </p>
 
-                <Link href="/contactus">
-                  <p className="border-primary bg-primary hover:border-blue-dark hover:bg-blue-dark inline-flex items-center justify-center rounded-md border px-7 py-3 text-center text-base font-medium text-white">
+                <Link href="https://cal.com/brightonmboya/15min">
+                  <p className="inline-flex items-center  justify-center rounded-md border border-primary bg-primary px-7 py-3 text-center text-base font-medium text-white">
                     Contact Us
                   </p>
                 </Link>
@@ -51,17 +52,17 @@ export default function About() {
                     />
                   </div>
 
-                  <div className="bg-primary relative z-10 mb-4 flex items-center justify-center overflow-hidden px-6 py-12 sm:mb-8 sm:h-[160px] sm:p-5 lg:mb-4 xl:mb-8">
+                  <div className="relative z-10 mb-4 flex items-center justify-center overflow-hidden bg-primary px-6 py-12 sm:mb-8 sm:h-[160px] sm:p-5 lg:mb-4 xl:mb-8">
                     <div>
                       <span className="block text-5xl font-extrabold text-white">
-                        10
+                        50
                       </span>
                       <span className="block text-base font-semibold text-white">
-                        Just a
+                        Businesses using Jani
                       </span>
-                      <span className="block text-base font-medium text-white text-opacity-70">
+                      {/* <span className="block text-base font-medium text-white text-opacity-70">
                         fancy stat
-                      </span>
+                      </span> */}
                     </div>
                     <div>
                       <span className="absolute left-0 top-0 -z-10">

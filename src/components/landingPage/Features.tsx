@@ -1,28 +1,33 @@
+import Image from "next/image";
+
+
 export default function Features() {
   return (
-    <section className="dark:bg-dark flex flex-col items-center justify-center pb-8 pt-20 lg:pb-[70px] lg:pt-[120px]">
+    <section className=" flex flex-col items-center justify-center pb-8 pt-20 text-black lg:pb-[70px] lg:pt-[120px]">
       <div className="container">
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4">
-            <div className="mx-auto mb-12 max-w-[485px] text-center lg:mb-[70px]">
-              <span className="text-primary mb-2 block text-lg font-semibold">
+            <div className="mx-auto mb-12 text-center lg:mb-[70px] lg:max-w-2xl">
+              {/* <span className="mb-2 block text-lg font-semibold text-primary">
                 Features
-              </span>
-              <h2 className="text-dark mb-3 text-3xl font-bold sm:text-4xl md:text-[40px] md:leading-[1.2] dark:text-white">
-                Main Features Of Yuwe
+              </span> */}
+              <h2 className="mb-3 text-balance text-4xl font-bold text-black lg:text-6xl lg:font-extrabold">
+                Giving observability from farm to fork.
               </h2>
-              <p className="text-body-color dark:text-dark-6 text-base">
-                With Yuwe you can rest assured your tech stack of your business is handled well and you can focus
-                on the core operations of your business.
+              <p className="text-lg lg:text-xl">
+                Map out your supply chain and see where you can optimize,
+                provide your clients with transparency and traceability of your
+                resources.
               </p>
             </div>
           </div>
         </div>
-        <div className="-mx-4 flex flex-wrap">
+
+        <div className="-mx-4 flex flex-wrap px-5">
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".1s">
-              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
-                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
+                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"
@@ -36,18 +41,19 @@ export default function Features() {
                   />
                 </svg>
               </div>
-              <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
+              <h4 className="mb-3 text-3xl font-bold text-black lg:text-2xl">
                 Tailored to your workflow
               </h4>
-              <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-              Yuwe is tailored around your business workflow and not the other way around.
+              <p className="mb-8 text-lg lg:mb-9 ">
+                We have designed Jani to fit perfectly with your workflow so
+                that you can easily integrate it within your organization.
               </p>
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".15s">
-              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
-                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
+                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="36"
                   height="36"
@@ -61,18 +67,19 @@ export default function Features() {
                   />
                 </svg>
               </div>
-              <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
+              <h4 className="mb-3 text-3xl font-bold text-black lg:text-2xl">
                 Custom Made
               </h4>
-              <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-                Request custom features that are unique to your business and workflow.
+              <p className="mb-8 text-lg lg:mb-9 ">
+                Request custom features that are unique to your business and
+                workflow.
               </p>
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".2s">
-              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
-                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
+                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"
@@ -118,18 +125,19 @@ export default function Features() {
                   />
                 </svg>
               </div>
-              <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
-               Own Your Data
+              <h4 className="mb-3 text-3xl font-bold text-black lg:text-2xl">
+                Own Your Data
               </h4>
-              <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-               With Yuwe you can chose to self host your data as it is open source.
+              <p className="mb-8 text-lg lg:mb-9 ">
+                With Jani you can chose to self host your data as it is open
+                source.
               </p>
             </div>
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".25s">
-              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
-                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
+                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"
@@ -155,11 +163,12 @@ export default function Features() {
                   />
                 </svg>
               </div>
-              <h4 className="text-dark mb-3 text-xl font-bold dark:text-white">
+              <h4 className="mb-3 text-3xl font-bold text-black lg:text-2xl">
                 Open Sourced
               </h4>
-              <p className="text-body-color dark:text-dark-6 mb-8 lg:mb-9">
-               Yuwe is Open Sourced allowing anyone to contribute to the software and catch bugs.
+              <p className="mb-8 text-lg lg:mb-9 ">
+                Jani AI is Open Sourced allowing anyone to contribute to the
+                software and also self host.
               </p>
             </div>
           </div>

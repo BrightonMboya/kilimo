@@ -10,23 +10,28 @@ export default function HeroSection() {
           <div className="container">
             <div className="-mx-4 flex flex-wrap items-center">
               <div className="w-full px-4">
-                <div
-                  className="hero-content wow fadeInUp mx-auto max-w-[780px] text-center"
-                  data-wow-delay=".2s"
-                >
-                  <h1 className="mb-6 text-3xl font-medium leading-snug  sm:text-4xl sm:leading-snug lg:text-5xl lg:leading-[1.2]">
-                    Helping AgriBusinesses Collect, Manage, and analyze data
-                    flows.
+                <div className="px-5 text-black">
+                  <h1
+                    className="text-balance text-3xl font-extrabold tracking-tight md:text-5xl lg:text-7xl "
+                  >
+                    Helping AgriBusinesses{" "}
+                    <span className="underline decoration-primary decoration-dashed underline-offset-4">
+                      track resources
+                    </span>{" "}
+                    across the supply chain.
                   </h1>
-                  <p className="mx-auto mb-9 max-w-[600px] text-base font-medium sm:text-lg sm:leading-[1.44]">
-                   Move from recording data from Excel sheets, papers and move to a custom software tailored to 
-                   your business workflow. 
+
+                  <p className="mx-auto mb-9 pt-5 text-xl font-medium sm:text-lg md:text-2xl lg:pt-7">
+                    Track your resources from the farm all the way up to the
+                    fork. Give your clients more observability and traceability
+                    to increase trust and transparency.
                   </p>
-                  <ul className="mb-10 flex flex-wrap items-center justify-center gap-5">
+                  <ul className="mb-10 flex flex-wrap gap-5">
                     <li>
                       <Link href="https://cal.com/brightonmboya/15min">
-                      
-                      <Button>Contact Sales</Button>
+                        <Button className="lg:py-6 lg:text-xl" size="lg">
+                          Contact Sales
+                        </Button>
                       </Link>
                     </li>
 
@@ -34,25 +39,16 @@ export default function HeroSection() {
                       <Button variant="ghost">Watch Demo</Button>
                     </li> */}
                   </ul>
-                  {/* <div>
-                  <p className="mb-4 text-center text-base font-medium">
-                    Built with latest technology
-                  </p>
-               
-                </div> */}
                 </div>
               </div>
 
               <div className="w-full px-4">
-                <div
-                  className="wow fadeInUp relative z-10 mx-auto max-w-[845px]"
-                  data-wow-delay=".25s"
-                >
-                  <div className="mt-10">
+                <div className="relative z-10 mx-auto ">
+                  <div className="mt-10 hidden rounded-md border-2 border-primary shadow-lg md:block">
                     <img
-                      src="https://uplink.weforum.org/uplink/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=0682o00000rF3w4AAC"
+                      src="/static/images/product.png"
                       alt="hero"
-                      className="mx-auto max-w-full rounded-t-xl rounded-tr-xl"
+                      className="mx-auto max-w-full rounded-md rounded-t-xl rounded-tr-xl"
                     />
                   </div>
                 </div>

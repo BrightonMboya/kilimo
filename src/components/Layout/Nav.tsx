@@ -16,8 +16,8 @@ const Nav = () => {
 
   return (
     <>
-      <nav className="absolute top-0 z-[9999] w-full font-montserrat">
-        <div
+      <nav className="font-montserrat absolute top-0 z-[9999] w-full ">
+        {/* <div
           onClick={() => setShowNav(!showNav)}
           className="absolute right-5 top-5 z-10 cursor-pointer lg:hidden"
         >
@@ -26,15 +26,27 @@ const Nav = () => {
           ) : (
             <RiMenu3Line size={30} color="#46783E" />
           )}
+        </div> */}
+        <div className="absolute left-5 top-5 md:hidden">
+          <div className="relative h-[50px] w-[80px] lg:block">
+            <Image
+              src="/static/images/jani.svg"
+              style={{
+                borderRadius: "12px",
+              }}
+              alt="logo"
+              layout="fill"
+            />
+          </div>
         </div>
         <ul
           className={
             !showNav
               ? "hidden"
-              : "bg-[#46783E] absolute left-0  top-0 flex h-[400px] w-full flex-col items-center justify-center gap-5 text-lg font-medium text-white"
+              : "absolute left-0 top-0  flex h-[400px] w-full flex-col items-center justify-center gap-5 bg-[#46783E] text-lg font-medium text-white"
           }
         >
-          <li>
+          {/* <li>
             <Link
               href="/"
               className={pathname === "/" ? activeRoute : normalRoute}
@@ -55,19 +67,20 @@ const Nav = () => {
             </Link>
           </li>
 
+          */}
           <li>
-            <Link href="/contactus">Contact Us</Link>
+            <Link href="https://cal.com/brightonmboya/15min">Contact Us</Link>
           </li>
         </ul>
 
         {/* for freaking wide screens */}
-        <ul className=" md:bg-[#46783E] hidden text-xl text-white md:h-[100px] md:items-center md:justify-between md:space-x-5 md:px-7 md:text-lg lg:flex">
+        <ul className=" hidden text-xl text-white md:h-[100px] md:items-center md:justify-between md:space-x-5 md:bg-[#46783E] md:px-7 md:text-lg lg:flex">
           <div>
             <li>
               <Link href="/">
                 <div className="relative hidden h-[65px] w-[148px] lg:block">
                   <Image
-                    src="/new_logo.png"
+                    src="/static/images/jani-white.png"
                     style={{
                       borderRadius: "12px",
                     }}
@@ -79,7 +92,7 @@ const Nav = () => {
             </li>
           </div>
           <div className="flex items-center space-x-7">
-            <li>
+            {/* <li>
               <Link
                 href="/"
                 className={pathname === "/" ? activeRoute : normalRoute}
@@ -95,7 +108,7 @@ const Nav = () => {
               >
                 sub Header
               </Link>
-            </li>
+            </li> */}
 
             <li>
               <Link href="https://cal.com/brightonmboya/15min">
@@ -104,9 +117,7 @@ const Nav = () => {
                 </button>
               </Link>
             </li>
-            <li>
-              
-            </li>
+            <li></li>
           </div>
         </ul>
       </nav>

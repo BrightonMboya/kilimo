@@ -1,27 +1,23 @@
 export default function Faq() {
   return (
-    <section className="dark:bg-dark relative z-20 overflow-hidden bg-white pb-8 pt-20 lg:pb-[50px] lg:pt-[120px]">
+    <section className="relative z-20 overflow-hidden bg-white pb-8 pt-20 lg:pb-[50px] lg:pt-[120px] pl-5 lg:pl-0">
       <div className="container mx-auto">
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4">
             <div className="mx-auto mb-[60px] max-w-[520px] text-center">
-              <span className="text-primary mb-2 block text-lg font-semibold">
+              <span className="mb-2 block text-lg font-semibold text-primary">
                 FAQ
               </span>
-              <h2 className="text-dark mb-3 text-3xl font-bold leading-[1.2] dark:text-white sm:text-4xl md:text-[40px]">
+              <h2 className="mb-3 text-3xl font-bold leading-[1.2] text-black sm:text-4xl md:text-[40px]">
                 Any Questions? Look Here
               </h2>
-              {/* <p className="text-body-color dark:text-dark-6 mx-auto max-w-[485px] text-base">
-                There are many variations of passages of Lorem Ipsum available
-                but the majority have suffered alteration in some form.
-              </p> */}
             </div>
           </div>
         </div>
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4 lg:w-1/2">
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -34,17 +30,18 @@ export default function Faq() {
                 </svg>
               </div>
               <div className="w-full">
-                <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
-                  What is Yuwe
+                <h3 className="text-dark mb-4 text-xl font-semibold  sm:text-2xl lg:text-xl xl:text-2xl">
+                  What is Jani AI
                 </h3>
-                <p className=" text-base">
-                 Yuwe helps Agribusiness collect, manage, and analyze data by creating custom enteprise software 
-                 that aligns with their workflow.
+                <p className=" text-base lg:text-lg">
+                  Jani helps agribusinesses track their resources across the
+                  supply chain, generate reports easily, as well as record
+                  keeping management.
                 </p>
               </div>
             </div>
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -57,19 +54,21 @@ export default function Faq() {
                 </svg>
               </div>
               <div className="w-full">
-                <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
+                <h3 className="text-dark mb-4 text-xl font-semibold sm:text-2xl lg:text-xl xl:text-2xl">
                   Why Open Source
                 </h3>
-                <p className=" text-base">
-                 We believe that as AI models continue to improve, the company should have a transparency
-                 on how their data is collected, and distributed in a very open way and that is why we chose the open source route.
+                <p className=" text-base lg:text-lg">
+                  We believe that data and custom workflows is crucial to the
+                  success of any businesses. Jani allows businesses to fork the
+                  repo so that they can build their custom workflow and features
+                  on top of our existing features.
                 </p>
               </div>
             </div>
           </div>
           <div className="w-full px-4 lg:w-1/2">
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -82,17 +81,19 @@ export default function Faq() {
                 </svg>
               </div>
               <div className="w-full">
-                <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
+                <h3 className="text-dark mb-4 text-xl font-semibold sm:text-2xl lg:text-xl xl:text-2xl">
                   Why you should care
                 </h3>
-                <p className=" text-base">
-                  AI is here to stay, and what better way to take the advantage of it than integrating it within your business.
-                  The first step however is having the data to work with the AI models in the first place.
+                <p className=" text-base lg:text-lg">
+                  We are what we eat. Giving the transparency to your clients on
+                  what processes and input goes to the food the buy will not
+                  only increase loyalty and trust but also increase your brand
+                  value.
                 </p>
               </div>
             </div>
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -105,12 +106,14 @@ export default function Faq() {
                 </svg>
               </div>
               <div className="w-full">
-                <h3 className="text-dark mb-4 text-xl font-semibold dark:text-white sm:text-2xl lg:text-xl xl:text-2xl">
+                <h3 className="text-dark mb-4 text-xl font-semibold sm:text-2xl lg:text-xl xl:text-2xl">
                   How can I self host?
                 </h3>
-                <p className=" text-base">
-                  With each software created, comes with a dedicated manual on how you can self host.
-                  Also, we gurantee 99% uptime for all the software shipped so that you can keep on focusing on your business operations.
+                <p className=" text-base lg:text-lg">
+                  With each software created, comes with a dedicated manual on
+                  how you can self host. Also, we gurantee 99% uptime for all
+                  the software shipped so that you can keep on focusing on your
+                  business operations.
                 </p>
               </div>
             </div>

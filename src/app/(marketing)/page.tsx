@@ -18,7 +18,6 @@ function Page() {
       <Call2Action />
       {/* <Pricing /> */}
       <Faq />
-      <Call2Action />
     </Layout>
   );
 }
