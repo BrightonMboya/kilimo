@@ -2,6 +2,7 @@
 import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AccountSelector from "~/components/auth/basejump/AccountSwitcher";
 
 const MenuItems = () => {
   const { menuItemsTop, menuItemsBottom } = useMainMenuItems();
@@ -12,28 +13,32 @@ const MenuItems = () => {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-full flex-col justify-between">
-        <ul className="menu">
-          {menuItemsTop.map((item) => (
-            <li key={item.label}>
-              <Link
-                className={`${baseNavClass} ${pathname.startsWith(item.to) ? "bg-primary text-white" : ""}`}
-                href={item.to}
-                title={item.label}
-              >
-                <i
-                  className={`inline-flex pl-[2px] text-gray-500 transition duration-200 ease-linear group-hover:text-white
-                  ${pathname.startsWith(item.to) ? "text-white" : "text-gray-500"}`}
-                >
-                  {item.icon}
-                </i>
-                <span className="text whitespace-nowrap transition duration-200 ease-linear group-hover:text-white">
-                  {item.label}
-                </span>
-              </Link>
+        <>
+          <ul className="menu">
+            <li className="my-2">
+              <AccountSelector accountId={""} />
             </li>
-          ))}
-        </ul>
-
+            {menuItemsTop.map((item) => (
+              <li key={item.label}>
+                <Link
+                  className={`${baseNavClass} ${pathname.startsWith(item.to) ? "bg-primary text-white" : ""}`}
+                  href={item.to}
+                  title={item.label}
+                >
+                  <i
+                    className={`inline-flex pl-[2px] text-gray-500 transition duration-200 ease-linear group-hover:text-white
+                  ${pathname.startsWith(item.to) ? "text-white" : "text-gray-500"}`}
+                  >
+                    {item.icon}
+                  </i>
+                  <span className="text whitespace-nowrap transition duration-200 ease-linear group-hover:text-white">
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
         <div className="lower-menu">
           <ul className="menu mb-6">
             {menuItemsBottom.map((item) => (

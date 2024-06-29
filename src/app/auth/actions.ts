@@ -67,6 +67,7 @@ export const signUp = async (formData: FormData) => {
     options: {
       data: {
         organization_name: organization_name,
+        organization_id: ""
       },
     },
     // options: {

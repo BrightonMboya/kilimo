@@ -95,6 +95,9 @@ dependencies:
   '@trpc/server':
     specifier: ^10.43.6
     version: 10.45.2
+  '@usebasejump/shared':
+    specifier: ^0.0.3
+    version: 0.0.3
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
@@ -140,6 +143,9 @@ dependencies:
   superjson:
     specifier: ^2.2.1
     version: 2.2.1
+  swr:
+    specifier: ^2.2.5
+    version: 2.2.5(react@18.3.1)
   tailwind-merge:
     specifier: ^2.2.1
     version: 2.3.0
@@ -2207,6 +2213,10 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
+
+  /@usebasejump/shared@0.0.3:
+    resolution: {integrity: sha512-qO9AnKnt5ALvMylnnlTuePrNM+cVs5aCbylzFfMN8ZgCOARWuir5PzZxB3CAVdtDzJpSYioLghYF0kaX1ryAZQ==}
+    dev: false
 
   /abs-svg-path@0.1.1:
     resolution: {integrity: sha512-d8XPSGjfyzlXC3Xx891DJRyZfqk5JU0BJrDQcsWomFIV1/BIzPW5HDH5iDdWpqWaav0YVIEzT1RHTwWr0FFshA==}
@@ -5122,6 +5132,16 @@ packages:
 
   /svg-arc-to-cubic-bezier@3.2.0:
     resolution: {integrity: sha512-djbJ/vZKZO+gPoSDThGNpKDO+o+bAeA4XQKovvkNCqnIS2t+S4qnLAGQhyyrulhCFRl1WWzAp0wUDV8PpTVU3g==}
+    dev: false
+
+  /swr@2.2.5(react@18.3.1):
+    resolution: {integrity: sha512-QtxqyclFeAsxEUeZIYmsaQ0UjimSq1RZ9Un7I68/0ClKK/U3LoyQunwkQfJZr2fc22DfIXLNDc2wFyTEikCUpg==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
+      use-sync-external-store: 1.2.2(react@18.3.1)
     dev: false
 
   /tailwind-merge@2.3.0:
