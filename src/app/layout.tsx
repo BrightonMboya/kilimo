@@ -4,7 +4,8 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { baseUrl } from "./sitemap";
-
+import { createClient } from "~/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -36,16 +37,26 @@ export const metadata: Metadata = {
   },
 };
 
-// const montserrat = Montserrat({
-//   subsets: ["latin"],
-//   display: "swap",
-// });
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params: { accountSlug },
 }: {
   children: React.ReactNode;
+  params: { accountSlug: string };
 }) {
+  const supabaseClient = createClient();
+
+  const { data: teamAccount, error } = await supabaseClient.rpc(
+    "get_account_by_slug",
+    {
+      slug: accountSlug,
+    },
+  );
+
+  // if (!teamAccount) {
+  //   redirect("/");
+  // }
+  console.log(teamAccount, ">>>>>>>>");
   return (
     <html lang="en" className={`${GeistSans.className} font-sans`}>
       <body>

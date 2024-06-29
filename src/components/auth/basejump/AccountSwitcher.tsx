@@ -1,7 +1,7 @@
 "use client";
 
 import { ComponentPropsWithoutRef, useMemo, useState } from "react";
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
+import { Check, ChevronsUpDown, Cone, PlusCircle } from "lucide-react";
 
 import { cn } from "~/utils/utils";
 import { Button } from "~/components/ui";
@@ -61,7 +61,7 @@ export default function AccountSelector({
     const selectedAccount = accounts?.find(
       (account) => account.account_id === accountId,
     );
-
+    console.log(selectedAccount);
     return {
       personalAccount,
       teamAccounts,
