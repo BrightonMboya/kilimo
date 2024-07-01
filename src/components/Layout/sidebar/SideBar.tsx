@@ -49,7 +49,7 @@ export default function Sidebar() {
               <img
                 src="/static/images/jani.svg"
                 alt="Shelf Logo"
-                className="mx-1.5 pl-3 inline h-[32px]"
+                className="mx-1.5 inline h-[32px] pl-3"
               />
             </Link>
           </div>

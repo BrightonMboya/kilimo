@@ -4,7 +4,7 @@ import {
   NOT_FOUND_ERROR,
 } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { reportSchema } from "~/app/(app)/dashboard/reports/_components/schema";
+import { reportSchema } from "~/app/(app)/dashboard/[accountSlug]/reports/_components/schema";
 import z from "zod";
 
 const reports = createTRPCRouter({
