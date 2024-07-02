@@ -63,6 +63,7 @@ export default function AccountSelector({
     const selectedAccount = accounts?.find(
       (account) => account.account_id === accountId,
     );
+    // console.log(teamAccounts, ",,,,,")
 
     return {
       personalAccount,

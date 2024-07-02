@@ -1,7 +1,6 @@
 import Icon from "~/components/ui/icons/icons";
-// import { useUserIsSelfService } from "./user-user-is-self-service";
 
-export function useMainMenuItems() {
+export function useMainMenuItems({accountSlug}: {accountSlug: string}) {
   let menuItemsTop = [
     {
       icon: <Icon icon="graph" />,
@@ -10,39 +9,39 @@ export function useMainMenuItems() {
     },
     {
       icon: <Icon icon="farmers" />,
-      to: "/dashboard/farmers",
+      to: `/dashboard/${accountSlug}/farmers`,
       label: "Farmers",
     },
     {
       icon: <Icon icon="harvest" />,
-      to: "/dashboard/harvests",
+      to: `/dashboard/${accountSlug}/harvests`,
       label: "Harvests",
     },
     {
       icon: <Icon icon="reports" />,
-      to: "/dashboard/reports",
+      to: `/dashboard/${accountSlug}/reports`,
       label: "Reports",
     },
     {
       icon: <Icon icon="shoppingCart" />,
-      to: "/dashboard/orders",
+      to: `/dashboard/${accountSlug}/orders`,
       label: "Orders",
     },
     {
       icon: <Icon icon="currencyDollar" />,
-      to: "/dashboard/sales",
+      to: `/dashboard/${accountSlug}/sales`,
       label: "Sales",
     },
 
     {
       icon: <Icon icon="settings" />,
-      to: "/dashboard/settings",
+      to: `/dashboard/${accountSlug}/settings`,
       label: "Settings",
       end: true,
     },
     {
       icon: <Icon icon="scanQR" />,
-      to: "scanner",
+      to: `/dashboard/${accountSlug}/billing`,
       label: "Billing",
       end: true,
     },

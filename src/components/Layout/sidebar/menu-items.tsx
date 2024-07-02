@@ -3,14 +3,18 @@ import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NavigatingAccountSelector from "~/components/auth/basejump/navigation-account-selector";
+import { useParams } from "next/navigation";
 
 const MenuItems = () => {
-  const { menuItemsTop, menuItemsBottom } = useMainMenuItems();
+  const params = useParams();
+  const { menuItemsTop, menuItemsBottom } = useMainMenuItems({
+    accountSlug: params.accountSlug as unknown as string,
+  });
   const pathname = usePathname();
+
   const baseNavClass =
     "group my-1 flex items-center gap-3 rounded px-3 py-2.5 text-[16px] font-semibold text-gray-700 transition-all duration-75 hover:bg-primary hover:text-white";
 
-  
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-full flex-col justify-between">
@@ -58,7 +62,6 @@ const MenuItems = () => {
                 </Link>
               </li>
             ))}
-
           </ul>
         </div>
       </div>

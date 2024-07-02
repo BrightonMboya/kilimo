@@ -8,25 +8,21 @@ interface Props {
 }
 export default function NavigatingAccountSelector() {
   const params = useParams();
-  // console.log(params.accountSlug, params.);
+  const router = useRouter();
   const { data, isLoading, isError } = api.auth.getAccountBySlug.useQuery({
     accountSlug: params.accountSlug as unknown as string,
   });
-  console.log(data, "?????????");
 
   return (
     <AccountSelector
-      accountId=""
-      //   onAccountSelected={(account) =>
-      //     router.push(
-      //       account?.personal_account
-      //         ? `/dashboard`
-      //         : `/dashboard/${account?.slug}`,
-      //     )
-      //   }
-      onAccountSelected={() => {
-        console.log("Motherfucker");
-      }}
+      accountId={data?.account_id}
+      onAccountSelected={(account) =>
+        router.push(
+          account?.personal_account
+            ? `/dashboard/farmers`
+            : `/dashboard/${account?.slug}/farmers`,
+        )
+      }
     />
   );
 }
