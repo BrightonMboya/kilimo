@@ -9,10 +9,10 @@ interface Props {
 export default function NavigatingAccountSelector() {
   const params = useParams();
   // console.log(params.accountSlug, params.);
-  // const { data, isLoading, isError } = api.auth.getAccountBySlug.useQuery({
-  //   accountSlug: params.accountSlug as unknown as string,
-  // });
-  // console.log(data, "?????????");
+  const { data, isLoading, isError } = api.auth.getAccountBySlug.useQuery({
+    accountSlug: params.accountSlug as unknown as string,
+  });
+  console.log(data, "?????????");
 
   return (
     <AccountSelector
