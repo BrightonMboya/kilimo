@@ -3,9 +3,8 @@
 import { useRouter, useParams } from "next/navigation";
 import AccountSelector from "./AccountSwitcher";
 import { api } from "~/trpc/react";
-interface Props {
-  accountId: string;
-}
+import { Skeleton } from "~/components/ui/Skeleton";
+
 export default function NavigatingAccountSelector() {
   const params = useParams();
   const router = useRouter();
@@ -14,15 +13,21 @@ export default function NavigatingAccountSelector() {
   });
 
   return (
-    <AccountSelector
-      accountId={data?.account_id}
-      onAccountSelected={(account) =>
-        router.push(
-          account?.personal_account
-            ? `/dashboard/farmers`
-            : `/dashboard/${account?.slug}/farmers`,
-        )
-      }
-    />
+    <>
+      {isLoading ? (
+        <Skeleton className="h-[50px] w-full" />
+      ) : (
+        <AccountSelector
+          accountId={data?.account_id}
+          onAccountSelected={(account) =>
+            router.push(
+              account?.personal_account
+                ? `/dashboard/farmers`
+                : `/dashboard/${account?.slug}/farmers`,
+            )
+          }
+        />
+      )}
+    </>
   );
 }

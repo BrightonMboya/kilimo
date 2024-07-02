@@ -21,7 +21,7 @@ export async function createTeam(prevState: any, formData: FormData) {
         };
     }
 
-    redirect(`/dashboard/${data.slug}`);
+    redirect(`/dashboard/${data.slug}/farmers`);
 };
 
 

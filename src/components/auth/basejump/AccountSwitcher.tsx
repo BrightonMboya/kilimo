@@ -63,7 +63,6 @@ export default function AccountSelector({
     const selectedAccount = accounts?.find(
       (account) => account.account_id === accountId,
     );
-    // console.log(teamAccounts, ",,,,,")
 
     return {
       personalAccount,
@@ -74,127 +73,129 @@ export default function AccountSelector({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   return (
-    <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            aria-label="Select a team"
-            className={cn("w-[250px] justify-between", className)}
-          >
-            {selectedAccount?.name || placeholder}
-            <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[250px] p-0">
-          <Command>
-            <CommandList>
-              <CommandInput placeholder="Search account..." />
-              <CommandEmpty>No account found.</CommandEmpty>
-              <CommandGroup heading="Personal Account">
-                <CommandItem
-                  key={personalAccount?.account_id}
-                  onSelect={() => {
-                    if (onAccountSelected) {
-                      onAccountSelected(personalAccount!);
-                    }
-                    setOpen(false);
-                  }}
-                  className="text-sm"
-                >
-                  {personalAccount?.name}
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      selectedAccount?.account_id ===
-                        personalAccount?.account_id
-                        ? "opacity-100"
-                        : "opacity-0",
-                    )}
-                  />
-                </CommandItem>
-              </CommandGroup>
-              {Boolean(teamAccounts?.length) && (
-                <CommandGroup heading="Teams">
-                  {teamAccounts?.map((team) => (
-                    <CommandItem
-                      key={team.account_id}
-                      onSelect={() => {
-                        if (onAccountSelected) {
-                          onAccountSelected(team);
-                        }
-
-                        setOpen(false);
-                      }}
-                      className="text-sm"
-                    >
-                      {team.name}
-                      <Check
-                        className={cn(
-                          "ml-auto h-4 w-4",
-                          selectedAccount?.account_id === team.account_id
-                            ? "opacity-100"
-                            : "opacity-0",
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
+    <section className="max-w-[250px]">
+      <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              aria-label="Select a team"
+              className={cn("w-[200px] justify-between", className)}
+            >
+              {selectedAccount?.name || placeholder}
+              <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <Command>
+              <CommandList>
+                <CommandInput placeholder="Search account..." />
+                <CommandEmpty>No account found.</CommandEmpty>
+                <CommandGroup heading="Personal Account">
+                  <CommandItem
+                    key={personalAccount?.account_id}
+                    onSelect={() => {
+                      if (onAccountSelected) {
+                        onAccountSelected(personalAccount!);
+                      }
+                      setOpen(false);
+                    }}
+                    className="text-sm"
+                  >
+                    {personalAccount?.name}
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        selectedAccount?.account_id ===
+                          personalAccount?.account_id
+                          ? "opacity-100"
+                          : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
                 </CommandGroup>
-              )}
-            </CommandList>
-            <CommandSeparator />
-            <CommandList>
-              <CommandGroup>
-                <DialogTrigger asChild>
+                {Boolean(teamAccounts?.length) && (
+                  <CommandGroup heading="Teams">
+                    {teamAccounts?.map((team) => (
+                      <CommandItem
+                        key={team.account_id}
+                        onSelect={() => {
+                          if (onAccountSelected) {
+                            onAccountSelected(team);
+                          }
+
+                          setOpen(false);
+                        }}
+                        className="text-sm"
+                      >
+                        {team.name}
+                        <Check
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            selectedAccount?.account_id === team.account_id
+                              ? "opacity-100"
+                              : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+              </CommandList>
+              <CommandSeparator />
+              <CommandList>
+                <CommandGroup>
+                  <DialogTrigger asChild>
+                    <CommandItem
+                      value="new-team"
+                      onSelect={() => {
+                        setOpen(false);
+                        setShowNewTeamDialog(true);
+                      }}
+                    >
+                      <PlusCircle className="mr-2 h-5 w-5" />
+                      Create Team
+                    </CommandItem>
+                  </DialogTrigger>
+                </CommandGroup>
+              </CommandList>
+
+              <CommandList>
+                <CommandGroup>
                   <CommandItem
                     value="new-team"
+                    className="text-white "
+                    style={{
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      cursor: "pointer",
+                    }}
                     onSelect={() => {
-                      setOpen(false);
-                      setShowNewTeamDialog(true);
+                      setIsLoggingOut(true);
+                      signOut();
+                      setIsLoggingOut(false);
                     }}
                   >
-                    <PlusCircle className="mr-2 h-5 w-5" />
-                    Create Team
+                    {isLoggingOut ? <Spinner /> : <LogOut />}
+                    <span className="pl-3">Log Out</span>
                   </CommandItem>
-                </DialogTrigger>
-              </CommandGroup>
-            </CommandList>
-
-            <CommandList>
-              <CommandGroup>
-                <CommandItem
-                  value="new-team"
-                  className="text-white "
-                  style={{
-                    backgroundColor: "#ef4444",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
-                  onSelect={() => {
-                    setIsLoggingOut(true);
-                    signOut();
-                    setIsLoggingOut(false);
-                  }}
-                >
-                  {isLoggingOut ? <Spinner /> : <LogOut />}
-                  <span className="pl-3">Log Out</span>
-                </CommandItem>
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create a new team</DialogTitle>
-          <DialogDescription>
-            Create a team to collaborate with others.
-          </DialogDescription>
-        </DialogHeader>
-        <NewTeamForm />
-      </DialogContent>
-    </Dialog>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create a new team</DialogTitle>
+            <DialogDescription>
+              Create a team to collaborate with others.
+            </DialogDescription>
+          </DialogHeader>
+          <NewTeamForm />
+        </DialogContent>
+      </Dialog>
+    </section>
   );
 }
