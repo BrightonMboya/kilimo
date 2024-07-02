@@ -1,7 +1,7 @@
 "use client";
 
 import { ComponentPropsWithoutRef, useMemo, useState } from "react";
-import { Check, ChevronsUpDown, PlusCircle } from "lucide-react";
+import { Check, ChevronsUpDown, PlusCircle, LogOut } from "lucide-react";
 
 import { cn } from "~/utils/utils";
 import Button from "~/components/ui/Button";
@@ -14,6 +14,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "~/components/ui/Command";
+import { Spinner } from "~/components/ui/LoadingSkeleton";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ import {
 } from "~/components/ui/popover";
 import NewTeamForm from "./new-team-form";
 import { useAccounts } from "~/utils/hooks/use-accounts";
+import { signOut } from "~/app/auth/actions";
 
 type PopoverTriggerProps = ComponentPropsWithoutRef<typeof PopoverTrigger>;
 
@@ -61,12 +63,14 @@ export default function AccountSelector({
     const selectedAccount = accounts?.find(
       (account) => account.account_id === accountId,
     );
+
     return {
       personalAccount,
       teamAccounts,
       selectedAccount,
     };
   }, [accounts, accountId]);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   return (
     <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
@@ -154,6 +158,32 @@ export default function AccountSelector({
                     Create Team
                   </CommandItem>
                 </DialogTrigger>
+              </CommandGroup>
+            </CommandList>
+
+            <CommandList>
+              <CommandGroup>
+                <CommandItem
+                  value="new-team"
+                  className="text-white "
+                  style={{
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    cursor: "pointer",
+                  }}
+                  // onSelect={() => {
+                  //   setOpen(false);
+                  //   // setShowNewTeamDialog(true);
+                  // }}
+                  onSelect={() => {
+                    setIsLoggingOut(true);
+                    signOut();
+                    setIsLoggingOut(false);
+                  }}
+                >
+                  {isLoggingOut ? <Spinner /> : <LogOut />}
+                  <span className="pl-3">Log Out</span>
+                </CommandItem>
               </CommandGroup>
             </CommandList>
           </Command>

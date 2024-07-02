@@ -1,5 +1,4 @@
 import Icon from "~/components/ui/icons/icons";
-
 // import { useUserIsSelfService } from "./user-user-is-self-service";
 
 export function useMainMenuItems() {
@@ -49,12 +48,13 @@ export function useMainMenuItems() {
     },
   ];
   const menuItemsBottom = [
-    {
-      icon: <Icon icon="scanQR" />,
-      to: "scanner",
-      label: "QR scanner",
-      end: true,
-    },
+    // {
+    //   // icon: <Icon icon="scanQR" />,
+    //   icon: <Header />,
+    //   // to: "scanner",
+    //   label: "Profile Settings",
+    //   end: true,
+    // },
     {
       icon: <Icon icon="settings" />,
       to: "settings",
@@ -62,14 +62,6 @@ export function useMainMenuItems() {
       end: true,
     },
   ];
-
-//   if (useUserIsSelfService()) {
-//     /** Deleting the Dashboard menu item as its not needed for self_service users. */
-//     const itemsToRemove = ["dashboard", "categories", "tags", "locations"];
-//     menuItemsTop = menuItemsTop.filter(
-//       (item) => !itemsToRemove.includes(item.to)
-//     );
-//   }
 
   return {
     menuItemsTop,

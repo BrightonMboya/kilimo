@@ -42,13 +42,19 @@ export function ProfileIcon({ user }: ProfileProps) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pics/${user?.user_metadata?.avatar_url}`}
-            alt="user_profile"
-          />
-          <AvatarFallback>{avatarFallback}</AvatarFallback>
-        </Avatar>
+        <div className="flex items-center space-x-3">
+          <Avatar className="cursor-pointer">
+            <AvatarImage
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile_pics/${user?.user_metadata?.avatar_url}`}
+              alt="user_profile"
+            />
+            <AvatarFallback>{avatarFallback}</AvatarFallback>
+          </Avatar>
+
+          <p className="font-medium">
+            {user?.user_metadata?.organization_name}
+          </p>
+        </div>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>

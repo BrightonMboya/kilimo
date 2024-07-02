@@ -3,7 +3,6 @@ import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NavigatingAccountSelector from "~/components/auth/basejump/navigation-account-selector";
-// import AccountSelector from "~/components/auth/basejump/AccountSwitcher";
 
 const MenuItems = () => {
   const { menuItemsTop, menuItemsBottom } = useMainMenuItems();
@@ -59,6 +58,7 @@ const MenuItems = () => {
                 </Link>
               </li>
             ))}
+
           </ul>
         </div>
       </div>
