@@ -171,10 +171,6 @@ export default function AccountSelector({
                     color: "white",
                     cursor: "pointer",
                   }}
-                  // onSelect={() => {
-                  //   setOpen(false);
-                  //   // setShowNewTeamDialog(true);
-                  // }}
                   onSelect={() => {
                     setIsLoggingOut(true);
                     signOut();

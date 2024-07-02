@@ -76,7 +76,6 @@ export const signUp = async (formData: FormData) => {
   });
 
   // then we add the info on the organization_table
-  console.log(data);
   if (data.user !== null && !error) {
     const res = await db.organization.create({
       data: {
@@ -85,7 +84,18 @@ export const signUp = async (formData: FormData) => {
         emailAddress: email,
       },
     });
-    console.log(res);
+
+    // then we create a team with that organization name
+    const response = await supabase.rpc('create_account', {
+      name: organization_name,
+      slug: organization_name,
+    });
+
+    if (response.error) {
+        return {
+            message: response.error.message
+        };
+    }
   }
 
   if (error) {
@@ -93,5 +103,5 @@ export const signUp = async (formData: FormData) => {
     return redirect(`/auth/sign-up?message=${error.message}`);
   }
 
-  return redirect("/dashboard/farmers");
+  return redirect(`/dashboard/${organization_name}/farmers`);
 };
