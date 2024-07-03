@@ -12,6 +12,7 @@ import CreateTeamInvitationButton from "./create-team-invitation-button";
 import { formatDistanceToNow } from "date-fns";
 import DeleteTeamInvitationButton from "./delete-team-invitation-button";
 import { api } from "~/trpc/react";
+import { Skeleton } from "~/components/ui/Skeleton";
 
 type Props = {
   accountId: string;
@@ -22,14 +23,6 @@ export default function ManageTeamInvitations({ accountId }: Props) {
     api.auth.getAccountInvitations.useQuery({
       accountId: accountId,
     });
-  //   const supabaseClient = createClient();
-
-  //   const { data: invitations } = await supabaseClient.rpc(
-  //     "get_account_invitations",
-  //     {
-  //       account_id: accountId,
-  //     },
-  //   );
 
   return (
     <Card>
@@ -44,6 +37,25 @@ export default function ManageTeamInvitations({ accountId }: Props) {
           <CreateTeamInvitationButton accountId={accountId} />
         </div>
       </CardHeader>
+      {isLoading && (
+        <div className="space-y-3 pl-5 pb-5">
+          <div className="flex  space-x-3">
+            <Skeleton className="h-[20px] w-[150px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+          </div>
+          <div className="flex  space-x-3">
+            <Skeleton className="h-[20px] w-[150px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+          </div>
+          <div className="flex  space-x-3">
+            <Skeleton className="h-[20px] w-[150px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+          </div>
+        </div>
+      )}
       {!isLoading && invitations && (
         <>
           {Boolean(invitations?.length) && (

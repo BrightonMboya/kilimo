@@ -11,22 +11,13 @@ import { Table, TableRow, TableBody, TableCell } from "~/components/ui/table";
 import { Badge } from "~/components/ui/badge";
 import TeamMemberOptions from "./team-member-options";
 import { api } from "~/trpc/react";
+import { Skeleton } from "~/components/ui/Skeleton";
 
 type Props = {
   accountId: string;
 };
 
 export default function ManageTeamMembers({ accountId }: Props) {
-  //   const supabaseClient = createClient();
-
-  //   const { data: members } = await supabaseClient.rpc("get_account_members", {
-  //     account_id: accountId,
-  //   });
-
-  //   const { data } = await supabaseClient.auth.getUser();
-  //   const isPrimaryOwner = members?.find(
-  //     (member: any) => member.user_id === data?.user?.id,
-  //   )?.is_primary_owner;
   const { data, isLoading } = api.auth.getAccountMembers.useQuery({
     accountId: accountId,
   });
@@ -34,13 +25,21 @@ export default function ManageTeamMembers({ accountId }: Props) {
     (member: any) => member.user_id === data?.user?.user?.id,
   )?.is_primary_owner;
 
-
   return (
     <Card className="mt-5">
       <CardHeader>
         <CardTitle>Team Members</CardTitle>
         <CardDescription>These are the users in your team</CardDescription>
       </CardHeader>
+      {isLoading && (
+        <div className="pl-5 pb-5">
+          <div className="flex  space-x-3">
+            <Skeleton className="h-[20px] w-[150px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+            <Skeleton className="h-[20px] w-[70px]" />
+          </div>
+        </div>
+      )}
       {!isLoading && data && (
         <CardContent>
           <Table>
