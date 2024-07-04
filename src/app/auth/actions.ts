@@ -67,7 +67,7 @@ export const signUp = async (formData: FormData) => {
     options: {
       data: {
         organization_name: organization_name,
-        organization_id: ""
+        // organization_id: ""
       },
     },
     // options: {
@@ -77,24 +77,24 @@ export const signUp = async (formData: FormData) => {
 
   // then we add the info on the organization_table
   if (data.user !== null && !error) {
-    const res = await db.organization.create({
-      data: {
-        name: organization_name,
-        id: data?.user?.id,
-        emailAddress: email,
-      },
+    const res = await supabase.from("Organization").insert({
+      name: organization_name,
+      emailAddress: email,
+      // id: data?.user?.id,
     });
 
+    console.log(res, ">>>>>>")
+
     // then we create a team with that organization name
-    const response = await supabase.rpc('create_account', {
+    const response = await supabase.rpc("create_account", {
       name: organization_name,
       slug: organization_name,
     });
 
     if (response.error) {
-        return {
-            message: response.error.message
-        };
+      return {
+        message: response.error.message,
+      };
     }
   }
 

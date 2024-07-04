@@ -7,251 +7,359 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      [_ in never]: never
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
+      Farmers: {
         Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
+          account_id: string
+          country: string
           created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
+          created_by: string | null
+          crops: string
+          farmSize: number
+          fullName: string
+          id: number
+          organization_id: number
+          phoneNumber: string | null
+          province: string
+          quantityCanSupply: number
           updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
+          account_id: string
+          country: string
           created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
+          created_by?: string | null
+          crops: string
+          farmSize: number
+          fullName: string
+          id?: number
+          organization_id: number
+          phoneNumber?: string | null
+          province: string
+          quantityCanSupply: number
           updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
+          account_id?: string
+          country?: string
           created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
+          created_by?: string | null
+          crops?: string
+          farmSize?: number
+          fullName?: string
+          id?: number
+          organization_id?: number
+          phoneNumber?: string | null
+          province?: string
+          quantityCanSupply?: number
           updated_at?: string | null
+          updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "Farmers_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Farmers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Farmers_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "Organization"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      migrations: {
+      Harvests: {
         Row: {
-          executed_at: string | null
-          hash: string
+          account_id: string
+          created_at: string | null
+          created_by: string | null
+          crop: string
+          date: string
+          farmers_id: number
+          id: number
+          inputsUsed: string
+          name: string
+          organization_id: number
+          size: number
+          unit: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string | null
+          created_by?: string | null
+          crop: string
+          date: string
+          farmers_id: number
+          id?: number
+          inputsUsed: string
+          name: string
+          organization_id: number
+          size: number
+          unit: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          crop?: string
+          date?: string
+          farmers_id?: number
+          id?: number
+          inputsUsed?: string
+          name?: string
+          organization_id?: number
+          size?: number
+          unit?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_farmers_harvests"
+            columns: ["farmers_id"]
+            isOneToOne: false
+            referencedRelation: "Farmers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_organization_harvests"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "Organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Harvests_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Harvests_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Harvests_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Organization: {
+        Row: {
+          account_id: string
+          country: string | null
+          emailAddress: string
           id: number
           name: string
         }
         Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
+          account_id: string
+          country?: string | null
+          emailAddress: string
+          id?: number
           name: string
         }
         Update: {
-          executed_at?: string | null
-          hash?: string
+          account_id?: string
+          country?: string | null
+          emailAddress?: string
           id?: number
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "Organization_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      objects: {
+      Reports: {
         Row: {
-          bucket_id: string | null
+          account_id: string
           created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
+          created_by: string | null
+          dateCreated: string
+          finishedTracking: boolean | null
+          harvests_id: number
+          id: number
+          name: string
+          organization_id: number
           updated_at: string | null
-          version: string | null
+          updated_by: string | null
         }
         Insert: {
-          bucket_id?: string | null
+          account_id: string
           created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
+          created_by?: string | null
+          dateCreated: string
+          finishedTracking?: boolean | null
+          harvests_id: number
+          id?: number
+          name: string
+          organization_id: number
           updated_at?: string | null
-          version?: string | null
+          updated_by?: string | null
         }
         Update: {
-          bucket_id?: string | null
+          account_id?: string
           created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
+          created_by?: string | null
+          dateCreated?: string
+          finishedTracking?: boolean | null
+          harvests_id?: number
+          id?: number
+          name?: string
+          organization_id?: number
           updated_at?: string | null
-          version?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: "fk_harvests_reports"
+            columns: ["harvests_id"]
             isOneToOne: false
-            referencedRelation: "buckets"
+            referencedRelation: "Harvests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_organization_reports"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "Organization"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Reports_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Reports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Reports_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
       }
-      s3_multipart_uploads: {
+      ReportTrackingEvents: {
         Row: {
-          bucket_id: string
-          created_at: string
-          id: string
-          in_progress_size: number
-          key: string
-          owner_id: string | null
-          upload_signature: string
-          version: string
+          account_id: string
+          created_at: string | null
+          created_by: string | null
+          dateCreated: string
+          description: string
+          eventName: string
+          id: number
+          organization_id: number
+          report_id: number
+          updated_at: string | null
+          updated_by: string | null
         }
         Insert: {
-          bucket_id: string
-          created_at?: string
-          id: string
-          in_progress_size?: number
-          key: string
-          owner_id?: string | null
-          upload_signature: string
-          version: string
+          account_id: string
+          created_at?: string | null
+          created_by?: string | null
+          dateCreated: string
+          description: string
+          eventName: string
+          id?: number
+          organization_id: number
+          report_id: number
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Update: {
-          bucket_id?: string
-          created_at?: string
-          id?: string
-          in_progress_size?: number
-          key?: string
-          owner_id?: string | null
-          upload_signature?: string
-          version?: string
+          account_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          dateCreated?: string
+          description?: string
+          eventName?: string
+          id?: number
+          organization_id?: number
+          report_id?: number
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
-            columns: ["bucket_id"]
+            foreignKeyName: "fk_organization_reporttrackingevents"
+            columns: ["organization_id"]
             isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string
-          created_at: string
-          etag: string
-          id: string
-          key: string
-          owner_id: string | null
-          part_number: number
-          size: number
-          upload_id: string
-          version: string
-        }
-        Insert: {
-          bucket_id: string
-          created_at?: string
-          etag: string
-          id?: string
-          key: string
-          owner_id?: string | null
-          part_number: number
-          size?: number
-          upload_id: string
-          version: string
-        }
-        Update: {
-          bucket_id?: string
-          created_at?: string
-          etag?: string
-          id?: string
-          key?: string
-          owner_id?: string | null
-          part_number?: number
-          size?: number
-          upload_id?: string
-          version?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
+            referencedRelation: "Organization"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
-            columns: ["upload_id"]
+            foreignKeyName: "fk_reports_reporttrackingevents"
+            columns: ["report_id"]
             isOneToOne: false
-            referencedRelation: "s3_multipart_uploads"
+            referencedRelation: "Reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ReportTrackingEvents_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ReportTrackingEvents_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ReportTrackingEvents_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -261,90 +369,126 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      can_insert_object: {
+      accept_invitation: {
         Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
+          lookup_invitation_token: string
+        }
+        Returns: Json
+      }
+      create_account: {
+        Args: {
+          slug?: string
+          name?: string
+        }
+        Returns: Json
+      }
+      create_invitation: {
+        Args: {
+          account_id: string
+          account_role: "owner" | "member"
+          invitation_type: "one_time" | "24_hour"
+        }
+        Returns: Json
+      }
+      current_user_account_role: {
+        Args: {
+          account_id: string
+        }
+        Returns: Json
+      }
+      delete_invitation: {
+        Args: {
+          invitation_id: string
         }
         Returns: undefined
       }
-      extension: {
+      get_account: {
         Args: {
-          name: string
+          account_id: string
+        }
+        Returns: Json
+      }
+      get_account_billing_status: {
+        Args: {
+          account_id: string
+        }
+        Returns: Json
+      }
+      get_account_by_slug: {
+        Args: {
+          slug: string
+        }
+        Returns: Json
+      }
+      get_account_id: {
+        Args: {
+          slug: string
         }
         Returns: string
       }
-      filename: {
+      get_account_invitations: {
         Args: {
-          name: string
+          account_id: string
+          results_limit?: number
+          results_offset?: number
         }
-        Returns: string
+        Returns: Json
       }
-      foldername: {
+      get_account_members: {
         Args: {
-          name: string
+          account_id: string
+          results_limit?: number
+          results_offset?: number
         }
-        Returns: string[]
+        Returns: Json
       }
-      get_size_by_bucket: {
+      get_accounts: {
         Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
+        Returns: Json
       }
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          next_key_token?: string
-          next_upload_token?: string
-        }
-        Returns: {
-          key: string
-          id: string
-          created_at: string
-        }[]
+      get_personal_account: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
       }
-      list_objects_with_delimiter: {
+      lookup_invitation: {
         Args: {
-          bucket_id: string
-          prefix_param: string
-          delimiter_param: string
-          max_keys?: number
-          start_after?: string
-          next_token?: string
+          lookup_invitation_token: string
         }
-        Returns: {
-          name: string
-          id: string
-          metadata: Json
-          updated_at: string
-        }[]
+        Returns: Json
       }
-      search: {
+      remove_account_member: {
         Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
+          account_id: string
+          user_id: string
         }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
+        Returns: undefined
+      }
+      service_role_upsert_customer_subscription: {
+        Args: {
+          account_id: string
+          customer?: Json
+          subscription?: Json
+        }
+        Returns: undefined
+      }
+      update_account: {
+        Args: {
+          account_id: string
+          slug?: string
+          name?: string
+          public_metadata?: Json
+          replace_metadata?: boolean
+        }
+        Returns: Json
+      }
+      update_account_user_role: {
+        Args: {
+          account_id: string
+          user_id: string
+          new_account_role: "owner" | "member"
+          make_primary_owner?: boolean
+        }
+        Returns: undefined
       }
     }
     Enums: {
@@ -437,4 +581,3 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
     : never
-
