@@ -40,17 +40,6 @@ model Farmers {
   harvests          Harvests[]
 }
 
-// model FarmersNationalId {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
-
-// model FarmersProfilePictures {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
 
 model Harvests {
   id              String       @id @default(cuid())
