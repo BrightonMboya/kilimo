@@ -15,10 +15,11 @@ export function TeamMembers() {
   const { data, isLoading } = api.auth.getAccountBySlug.useQuery({
     accountSlug: params.accountSlug as unknown as string,
   });
+  console.log(data)
 
   return (
     <>
-      {!isLoading && (
+      {!isLoading && data && (
         <>
           {data.account_role !== "owner" && (
             <Alert variant="destructive">

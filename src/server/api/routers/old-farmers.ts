@@ -4,7 +4,6 @@ import z from "zod";
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { TRPCClientError } from "@trpc/client";
 import { TRPCError } from "@trpc/server";
-import { createClient } from "~/utils/supabase/client";
 
 const farmers = createTRPCRouter({
   addFarmer: protectedProcedure
@@ -66,24 +65,13 @@ const farmers = createTRPCRouter({
   fetchByOrganization: protectedProcedure
     .query(async ({ ctx }) => {
       try {
-        // return await ctx.db.farmers.findMany({
-        //   where: {
-        //     organization_id: ctx?.user.id,
-        //   },
-        // });
-        console.log(ctx?.user, "*******")
-        const { data, error } = await ctx.supabase
-          .from("Farmers")
-          .select("*");
-        //   .eq("organization_id", ctx?.user.id);
-        if (data) {
-          return data;
-        } else {
-          console.log("######, I am fucked up");
-          console.log(data, ">?>??@*!*(*&@!*(Y!W*H!SHSU!UIBWUSBQHW");
-        }
+        return await ctx.db.farmers.findMany({
+          where: {
+            organization_id: ctx?.user.id,
+          },
+        });
       } catch (cause) {
-        console.log(cause, "??ASAOQO@(!)!)@W");
+        console.log(cause);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to load farmers",

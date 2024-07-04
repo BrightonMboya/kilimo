@@ -18,7 +18,10 @@ const auth = createTRPCRouter({
             slug: input.accountSlug,
           },
         );
+        console.log(error, "^^^^^^^^^^^")
         return teamAccount;
+      
+        
       } catch (cause) {
         console.log(cause);
       }
