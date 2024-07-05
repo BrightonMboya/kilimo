@@ -13,18 +13,33 @@ const farmers = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        return await ctx.db.farmers.create({
-          data: {
-            fullName: input.fullName,
-            phoneNumber: input.phoneNumber!,
-            farmSize: input.farmSize,
-            province: input.province,
-            country: input.country,
-            crops: input.crops,
-            quantityCanSupply: input.quantityCanSupply,
-            organization_id: ctx?.user.id,
-          },
-        });
+        // return await ctx.db.farmers.create({
+        //   data: {
+        //     fullName: input.fullName,
+        //     phoneNumber: input.phoneNumber!,
+        //     farmSize: input.farmSize,
+        //     province: input.province,
+        //     country: input.country,
+        //     crops: input.crops,
+        //     quantityCanSupply: input.quantityCanSupply,
+        //     organization_id: ctx?.user.id,
+        //   },
+        // });
+
+        const {data, error} = await ctx.supabase
+        .from("Farmers")
+        .insert({
+          fullName: input.fullName,
+          phoneNumber: input.phoneNumber,
+          farmSize: input.farmSize,
+          province: input.province,
+          country: input.country,
+          crops: input.country,
+          quantityCanSupply: input.quantityCanSupply,
+          organization_id: "",
+          account_id: ""
+        })
+
       } catch (cause) {
         console.log(cause);
         throw new TRPCError({
@@ -66,16 +81,12 @@ const farmers = createTRPCRouter({
   fetchByOrganization: protectedProcedure
     .query(async ({ ctx }) => {
       try {
-        // return await ctx.db.farmers.findMany({
-        //   where: {
-        //     organization_id: ctx?.user.id,
-        //   },
-        // });
-        console.log(ctx?.user, "*******")
+       
         const { data, error } = await ctx.supabase
           .from("Farmers")
           .select("*");
         //   .eq("organization_id", ctx?.user.id);
+    
         if (data) {
           return data;
         } else {
