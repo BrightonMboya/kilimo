@@ -2,6 +2,9 @@ import { TRPCError } from "@trpc/server";
 import z from "zod";
 
 
+export const HOME_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}`;
+
+
 export const NOT_FOUND_ERROR = new TRPCError({
   code: "NOT_FOUND",
   message: "Requested resource is not found",
