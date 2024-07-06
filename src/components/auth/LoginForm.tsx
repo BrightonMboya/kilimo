@@ -1,9 +1,6 @@
 "use client";
-
-// import { Button, InfoTooltip, Github, Google } from "~/components/ui";
 import { Button } from "../ui/Button";
-import { InfoTooltip } from "../ui/tooltip";
-import {Github, Google} from "../ui/icons";   
+import { Github, Google } from "../ui/icons";
 import { useMediaQuery } from "~/utils/hooks/useMediaQuery";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
@@ -15,7 +12,6 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams?.get("next");
   const [showEmailOption, setShowEmailOption] = useState(false);
-  const [showSSOOption, setShowSSOOption] = useState(false);
   const [noSuchAccount, setNoSuchAccount] = useState(false);
   const [email, setEmail] = useState("");
   const [clickedGoogle, setClickedGoogle] = useState(false);
@@ -133,7 +129,7 @@ export default function LoginForm() {
             type: "button",
             onClick: (e: any) => {
               e.preventDefault();
-              setShowSSOOption(false);
+
               setShowEmailOption(true);
             },
           })}
@@ -162,45 +158,7 @@ export default function LoginForm() {
           });
         }}
         className="flex flex-col space-y-3"
-      >
-        {showSSOOption && (
-          <div>
-            <div className="mb-4 mt-1 border-t border-gray-300" />
-            <div className="flex items-center space-x-2">
-              <h2 className="text-sm font-medium text-gray-900">
-                Workspace Slug
-              </h2>
-              <InfoTooltip
-                content={`This is your workspace's unique identifier on ${process.env.NEXT_PUBLIC_APP_NAME}. E.g. app.dub.co/acme is "acme".`}
-              />
-            </div>
-            <input
-              id="slug"
-              name="slug"
-              autoFocus={!isMobile}
-              type="text"
-              placeholder="my-team"
-              autoComplete="off"
-              required
-              className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
-            />
-          </div>
-        )}
-        <Button
-          text="Continue with SAML SSO"
-          variant="secondary"
-          {...(!showSSOOption && {
-            type: "button",
-            onClick: (e: any) => {
-              e.preventDefault();
-              setShowEmailOption(false);
-              setShowSSOOption(true);
-            },
-          })}
-          loading={clickedSSO}
-          disabled={clickedGoogle || clickedEmail}
-        />
-      </form>
+      ></form>
       {noSuchAccount ? (
         <p className="text-center text-sm text-red-500">
           No such account.{" "}

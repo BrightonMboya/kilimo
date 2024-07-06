@@ -1,17 +1,11 @@
-import { Button } from "~/components/ui";
-import { HOME_DOMAIN, constructMetadata } from "~/utils";
-import { Suspense } from "react";
-import LoginForm from "~/components/auth/LoginForm";
 import Image from "next/legacy/image";
-import LoginPage from "~/components/auth/LoginPage";
+import RegisterPage from "~/components/auth/RegisterPage";
 
-export const metadata = constructMetadata({
-  title: `Sign in to ${process.env.NEXT_PUBLIC_APP_NAME}`,
-});
+
 
 export default function Page() {
   return (
-    <div className="container relative h-screen flex items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:space-x-10 ">
+    <div className="container relative flex h-screen items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:space-x-10 ">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
         <div className="absolute inset-0 bg-zinc-900 " />
         <Image
@@ -34,7 +28,7 @@ export default function Page() {
           </blockquote>
         </div>
       </div>
-      <LoginPage />
+      <RegisterPage/>
     </div>
   );
 }
