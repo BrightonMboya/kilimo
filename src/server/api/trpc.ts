@@ -11,7 +11,6 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
-import { getUser } from "~/app/auth/actions";
 import { createClient } from "~/utils/supabase/server";
 
 /**
@@ -24,7 +23,7 @@ import { createClient } from "~/utils/supabase/server";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // const headers = opts.headers;
   // const authToken = headers.get("authorization");
-  const user = await getUser();
+  const user = ""
   const supabase = createClient()
 
   // const { user } = authToken ? await getUserAsAdmin(authToken) : { user: null };

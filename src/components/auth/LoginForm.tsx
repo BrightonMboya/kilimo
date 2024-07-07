@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "../ui/Button";
+import { Button } from "./Auth-Button";
 import { Github, Google } from "../ui/icons";
 import { useMediaQuery } from "~/utils/hooks/useMediaQuery";
 import { signIn } from "next-auth/react";

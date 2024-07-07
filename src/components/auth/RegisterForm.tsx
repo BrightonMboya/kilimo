@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Github, Google } from "~/components/ui";
+import { Github, Google } from "~/components/ui";
+import { Button } from "./Auth-Button";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +23,26 @@ export default function RegisterForm() {
 
   return (
     <>
+      {/* <form
+        action={async () => {
+          try {
+            ("use server");
+            setClickedGoogle(true);
+            await signIn("google");
+          } catch (cause) {
+            console.log(cause, "?????");
+          }
+        }}
+      >
+        <Button
+          variant="secondary"
+          text="Continue with Google"
+          type="submit"
+          loading={clickedGoogle}
+          icon={<Google className="h-4 w-4" />}
+        />
+      </form> */}
+
       <Button
         variant="secondary"
         text="Continue with Google"

@@ -1,4 +1,4 @@
-import { Button } from "~/components/ui";
+import { Button } from "./Auth-Button";
 import { HOME_DOMAIN, constructMetadata } from "~/utils";
 import { Suspense } from "react";
 import LoginForm from "~/components/auth/LoginForm";
