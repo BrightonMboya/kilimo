@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 
 export default function RegisterForm() {
   const searchParams = useSearchParams();
-  const next = searchParams?.get("next");
   const [clickedGoogle, setClickedGoogle] = useState(false);
   const [clickedGithub, setClickedGithub] = useState(false);
 
@@ -23,33 +22,13 @@ export default function RegisterForm() {
 
   return (
     <>
-      {/* <form
-        action={async () => {
-          try {
-            ("use server");
-            setClickedGoogle(true);
-            await signIn("google");
-          } catch (cause) {
-            console.log(cause, "?????");
-          }
-        }}
-      >
-        <Button
-          variant="secondary"
-          text="Continue with Google"
-          type="submit"
-          loading={clickedGoogle}
-          icon={<Google className="h-4 w-4" />}
-        />
-      </form> */}
-
       <Button
         variant="secondary"
         text="Continue with Google"
         onClick={() => {
           setClickedGoogle(true);
           signIn("google", {
-            ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+            callbackUrl: "/welcome",
           });
         }}
         loading={clickedGoogle}
@@ -60,7 +39,7 @@ export default function RegisterForm() {
         onClick={() => {
           setClickedGithub(true);
           signIn("github", {
-            ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+            callbackUrl: "/welcome",
           });
         }}
         loading={clickedGithub}

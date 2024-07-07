@@ -1,5 +1,5 @@
 // export { default as Button } from "./Button";
-export * from "./Button"
+export * from "./Button";
 export { default as Input } from "./Input";
 export { default as Label } from "./label";
 export { default as Container } from "./Container";
@@ -31,4 +31,5 @@ export * from "./sheet";
 export * from "./table";
 export * from "./icons";
 export * from "./tooltip";
-export * from "./BlurImage"
+export * from "./BlurImage";
+export * from "./modals";

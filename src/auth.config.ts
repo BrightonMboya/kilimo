@@ -4,9 +4,10 @@ import Google from "next-auth/providers/google";
 import { env } from "./env";
 import { db } from "./server/db";
 import { JWT } from "next-auth/jwt";
-import { User} from "next-auth";
+import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
-
+import { resend } from "./emails";
+import WelcomeEmail from "./emails/welcome-email";
 
 export default {
   providers: [
@@ -61,7 +62,7 @@ export default {
           //   },
           // });
         }
-      } 
+      }
       return true;
     },
     jwt: async ({
@@ -121,53 +122,31 @@ export default {
         // (this is a workaround because the `isNewUser` flag is triggered when a user does `dangerousEmailAccountLinking`)
         if (
           user.createdAt &&
-          new Date(user.createdAt).getTime() > Date.now() - 10000 &&
-          process.env.NEXT_PUBLIC_IS_DUB
+          new Date(user.createdAt).getTime() > Date.now() - 10000
         ) {
-          await Promise.allSettled([
-            subscribe({ email, name: user.name || undefined }),
-            sendEmail({
-              subject: "Welcome to Dub.co!",
+          resend.emails.send({
+            subject: "Welcome to Jani AI",
+            to: email,
+            react: WelcomeEmail({
               email,
-              react: WelcomeEmail({
-                email,
-                name: user.name || null,
-              }),
+              name: user?.name || null,
               marketing: true,
             }),
-          ]);
-        }
-
-        const clickId = cookies().get("dclid")?.value;
-        if (clickId) {
-          // send lead event to Dub
-          await dub.track.lead({
-            clickId,
-            eventName: "Sign Up",
-            customerId: user.id,
-            customerName: user.name,
-            customerEmail: user.email,
-            customerAvatar: user.image,
+            from: "brighton.mboya.io@gmail.com",
           });
-          // delete the clickId cookie
-          cookies().delete("dclid");
+
+          // await Promise.allSettled([
+          //   sendEmail({
+          //     subject: "Welcome to Jani AI!",
+          //     email,
+          //     react: WelcomeEmail({
+          //       email,
+          //       name: user.name || null,
+          //     }),
+          //     marketing: true,
+          //   }),
+          // ]);
         }
-      }
-      // lazily backup user avatar to R2
-      const currentImage = message.user.image;
-      if (currentImage && !isStored(currentImage)) {
-        const { url } = await storage.upload(
-          `avatars/${message.user.id}`,
-          currentImage,
-        );
-        await prisma.user.update({
-          where: {
-            id: message.user.id,
-          },
-          data: {
-            image: url,
-          },
-        });
       }
     },
   },

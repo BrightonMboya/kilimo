@@ -4,7 +4,8 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { baseUrl } from "./sitemap";
-
+import { TooltipProvider } from "~/components/ui";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -36,11 +37,6 @@ export const metadata: Metadata = {
   },
 };
 
-// const montserrat = Montserrat({
-//   subsets: ["latin"],
-//   display: "swap",
-// });
-
 export default function RootLayout({
   children,
 }: {
@@ -48,7 +44,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.className} font-sans`}>
-      <body>
+      <body className={`${GeistSans.className} font-sans`}>
+        <Toaster closeButton className="pointer-events-auto" />
         <TRPCReactProvider headers={headers()}>{children}</TRPCReactProvider>
       </body>
     </html>

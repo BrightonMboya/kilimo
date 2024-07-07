@@ -11,7 +11,7 @@ import { ButtonProps } from "./Button";
 
 export function TooltipProvider({ children }: { children: ReactNode }) {
   return (
-    <TooltipPrimitive.Provider delayDuration={100}>
+    <TooltipPrimitive.Provider delayDuration={100} >
       {children}
     </TooltipPrimitive.Provider>
   );
@@ -27,7 +27,7 @@ export function Tooltip({ children, content, side = "top" }: TooltipProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <TooltipPrimitive.Root open={open} onOpenChange={setOpen}>
+    <TooltipPrimitive.Root open={open} onOpenChange={setOpen} >
       <TooltipPrimitive.Trigger
         asChild
         onClick={() => {
