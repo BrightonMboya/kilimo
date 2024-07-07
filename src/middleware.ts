@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import authConfig from "./auth.config";
+import authConfig from "./utils/lib/auth/auth.config";
 
 export const config = {
   matcher: [

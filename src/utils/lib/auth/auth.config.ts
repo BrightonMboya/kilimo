@@ -1,13 +1,13 @@
 import GitHub from "next-auth/providers/github";
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
-import { env } from "./env";
-import { db } from "./server/db";
+import { env } from "~/env";
+import { db } from "~/server/db";
 import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
-import { resend } from "./emails";
-import WelcomeEmail from "./emails/welcome-email";
+import { resend } from "~/emails";
+import WelcomeEmail from "~/emails/welcome-email";
 
 export default {
   providers: [

@@ -1,8 +1,7 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
 import authConfig from "./auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "./server/db";
+import { db } from "../../../server/db";
 
 export const config = {
   ...authConfig,
