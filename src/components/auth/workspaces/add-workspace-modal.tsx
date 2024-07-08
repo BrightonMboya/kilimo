@@ -58,19 +58,26 @@ function AddWorkspaceModalHelper({
 
   const { isMobile } = useMediaQuery();
 
-  const { isLoading, mutateAsync } = api.workspace.addWorkSpace.useMutation();
+  const { isLoading, mutateAsync, isError } = api.workspace.addWorkSpace.useMutation({
+    onError: (error) => {
+      toast.error(error.message)
+    }
+  });
   const onSubmit = async () => {
+    
     try {
       const res = await mutateAsync({ slug: slug, name: name });
       if (res === "Project already in use") {
         setSlugError("Slug is already in use.");
-      } else {
+      } 
+      if (res) {
         const workspaceId = res?.id;
         va.track("Created Workspace");
         router.push(`/dashboard/${slug}/farmers`);
         toast.success("Successfully created workspace!");
         setShowAddWorkspaceModal(false);
       }
+
     } catch (cause) {
       console.log(cause);
     }
@@ -92,6 +99,7 @@ function AddWorkspaceModalHelper({
           }
         }}
       >
+        {/* {isError && ()} */}
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
           <h3>This should be the logo</h3>
           <h3 className="text-lg font-medium">Create a new workspace</h3>

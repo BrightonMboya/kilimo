@@ -4,6 +4,8 @@ import { isReservedKey } from "~/utils/lib/edge-config";
 import { DEFAULT_REDIRECTS } from "~/utils";
 import { nanoid } from "~/utils";
 import { waitUntil } from "@vercel/functions";
+import { TRPCClientError } from "@trpc/client";
+import { TRPCError } from "@trpc/server";
 
 export const roles = ["owner", "member"] as const;
 export const plans = [
@@ -73,8 +75,7 @@ export const workspaces = createTRPCRouter({
   addWorkSpace: publicProcedure
     .input(z.object({ slug: z.string(), name: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      console.log(input.name, input.slug, "{}{}{}{}[][][]")
-      try {
+      // try {
         // check if the slug exists
         if (
           (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
@@ -92,6 +93,30 @@ export const workspaces = createTRPCRouter({
         if (project) {
           return "Project already in use";
         } else {
+          // lets check if the person can create more than one workspaces
+          const freeWorkspaces = await ctx.db.project.count({
+            where: {
+              plan: "free",
+              users: {
+                some: {
+                  userId: ctx?.user?.id,
+                  role: "owner",
+                },
+              },
+            },
+          });
+
+          if (freeWorkspaces >= 1) {
+            throw new TRPCClientError(
+              "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
+            );
+            // throw new TRPCError({
+            //   code: "METHOD_NOT_SUPPORTED",
+            //   message:
+            //     `You can only create up to 1 free workspaces. Additional workspaces require a paid plan.`,
+            // });
+          }
+
           const workspaceResponse = await ctx.db.project.create({
             data: {
               name: input.name,
@@ -137,9 +162,9 @@ export const workspaces = createTRPCRouter({
             id: `ws_${workspaceResponse.id}`,
           });
         }
-      } catch (cause) {
-        console.log(cause);
-      }
+      // } catch (cause) {
+      //   console.log(cause);
+      // }
     }),
 });
 
