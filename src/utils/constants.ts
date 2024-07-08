@@ -17,6 +17,9 @@ export const DEFAULT_REDIRECTS = {
   welcome: "https://jani-ai.com/welcome",
 };
 
+export const DICEBEAR_AVATAR_URL =
+  "https://api.dicebear.com/7.x/initials/svg?backgroundType=gradientLinear&fontFamily=Helvetica&fontSize=40&seed=";
+
 
 export const NOT_FOUND_ERROR = new TRPCError({
   code: "NOT_FOUND",

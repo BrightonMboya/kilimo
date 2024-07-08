@@ -5,18 +5,8 @@ import { DEFAULT_REDIRECTS } from "~/utils";
 import { nanoid } from "~/utils";
 import { waitUntil } from "@vercel/functions";
 import { TRPCClientError } from "@trpc/client";
-import { TRPCError } from "@trpc/server";
+import { plans, roles } from "~/utils/types";
 
-export const roles = ["owner", "member"] as const;
-export const plans = [
-  "free",
-  "pro",
-  "business",
-  "business plus",
-  "business extra",
-  "business max",
-  "enterprise",
-] as const;
 export const planSchema = z.enum(plans).describe("The plan of the workspace.");
 export const roleSchema = z
   .enum(roles)
@@ -76,95 +66,129 @@ export const workspaces = createTRPCRouter({
     .input(z.object({ slug: z.string(), name: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // try {
-        // check if the slug exists
-        if (
-          (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
-        ) {
-          return "Project already in use";
-        }
-        const project = await ctx.db.project.findUnique({
+      // check if the slug exists
+      if (
+        (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
+      ) {
+        return "Project already in use";
+      }
+      const project = await ctx.db.project.findUnique({
+        where: {
+          slug: input.slug,
+        },
+        select: {
+          slug: true,
+        },
+      });
+      if (project) {
+        return "Project already in use";
+      } else {
+        // lets check if the person can create more than one workspaces
+        const freeWorkspaces = await ctx.db.project.count({
           where: {
-            slug: input.slug,
-          },
-          select: {
-            slug: true,
+            plan: "free",
+            users: {
+              some: {
+                userId: ctx?.user?.id,
+                role: "owner",
+              },
+            },
           },
         });
-        if (project) {
-          return "Project already in use";
-        } else {
-          // lets check if the person can create more than one workspaces
-          const freeWorkspaces = await ctx.db.project.count({
-            where: {
-              plan: "free",
-              users: {
-                some: {
-                  userId: ctx?.user?.id,
-                  role: "owner",
-                },
-              },
-            },
-          });
 
-          if (freeWorkspaces >= 1) {
-            throw new TRPCClientError(
-              "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
-            );
-            // throw new TRPCError({
-            //   code: "METHOD_NOT_SUPPORTED",
-            //   message:
-            //     `You can only create up to 1 free workspaces. Additional workspaces require a paid plan.`,
-            // });
-          }
-
-          const workspaceResponse = await ctx.db.project.create({
-            data: {
-              name: input.name,
-              slug: input.slug,
-              users: {
-                create: {
-                  userId: ctx.user?.id!,
-                  role: "owner",
-                },
-              },
-              billingCycleStart: new Date().getDate(),
-              inviteCode: nanoid(24),
-            },
-            include: {
-              users: {
-                where: {
-                  userId: ctx?.session?.user?.id,
-                },
-                select: {
-                  role: true,
-                },
-              },
-            },
-          });
-          waitUntil(
-            (async () => {
-              // @ts-ignore
-              if (ctx?.session?.user["defaultWorkspace"] === null) {
-                await ctx.db.user.update({
-                  where: {
-                    id: ctx.session.user.id,
-                  },
-                  data: {
-                    defaultWorkspace: workspaceResponse.slug,
-                  },
-                });
-              }
-            })(),
+        if (freeWorkspaces >= 1) {
+          throw new TRPCClientError(
+            "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
           );
-
-          return WorkspaceSchema.parse({
-            ...workspaceResponse,
-            id: `ws_${workspaceResponse.id}`,
-          });
         }
+
+        const workspaceResponse = await ctx.db.project.create({
+          data: {
+            name: input.name,
+            slug: input.slug,
+            users: {
+              create: {
+                userId: ctx.user?.id!,
+                role: "owner",
+              },
+            },
+            billingCycleStart: new Date().getDate(),
+            inviteCode: nanoid(24),
+          },
+          include: {
+            users: {
+              where: {
+                userId: ctx?.session?.user?.id,
+              },
+              select: {
+                role: true,
+              },
+            },
+          },
+        });
+        waitUntil(
+          (async () => {
+            // @ts-ignore
+            if (ctx?.session?.user["defaultWorkspace"] === null) {
+              await ctx.db.user.update({
+                where: {
+                  id: ctx.session.user.id,
+                },
+                data: {
+                  defaultWorkspace: workspaceResponse.slug,
+                },
+              });
+            }
+          })(),
+        );
+
+        return WorkspaceSchema.parse({
+          ...workspaceResponse,
+          id: `ws_${workspaceResponse.id}`,
+        });
+      }
       // } catch (cause) {
       //   console.log(cause);
       // }
+    }),
+
+  fetchAllWorkspaces: protectedProcedure
+    .query(async ({ ctx }) => {
+      const workspaces = await ctx.db.project.findMany({
+        where: {
+          users: {
+            some: {
+              userId: ctx?.user.id,
+            },
+          },
+        },
+        include: {
+          users: {
+            where: {
+              userId: ctx?.user.id,
+            },
+            select: {
+              role: true,
+            },
+          },
+        },
+      });
+      
+      // const formattedWorkspaces = workspaces.map((project) =>
+      //   WorkspaceSchema.parse({ ...project, id: `ws_${project.id}` })
+      // );
+
+      const freeWorkspaces = workspaces?.filter(
+        (workspace) =>
+          workspace.plan === "free" &&
+          workspace?.users &&
+          workspace?.users[0]!.role === "owner",
+      );
+      return {
+        workspaces,
+        freeWorkspaces,
+        exceedingFreeWorkspaces: freeWorkspaces && freeWorkspaces.length >= 2,
+      };
     }),
 });
 

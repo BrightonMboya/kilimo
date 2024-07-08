@@ -2,6 +2,7 @@
 import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import WorkspaceSwitcher from "~/components/auth/workspaces/workspace-switcher";
 
 const MenuItems = () => {
   const { menuItemsTop, menuItemsBottom } = useMainMenuItems();
@@ -13,6 +14,9 @@ const MenuItems = () => {
     <div className="flex h-full flex-col">
       <div className="flex h-full flex-col justify-between">
         <ul className="menu">
+          <li>
+            <WorkspaceSwitcher />
+          </li>
           {menuItemsTop.map((item) => (
             <li key={item.label}>
               <Link

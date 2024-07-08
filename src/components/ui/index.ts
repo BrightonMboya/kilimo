@@ -33,3 +33,4 @@ export * from "./icons";
 export * from "./tooltip";
 export * from "./BlurImage";
 export * from "./modals";
+export * from "./blur-image";
