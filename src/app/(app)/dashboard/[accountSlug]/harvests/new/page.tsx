@@ -11,7 +11,7 @@ import { useToast } from "~/utils/hooks/useToast";
 import {
   harvestsSchema,
   type HarvestSchemaType,
-} from "~/app/(app)/dashboard/harvests/_components/schema";
+} from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 
 export default function Page() {
   const {
@@ -37,7 +37,7 @@ export default function Page() {
     },
     onSettled: () => {
       utils.harvests.fetchByOrganization.invalidate();
-       router.push(`/dashboard/harvests`);
+      router.push(`/dashboard/harvests`);
     },
     // onMutate: (data) => {
     //   utils.harvests.fetchByOrganization.cancel();
@@ -60,7 +60,6 @@ export default function Page() {
   });
 
   const onSubmit: SubmitHandler<HarvestSchemaType> = async (data) => {
-   
     try {
       mutateAsync({
         ...data,

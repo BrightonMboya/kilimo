@@ -1,4 +1,6 @@
-import { AlertCircleFill } from "~/components/ui";
+"use client";
+
+import { AlertCircleFill, LoadingSpinner } from "~/components/ui";
 import { useMediaQuery, useRouterStuff } from "~/utils/hooks";
 import { InfoTooltip, Modal } from "~/components/ui";
 import slugify from "@sindresorhus/slugify";
@@ -14,11 +16,10 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { mutate } from "swr";
-import { useDebounce } from "use-debounce";
 import Button from "~/components/ui/Button";
 import { TooltipProvider } from "~/components/ui";
-import {Input} from "~/components/ui";
+import { Input } from "~/components/ui";
+import { api } from "~/trpc/react";
 
 function AddWorkspaceModalHelper({
   showAddWorkspaceModal,
@@ -40,19 +41,7 @@ function AddWorkspaceModalHelper({
   const { name, slug } = data;
 
   const [slugError, setSlugError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
 
-  const [debouncedSlug] = useDebounce(slug, 500);
-  useEffect(() => {
-    if (debouncedSlug.length > 0 && !slugError) {
-      fetch(`/api/workspaces/${slug}/exists`).then(async (res) => {
-        if (res.status === 200) {
-          const exists = await res.json();
-          setSlugError(exists === 1 ? "Slug is already in use." : null);
-        }
-      });
-    }
-  }, [debouncedSlug, slugError]);
 
   useEffect(() => {
     setSlugError(null);
@@ -68,6 +57,24 @@ function AddWorkspaceModalHelper({
   const { queryParams } = useRouterStuff();
 
   const { isMobile } = useMediaQuery();
+
+  const { isLoading, mutateAsync } = api.workspace.addWorkSpace.useMutation();
+  const onSubmit = async () => {
+    try {
+      const res = await mutateAsync({ slug: slug, name: name });
+      if (res === "Project already in use") {
+        setSlugError("Slug is already in use.");
+      } else {
+        const workspaceId = res?.id;
+        va.track("Created Workspace");
+        router.push(`/dashboard/${slug}/farmers`);
+        toast.success("Successfully created workspace!");
+        setShowAddWorkspaceModal(false);
+      }
+    } catch (cause) {
+      console.log(cause);
+    }
+  };
 
   return (
     <TooltipProvider>
@@ -98,41 +105,42 @@ function AddWorkspaceModalHelper({
         </div>
 
         <form
-          onSubmit={async (e: FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            setSaving(true);
-            fetch("/api/workspaces", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            }).then(async (res) => {
-              if (res.status === 200) {
-                const { workspaceId } = await res.json();
-                // track workspace creation event
-                va.track("Created Workspace");
-                await mutate("/api/workspaces");
-                if (welcomeFlow) {
-                  router.push(`/welcome?step=upgrade&slug=${slug}`);
-                } else {
-                  router.push(`/${slug}`);
-                  toast.success("Successfully created workspace!");
-                  setShowAddWorkspaceModal(false);
-                }
-              } else {
-                const { error } = await res.json();
-                const message = error.message;
+          // onSubmit={async (e: FormEvent<HTMLFormElement>) => {
+          //   e.preventDefault();
+          //   setSaving(true);
+          //   fetch("/api/workspaces", {
+          //     method: "POST",
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //     },
+          //     body: JSON.stringify(data),
+          //   }).then(async (res) => {
+          //     if (res.status === 200) {
+          //       const { workspaceId } = await res.json();
+          //       // track workspace creation event
+          //       va.track("Created Workspace");
+          //       await mutate("/api/workspaces");
+          //       if (welcomeFlow) {
+          //         router.push(`/welcome?step=upgrade&slug=${slug}`);
+          //       } else {
+          //         router.push(`/${slug}`);
+          //         toast.success("Successfully created workspace!");
+          //         setShowAddWorkspaceModal(false);
+          //       }
+          //     } else {
+          //       const { error } = await res.json();
+          //       const message = error.message;
 
-                if (message.toLowerCase().includes("slug")) {
-                  setSlugError(message);
-                }
+          //       if (message.toLowerCase().includes("slug")) {
+          //         setSlugError(message);
+          //       }
 
-                toast.error(error.message);
-              }
-              setSaving(false);
-            });
-          }}
+          //       toast.error(error.message);
+          //     }
+          //     setSaving(false);
+          //   });
+          // }}
+          onSubmit={onSubmit}
           className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16"
         >
           <div>
@@ -152,7 +160,6 @@ function AddWorkspaceModalHelper({
                 required
                 autoFocus={!isMobile}
                 autoComplete="off"
-                // className="block w-full rounded-md border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
                 placeholder="Acme, Inc."
                 value={name}
                 onChange={(e) => {
@@ -176,7 +183,7 @@ function AddWorkspaceModalHelper({
               <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-5 text-gray-500 sm:text-sm">
                 app.{process.env.NEXT_PUBLIC_APP_DOMAIN}
               </span>
-            <Input
+              <Input
                 name="slug"
                 id="slug"
                 type="text"
@@ -214,11 +221,8 @@ function AddWorkspaceModalHelper({
             )}
           </div>
 
-          <Button
-          //   disabled={slugError ? true : false}
-          //   loading={saving}
-          //   text="Create workspace"
-          >
+          <Button type="button" onClick={onSubmit}>
+            {isLoading && <LoadingSpinner className="pr-3"/>}
             Create Workspace
           </Button>
         </form>

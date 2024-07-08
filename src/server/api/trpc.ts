@@ -12,6 +12,7 @@ import { ZodError } from "zod";
 
 import { db } from "~/server/db";
 import { createClient } from "~/utils/supabase/server";
+import { auth } from "~/utils/lib/auth/auth";
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -23,16 +24,20 @@ import { createClient } from "~/utils/supabase/server";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // const headers = opts.headers;
   // const authToken = headers.get("authorization");
-  const user = ""
+
   const supabase = createClient()
+  const session = await auth()
+  const user = session?.user
 
   // const { user } = authToken ? await getUserAsAdmin(authToken) : { user: null };
+
 
   return {
     ...opts,
     db,
     user,
-    supabase
+    supabase,
+    session
   };
 };
 /**

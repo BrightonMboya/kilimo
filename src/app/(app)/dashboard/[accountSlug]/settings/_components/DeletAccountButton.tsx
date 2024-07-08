@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderButton } from "../_components/loaderButton";
+import { LoaderButton } from "./loaderButton";
 import {
   AlertDialog,
   AlertDialogCancel,

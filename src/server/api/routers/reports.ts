@@ -4,7 +4,7 @@ import {
   NOT_FOUND_ERROR,
 } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { reportSchema } from "~/app/(app)/dashboard/reports/_components/schema";
+import { reportSchema } from "~/app/(app)/dashboard/[accountSlug]/reports/_components/schema";
 import z from "zod";
 
 const reports = createTRPCRouter({
@@ -65,9 +65,11 @@ const reports = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         const newEvents = input.trackingEvents.filter((event) => event.isItNew);
-        const oldEvents = input.trackingEvents.filter((event) => !event.isItNew);
-        console.log(oldEvents)
-        console.log(newEvents, "new ones")
+        const oldEvents = input.trackingEvents.filter((event) =>
+          !event.isItNew
+        );
+        console.log(oldEvents);
+        console.log(newEvents, "new ones");
 
         return await ctx.db.reports.update({
           where: {

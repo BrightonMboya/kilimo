@@ -7,7 +7,7 @@ import { api } from "~/trpc/react";
 import {
   harvestsSchema,
   type HarvestSchemaType,
-} from "~/app/(app)/dashboard/harvests/_components/schema";
+} from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "~/utils/hooks/useToast";
@@ -23,7 +23,6 @@ export default function Page() {
   });
   const { toast } = useToast();
   const router = useRouter();
-  
 
   const {
     register,

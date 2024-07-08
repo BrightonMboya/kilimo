@@ -19,7 +19,7 @@ import { cn } from "~/utils/utils";
 import { api } from "~/utils/api";
 import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
-import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
+import { type HarvestSchemaType } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 import { ScrollArea } from "../ui/scroll-area";
 
 interface Props {

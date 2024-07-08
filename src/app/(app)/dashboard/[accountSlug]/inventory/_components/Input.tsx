@@ -2,8 +2,8 @@ import type { RefObject } from "react";
 import { forwardRef } from "react";
 
 import { tw } from "~/utils/utils";
-import type { IconType } from "../_components/icons-map";
-import iconsMap from "../_components/icons-map"
+import type { IconType } from "./icons-map";
+import iconsMap from "./icons-map";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement> {

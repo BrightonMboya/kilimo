@@ -2,8 +2,7 @@ import "~/styles/globals.css";
 import Layout from "~/components/Layout/Layout";
 import { Toaster } from "~/components/ui/Toaster";
 import { SessionProvider } from "next-auth/react";
-import { useSession } from "next-auth/react";
-import { auth } from "~/auth";
+import { auth } from "~/utils/lib/auth/auth";
 import { redirect } from "next/navigation";
 
 export default async function RootLayout({

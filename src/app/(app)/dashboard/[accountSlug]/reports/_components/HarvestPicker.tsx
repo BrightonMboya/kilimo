@@ -19,7 +19,7 @@ import { cn } from "~/utils/utils";
 import { api } from "~/utils/api";
 import { Spinner } from "~/components/ui/LoadingSkeleton";
 import { type ControllerRenderProps } from "react-hook-form";
-import { type IReportSchema } from "../../reports/_components/schema";
+import { type IReportSchema } from "./schema";
 import { ScrollArea } from "~/components/ui/scroll-area";
 
 interface Props {

@@ -4,6 +4,19 @@ import z from "zod";
 
 export const HOME_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}`;
 
+export const DEFAULT_REDIRECTS = {
+  home: "https://jani-ai.com",
+  jani: "https://jani-ai.com",
+  signin: "https://jani-ai.com/login",
+  login: "https://jani-ai.com/login",
+  register: "https://jani-ai.com/register",
+  signup: "https://jani-ai.com/register",
+  app: "https://jani-ai.com",
+  dashboard: "https://jani-ai.com",
+  settings: "https://jani-ai.com/settings",
+  welcome: "https://jani-ai.com/welcome",
+};
+
 
 export const NOT_FOUND_ERROR = new TRPCError({
   code: "NOT_FOUND",
