@@ -1,31 +1,88 @@
-import Link from "next/link";
-import Button from "~/components/ui/Button";
-import ProfileSettings from "./ProfileSettings";
-import DangerZone from "./DangerZone";
+"use client";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { Form } from "./form";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
-export default function GeneralSettings() {
+export default function GeneralSettings({ data }: any) {
+  const router = useRouter();
+  const { update } = useSession();
   return (
-    <section className="space-y-6">
-      <ProfileSettings />
-      <div className="rounded-md border bg-white">
-        <div className="rounded-t-md border-b bg-neutral-50 px-4 py-2 sm:px-6 md:py-3">
-          <span className="mb-4 text-base font-medium sm:text-lg">
-            Manage Subscription
-          </span>
-        </div>
-
-        <div className="p-4 sm:px-6">
-          <div className="mb-4 flex flex-col gap-4 text-sm sm:text-base">
-            <div>You can cancel your subscription with the link below</div>
-            <Button asChild className="max-w-fit">
-              <Link href="/dashboard/billing" target="_blank" rel="noreferrer">
-                Manage Subscription
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-      <DangerZone />
-    </section>
+    <>
+      <Form
+        title="Workspace Name"
+        description={`This is the name of your workspace on ${process.env.NEXT_PUBLIC_APP_NAME}.`}
+        inputAttrs={{
+          name: "name",
+          defaultValue: data?.workspace.name,
+          placeholder: "My Workspace",
+          maxLength: 32,
+        }}
+        helpText="Max 32 characters."
+        {...(!data?.isOwner && {
+          disabledTooltip:
+            "Only workspace owners can change the workspace name.",
+        })}
+        handleSubmit={(updateData) =>
+          fetch(`/api/workspaces/${data?.workspace.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updateData),
+          }).then(async (res) => {
+            if (res.status === 200) {
+              await Promise.all([
+                mutate("/api/workspaces"),
+                mutate(`/api/workspaces/${data?.workspace.id}`),
+              ]);
+              toast.success("Successfully updated workspace name!");
+            } else {
+              const { error } = await res.json();
+              toast.error(error.message);
+            }
+          })
+        }
+      />
+      <Form
+        title="Workspace Slug"
+        description={`This is your workspace's unique slug on ${process.env.NEXT_PUBLIC_APP_NAME}.`}
+        inputAttrs={{
+          name: "slug",
+          defaultValue: data?.workspace.slug!,
+          placeholder: "my-workspace",
+          pattern: "^[a-z0-9-]+$",
+          maxLength: 48,
+        }}
+        helpText="Only lowercase letters, numbers, and dashes. Max 48 characters."
+        {...(!data?.isOwner && {
+          disabledTooltip:
+            "Only workspace owners can change the workspace slug.",
+        })}
+        handleSubmit={(data) =>
+          fetch(`/api/workspaces/${data?.workspace.id}`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }).then(async (res) => {
+            if (res.status === 200) {
+              const { slug: newSlug } = await res.json();
+              await mutate("/api/workspaces");
+              if (newSlug != data?.workspace.slug) {
+                router.push(`/${newSlug}/settings`);
+                update();
+              }
+              toast.success("Successfully updated workspace slug!");
+            } else {
+              const { error } = await res.json();
+              toast.error(error.message);
+            }
+          })
+        }
+      />
+    </>
   );
 }

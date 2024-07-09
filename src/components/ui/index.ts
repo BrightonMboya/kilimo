@@ -34,3 +34,4 @@ export * from "./tooltip";
 export * from "./BlurImage";
 export * from "./modals";
 export * from "./blur-image";
+export * from "./file-upload"

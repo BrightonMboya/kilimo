@@ -173,7 +173,7 @@ export const workspaces = createTRPCRouter({
           },
         },
       });
-      
+
       // const formattedWorkspaces = workspaces.map((project) =>
       //   WorkspaceSchema.parse({ ...project, id: `ws_${project.id}` })
       // );
@@ -184,10 +184,38 @@ export const workspaces = createTRPCRouter({
           workspace?.users &&
           workspace?.users[0]!.role === "owner",
       );
+
       return {
         workspaces,
         freeWorkspaces,
         exceedingFreeWorkspaces: freeWorkspaces && freeWorkspaces.length >= 2,
+      };
+    }),
+
+  getSpecificWorkspace: protectedProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.slug,
+        },
+        // select: {
+        //   users: true,
+        //   plan: true
+        // },
+        include: {
+          users: true,
+          // plan: true
+        }
+      });
+      if (!workspace) {
+          throw new TRPCClientError("No Workspace found with this slug")
+      }
+
+      return {
+        workspace,
+        isOwner: workspace?.users && workspace.users[0]?.role === 'owner',
+        nextPlan: workspace?.plan
       };
     }),
 });
