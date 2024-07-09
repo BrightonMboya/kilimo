@@ -40,3 +40,11 @@ export const FAILED_TO_MUTATE =  new TRPCError({
   code: "BAD_REQUEST",
   message: "Failed to perform this operation"
 })
+
+
+export const APP_DOMAIN =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+    ? `https://www.jani-ai.com`
+    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
+      ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+      : "http://localhost:3000";

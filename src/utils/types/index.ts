@@ -10,6 +10,7 @@ export const plans = [
 ] as const;
 export type PlanProps = (typeof plans)[number];
 export type RoleProps = (typeof roles)[number];
+
 export interface WorkspaceProps {
   id: string;
   name: string;
@@ -29,4 +30,20 @@ export interface WorkspaceProps {
   // farmersLimit: number;
   // harvestsLimit: number;
   betaTester?: boolean;
+}
+
+export interface UserProps {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  createdAt: Date;
+  // source: string | null;
+  // migratedWorkspace: string | null;
+  // defaultWorkspace?: string;
+
+}
+
+export interface WorkspaceUserProps extends UserProps {
+  role: RoleProps;
 }

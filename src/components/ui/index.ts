@@ -34,4 +34,8 @@ export * from "./tooltip";
 export * from "./BlurImage";
 export * from "./modals";
 export * from "./blur-image";
-export * from "./file-upload"
+export * from "./file-upload";
+export * from "./logo";
+export * from "./copy-button";
+export * from "./badge";
+export * from "./icon-menu"
