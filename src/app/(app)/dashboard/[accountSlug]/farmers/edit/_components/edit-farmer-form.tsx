@@ -2,7 +2,7 @@ import FormRow from "~/components/shared/FormRow";
 import { Card } from "~/components/shared/empty/Card";
 import Input from "~/components/shared/Input";
 import { FarmerFormProps } from "../../_components/new-farmer-form";
-import { Button } from "~/components/ui";
+import  Button  from "~/components/ui/Button";
 
 export default function EditFarmerForm(props: FarmerFormProps) {
     return (

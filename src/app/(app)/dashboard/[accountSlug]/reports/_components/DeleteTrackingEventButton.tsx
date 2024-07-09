@@ -22,13 +22,18 @@ import {
 } from "~/components/ui/form";
 import { api } from "~/trpc/react";
 import { z } from "zod";
-import { deleteSchema } from "../../settings/_components/DeletAccountButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "~/components/ui/Input";
 import { Loader2Icon } from "lucide-react";
 import Button, { ButtonProps } from "~/components/ui/Button";
 import { useToast } from "~/utils/hooks/useToast";
+
+export const deleteSchema = z.object({
+  confirm: z.string().refine((v) => v === "Please delete", {
+    message: "Please type 'Please delete' to confirm",
+  }),
+});
 
 interface Props {
   remove: UseFieldArrayRemove;

@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { Button } from "~/components/ui";
 import Link from "next/link";
+import Button  from "~/components/ui/Button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { type ReportsTableData } from "./schema";

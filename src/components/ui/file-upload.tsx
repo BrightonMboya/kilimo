@@ -1,3 +1,4 @@
+"use client"
 
 import { cn } from "~/utils";
 import { VariantProps, cva } from "class-variance-authority";

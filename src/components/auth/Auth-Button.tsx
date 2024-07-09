@@ -8,7 +8,7 @@ export const buttonVariants = cva("transition-all", {
   variants: {
     variant: {
       primary:
-        "border-black bg-black text-white hover:bg-gray-800 hover:ring-4 hover:ring-gray-200",
+        " bg-primary text-white hover:bg-primary/90",
       secondary: cn(
         "border-gray-200 bg-white text-gray-900 hover:bg-gray-50 focus-visible:border-gray-500 outline-none",
         "data-[state=open]:border-gray-500 data-[state=open]:ring-4 data-[state=open]:ring-gray-200",
@@ -104,7 +104,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             className={cn(
               "hidden rounded px-2 py-0.5 text-xs font-light transition-all duration-75 md:inline-block",
               {
-                "bg-gray-700 text-gray-400 group-hover:bg-gray-600 group-hover:text-gray-300":
+                "bg-primary text-gray-400 group-hover:bg-gray-600 group-hover:text-gray-300":
                   variant === "primary",
                 "bg-gray-200 text-gray-400 group-hover:bg-gray-100 group-hover:text-gray-500":
                   variant === "secondary",

@@ -1,4 +1,4 @@
-// import { DUB_THUMBNAIL, DUB_WORDMARK } from "@dub/utils";
+
 import {
   Body,
   Container,
