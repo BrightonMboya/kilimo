@@ -13,7 +13,7 @@ const MenuItems = () => {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-full flex-col justify-between">
-        <ul className="menu">
+        <ul>
           <li>
             <WorkspaceSwitcher />
           </li>

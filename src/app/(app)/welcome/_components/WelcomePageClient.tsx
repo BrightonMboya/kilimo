@@ -40,9 +40,8 @@ export default function WelcomePageClient() {
 
   return (
     <div className="flex h-screen flex-col items-center">
-      
       <AddWorkspaceModal />
-     
+
       <AnimatePresence mode="wait">
         <Intro />
         <>

@@ -1,33 +1,31 @@
 "use client";
 
 import { api } from "~/trpc/react";
+import { PlanProps, WorkspaceProps } from "~/utils/types";
+import { ModalContext } from "./WorskpaceModalProvider";
+import PlanBadge from "./plan-badge";
 import {
+  BlurImage,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Tick,
-  BlurImage,
 } from "~/components/ui";
-import PlanBadge from "./plan-badge";
-import { PlanProps, WorkspaceProps } from "~/utils/types";
 import { DICEBEAR_AVATAR_URL } from "~/utils";
 import { ChevronsUpDown, PlusCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { useCallback, useMemo, useState, useEffect } from "react";
-import AddWorkSpaceButton from "./add-workspace-button";
-import { useSearchParams } from "next/navigation";
-import { useAddWorkspaceModal } from "./add-workspace-modal";
+import { useParams, usePathname } from "next/navigation";
+import { useCallback, useContext, useMemo, useState } from "react";
 
 export default function WorkspaceSwitcher() {
   const { data, isLoading } = api.workspace.fetchAllWorkspaces.useQuery();
-  const workspaces = data?.workspaces;
   const { data: session, status } = useSession();
   const { accountSlug: slug, key } = useParams() as {
     accountSlug?: string;
     key?: string;
   };
+  const workspaces = data?.workspaces;
 
   const selected = useMemo(() => {
     const selectedWorkspace = workspaces?.find(
@@ -67,24 +65,13 @@ export default function WorkspaceSwitcher() {
     return <WorkspaceSwitcherPlaceholder />;
   }
 
-
   return (
     <div>
-      <Popover
-        content={
-          <WorkspaceList
-            selected={selected}
-            workspaces={workspaces}
-            setOpenPopover={setOpenPopover}
-          />
-        }
-        openPopover={openPopover}
-        setOpenPopover={setOpenPopover}
-      >
-        <PopoverTrigger>
+      <Popover open={openPopover}>
+        <PopoverTrigger className="bg-gray-300 rounded-md w-[200px]">
           <button
             onClick={() => setOpenPopover(!openPopover)}
-            className="flex items-center justify-between rounded-lg bg-white p-1.5 text-left text-sm transition-all duration-75 hover:bg-gray-100 focus:outline-none active:bg-gray-200"
+            className="flex items-center justify-between rounded-lg  p-1.5 text-left text-sm transition-all duration-75 hover:bg-gray-100 focus:outline-none active:bg-gray-200"
           >
             <div className="flex items-center space-x-3 pr-2">
               <BlurImage
@@ -106,16 +93,17 @@ export default function WorkspaceSwitcher() {
                 {selected.slug !== "/" && <PlanBadge plan={selected.plan} />}
               </div>
             </div>
-            <ChevronsUpDown
+            {/* <ChevronsUpDown
               className="h-4 w-4 text-gray-400"
               aria-hidden="true"
-            />
+            /> */}
           </button>
         </PopoverTrigger>
 
-        <PopoverContent className="w-full bg-white">
+        <PopoverContent>
           <WorkspaceList
             selected={selected}
+            // @ts-ignore too lazy to correct the type here
             workspaces={workspaces}
             setOpenPopover={setOpenPopover}
           />
@@ -139,40 +127,25 @@ function WorkspaceList({
   workspaces: WorkspaceProps[];
   setOpenPopover: (open: boolean) => void;
 }) {
-  //   const { setShowAddWorkspaceModal } = useContext(ModalContext);
+  const { setShowAddWorkspaceModal } = useContext(ModalContext);
   const { domain, key } = useParams() as { domain?: string; key?: string };
   const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-   const { setShowAddWorkspaceModal, AddWorkspaceModal } =
-     useAddWorkspaceModal();
 
-  useEffect(() => {
-    if (searchParams.get("step") === "workspace") {
-      setTimeout(() => {
-        setShowAddWorkspaceModal(true);
-      }, 200);
-    } else {
-      setShowAddWorkspaceModal(false);
-    }
-  }, [searchParams.get("step")]);
-
-//   const href = useCallback(
-//     (slug: string) => {
-//       if (domain || key || selected.slug === "/") {
-//         // if we're on a link page, navigate back to the workspace root
-//         return `/${slug}`;
-//       } else {
-//         // else, we keep the path but remove all query params
-//         return pathname?.replace(selected.slug, slug).split("?")[0] || "/";
-//       }
-//     },
-//     [domain, key, pathname, selected.slug],
-//   );
-
+  const href = useCallback(
+    (slug: string) => {
+      if (domain || key || selected.slug === "/") {
+        // if we're on a link page, navigate back to the workspace root
+        return `/${slug}`;
+      } else {
+        // else, we keep the path but remove all query params
+        return pathname?.replace(selected.slug, slug).split("?")[0] || "/";
+      }
+    },
+    [domain, key, pathname, selected.slug],
+  );
 
   return (
-    <div className="relative mt-1 max-h-72 w-full space-y-0.5 overflow-auto rounded-md bg-white p-2 text-base sm:w-60 sm:text-sm sm:shadow-lg">
+    <div className="relative mt-1 max-h-72 w-full space-y-0.5 overflow-auto rounded-md bg-white p-2 text-base sm:w-60 sm:text-sm">
       <div className="flex items-center justify-between px-2 pb-1">
         <p className="text-xs text-gray-500">My Workspaces</p>
         {workspaces.length > 0 && (
@@ -192,18 +165,17 @@ function WorkspaceList({
             className={`relative flex w-full items-center space-x-2 rounded-md px-2 py-1.5 hover:bg-gray-100 active:bg-gray-200 ${
               selected.slug === slug ? "font-medium" : ""
             } transition-all duration-75`}
-            href={`/dashboard/${slug}/farmers`}
+            href={href(slug)}
             shallow={false}
             onClick={() => setOpenPopover(false)}
           >
             <BlurImage
               src={logo || `${DICEBEAR_AVATAR_URL}${name}`}
-              alt={id}
               width={20}
               height={20}
+              alt={id}
               className="h-7 w-7 shrink-0 overflow-hidden rounded-full"
             />
-
             <span
               className={`block truncate text-sm sm:max-w-[140px] ${
                 selected.slug === slug ? "font-medium" : "font-normal"
@@ -219,14 +191,11 @@ function WorkspaceList({
           </Link>
         );
       })}
-      {/* <AddWorkSpaceButton/> */}
       <button
         key="add"
         onClick={() => {
           setOpenPopover(false);
-        //   router.push({})
-        pathname
-          //   setShowAddWorkspaceModal(true);
+          setShowAddWorkspaceModal(true);
         }}
         className="flex w-full cursor-pointer items-center space-x-2 rounded-md p-2 transition-all duration-75 hover:bg-gray-100"
       >
