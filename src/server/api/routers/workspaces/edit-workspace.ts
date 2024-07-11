@@ -1,5 +1,7 @@
+import { TRPCClientError } from "@trpc/client";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 export const editWorkspace = createTRPCRouter({
   changeWorkspaceName: protectedProcedure
@@ -24,5 +26,37 @@ export const editWorkspace = createTRPCRouter({
         },
       });
       return res;
+    }),
+
+  changeWorkspaceSlug: protectedProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+        updatedSlug: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const res = await ctx.db.project.update({
+          where: {
+            slug: input.workspaceId,
+          },
+          data: {
+            slug: input.updatedSlug,
+          },
+          include: {
+            users: true,
+          },
+        });
+        return res;
+      } catch (error) {
+        // @ts-ignore
+        if (error?.code === "P2002") {
+          throw new TRPCError({
+            message: "Slug already in use",
+            code: "BAD_REQUEST",
+          });
+        }
+      }
     }),
 });
