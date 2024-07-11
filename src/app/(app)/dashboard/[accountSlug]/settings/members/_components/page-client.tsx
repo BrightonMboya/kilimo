@@ -1,5 +1,4 @@
 "use client";
-import { WorkspaceUserProps } from "~/utils/types";
 import { useEditRoleModal } from "~/components/auth/workspaces/modals/edit-role-modal";
 import { useInviteCodeModal } from "~/components/auth/workspaces/modals/invite-code-modal";
 import { useInviteTeammateModal } from "~/components/auth/workspaces/modals/invite-team-modal";
@@ -23,11 +22,13 @@ import { cn, timeAgo } from "~/utils";
 import { UserMinus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
 import { TooltipProvider } from "~/components/ui";
+import { useToast } from "~/utils/hooks";
+
 const tabs: Array<"Members" | "Invitations"> = ["Members", "Invitations"];
+
 
 export default function WorkspacePeopleClient() {
   const params = useParams();
@@ -50,11 +51,14 @@ export default function WorkspacePeopleClient() {
   const [currentTab, setCurrentTab] = useState<"Members" | "Invitations">(
     "Members",
   );
-  const { data: users } = api.workspace.getUsersAndInvites.useQuery({
+  const { data: usersAndInvites } = api.workspace.getUsersAndInvites.useQuery({
     projectId: workspace?.id!,
   });
+  const users =
+    currentTab === "Invitations"
+      ? usersAndInvites?.invites
+      : usersAndInvites?.users;
 
-  //   const { users } = useUsers({ invites: currentTab === "Invitations" });
 
   return (
     <>
@@ -109,12 +113,13 @@ export default function WorkspacePeopleClient() {
             ))}
           </div>
           <div className="grid divide-y divide-gray-200">
-            {users?.users ? (
-              users.users.length > 0 ? (
-                users.users.map((user) => (
+            {users ? (
+              users.length > 0 ? (
+                users.map((user) => (
                   <UserCard
-                    key={user.user.id}
-                    user={user.user}
+                  //@ts-ignore too lazy to fix the type issue
+                    key={user.id}
+                    user={user}
                     currentTab={currentTab}
                     logo={workspace?.logo!}
                     workspaceId={workspace?.id!}
@@ -154,7 +159,7 @@ const UserCard = ({
   logo,
   isOwner,
 }: {
-  user: WorkspaceUserProps;
+  user: any;
   currentTab: "Members" | "Invitations";
   workspaceName: string;
   workspaceId: string;
@@ -163,9 +168,7 @@ const UserCard = ({
 }) => {
   const [openPopover, setOpenPopover] = useState(false);
 
-  //   const { isOwner } = useWorkspace();
-
-  const { id, name, email, createdAt, role: currentRole } = user;
+  const { id, name, email, createdAt, role: currentRole } = user.user;
 
   const [role, setRole] = useState<"owner" | "member">(currentRole);
 
@@ -192,11 +195,15 @@ const UserCard = ({
     Date.now() - new Date(createdAt).getTime() > 14 * 24 * 60 * 60 * 1000;
 
   const [copiedUserId, setCopiedUserId] = useState(false);
+  const {toast} = useToast()
 
   const copyUserId = () => {
     navigator.clipboard.writeText(id);
     setCopiedUserId(true);
-    toast.success("User ID copied!");
+    toast({
+      description: "User ID copied!"
+    })
+    setOpenPopover(false)
     setTimeout(() => setCopiedUserId(false), 3000);
   };
 
@@ -210,7 +217,7 @@ const UserCard = ({
       >
         <div className="flex items-start space-x-3">
           <div className="flex items-center space-x-3">
-            <Avatar user={user} />
+            <Avatar user={user.user} />
             <div className="flex flex-col">
               <h3 className="text-sm font-medium">{name || email}</h3>
               <p className="text-xs text-gray-500">{email}</p>

@@ -1,7 +1,7 @@
 "use client";
 
-// import useWorkspace from "@/lib/swr/use-workspace";
-// import { useDeleteWorkspaceModal } from "@/ui/modals/delete-workspace-modal";
+
+import { useDeleteWorkspaceModal } from "./modals/delete-workspace-modal";
 import { Button } from "../Auth-Button";
 import { cn } from "~/utils";
 import { api } from "~/trpc/react";
@@ -13,13 +13,15 @@ export default function DeleteWorkspace() {
     slug: params.accountSlug as unknown as string,
   });
   const isOwner = data?.isOwner;
+    const { setShowDeleteWorkspaceModal, DeleteWorkspaceModal } =
+      useDeleteWorkspaceModal();
   return (
     <div
       className={cn("rounded-lg border border-red-600 bg-white", {
         "border-gray-200": !isOwner,
       })}
     >
-      {/* <DeleteWorkspaceModal /> */}
+      <DeleteWorkspaceModal />
       <div className="flex flex-col space-y-3 p-5 sm:p-10">
         <h2 className="text-xl font-medium">Delete Workspace</h2>
         <p className="text-sm text-gray-500">
@@ -39,7 +41,7 @@ export default function DeleteWorkspace() {
           <Button
             text="Delete Workspace"
             variant="danger"
-            // onClick={() => setShowDeleteWorkspaceModal(true)}
+            onClick={() => setShowDeleteWorkspaceModal(true)}
             {...(!isOwner && {
               disabledTooltip: "Only workspace owners can delete a workspace.",
             })}
