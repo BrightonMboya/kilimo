@@ -45,7 +45,7 @@ export default function WorkspacePeopleClient() {
 
   const { setShowInviteCodeModal, InviteCodeModal } = useInviteCodeModal({
     id: workspace?.id!,
-    inviteCode: workspace?.logo!,
+    inviteCode: workspace?.inviteCode!,
   });
 
   const [currentTab, setCurrentTab] = useState<"Members" | "Invitations">(

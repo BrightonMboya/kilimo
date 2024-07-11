@@ -13,10 +13,10 @@ export default function Page() {
   const { data, isLoading } = api.workspace.getSpecificWorkspace.useQuery({
     slug: params.accountSlug as unknown as string,
   });
-  
+
 
   return (
-    <section className="space-y-5">
+    <section className="space-y-5 pb-10">
       <TooltipProvider>
         <GeneralSettings data={data} />
         <UploadLogo
