@@ -4,12 +4,14 @@ import { addWorkSpace } from "./add-workspace";
 import { fetchAllWorkspaces } from "./fetch-all-workspaces";
 import { getUsersAndInvites } from "./getUsersAndInvites";
 import { editWorkspace } from "./edit-workspace";
+import { invites } from "./invites";
 
 const workspace = mergeRouters(
   addWorkSpace,
   getSpecificWorkSpace,
   fetchAllWorkspaces,
   getUsersAndInvites,
-  editWorkspace
+  editWorkspace,
+  invites,
 );
 export default workspace;

@@ -23,7 +23,6 @@ function DeleteWorkspaceModal({
   setShowDeleteWorkspaceModal: Dispatch<SetStateAction<boolean>>;
 }) {
   const router = useRouter();
-  const { slug } = useParams() as { slug: string };
   const params = useParams();
   const { data: workspace } = api.workspace.getSpecificWorkspace.useQuery({
     slug: params.accountSlug as unknown as string,
@@ -85,8 +84,10 @@ function DeleteWorkspaceModal({
             className="block text-sm font-medium text-gray-700"
           >
             Enter the workspace slug{" "}
-            <span className="font-semibold text-black">{slug}</span> to
-            continue:
+            <span className="font-semibold text-black">
+              {params.accountSlug}
+            </span>{" "}
+            to continue:
           </label>
           <div className="relative mt-1 rounded-md shadow-sm">
             <Input
@@ -95,7 +96,7 @@ function DeleteWorkspaceModal({
               id="workspace-slug"
               autoFocus={!isMobile}
               autoComplete="off"
-              pattern={slug}
+              pattern={params.accountSlug as unknown as string}
               disabled={!workspace?.isOwner}
               className={cn(
                 "block w-full rounded-md border-gray-300 text-gray-900 placeholder-gray-400 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm",

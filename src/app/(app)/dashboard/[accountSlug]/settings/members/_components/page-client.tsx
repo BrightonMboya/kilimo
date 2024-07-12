@@ -26,9 +26,8 @@ import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
 import { TooltipProvider } from "~/components/ui";
 import { useToast } from "~/utils/hooks";
-
+import { format } from "date-fns";
 const tabs: Array<"Members" | "Invitations"> = ["Members", "Invitations"];
-
 
 export default function WorkspacePeopleClient() {
   const params = useParams();
@@ -41,6 +40,7 @@ export default function WorkspacePeopleClient() {
       id: workspace?.id!,
       slug: workspace?.slug!,
       logo: workspace?.logo!,
+      workspaceName: workspace?.name!,
     });
 
   const { setShowInviteCodeModal, InviteCodeModal } = useInviteCodeModal({
@@ -54,11 +54,11 @@ export default function WorkspacePeopleClient() {
   const { data: usersAndInvites } = api.workspace.getUsersAndInvites.useQuery({
     projectId: workspace?.id!,
   });
+
   const users =
     currentTab === "Invitations"
       ? usersAndInvites?.invites
       : usersAndInvites?.users;
-
 
   return (
     <>
@@ -113,11 +113,12 @@ export default function WorkspacePeopleClient() {
             ))}
           </div>
           <div className="grid divide-y divide-gray-200">
-            {users ? (
-              users.length > 0 ? (
+            {currentTab === "Members" &&
+              users &&
+              (users.length > 0 ? (
                 users.map((user) => (
                   <UserCard
-                  //@ts-ignore too lazy to fix the type issue
+                    //@ts-ignore too lazy to fix the type issue
                     key={user.id}
                     user={user}
                     currentTab={currentTab}
@@ -138,18 +139,56 @@ export default function WorkspacePeopleClient() {
                   />
                   <p className="text-sm text-gray-500">No invitations sent</p>
                 </div>
-              )
-            ) : (
-              Array.from({ length: 5 }).map((_, i) => (
-                <UserPlaceholder key={i} />
-              ))
-            )}
+              ))}
+          </div>
+          {isLoading &&
+            Array.from({ length: 5 }).map((_, i) => (
+              <UserPlaceholder key={i} />
+            ))}
+          <div className="grid divide-y divide-gray-200">
+            {currentTab === "Invitations" &&
+              users &&
+              (users.length > 0 ? (
+                users.map((user) => <InvitationUsers user={user} />)
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10">
+                  <img
+                    src="/_static/illustrations/video-park.svg"
+                    alt="No invitations sent"
+                    width={300}
+                    height={300}
+                    className="pointer-events-none -my-8"
+                  />
+                  <p className="text-sm text-gray-500">No invitations sent</p>
+                </div>
+              ))}
           </div>
         </div>
       </TooltipProvider>
     </>
   );
 }
+
+const InvitationUsers = ({ user }: any) => {
+  // invites expire after 14 days of being sent
+  const expiredInvite =
+    user.createdAt &&
+    Date.now() - new Date(user?.createdAt).getTime() > 14 * 24 * 60 * 60 * 1000;
+  return (
+    <section className="p-5">
+      <div className="flex items-center space-x-3">
+        <Avatar user={user} />
+        <div className="flex flex-col">
+          <h3 className="text-sm font-medium">{user?.email}</h3>
+          <p className="text-xs text-gray-500">
+            Invited at {format(user?.createdAt, "PPP")}
+          </p>
+        </div>
+        {expiredInvite && <Badge variant="gray">Expired</Badge>}
+      </div>
+    </section>
+  );
+};
 
 const UserCard = ({
   user,
@@ -188,22 +227,16 @@ const UserCard = ({
 
   const { data: session } = useSession();
 
-  // invites expire after 14 days of being sent
-  const expiredInvite =
-    currentTab === "Invitations" &&
-    createdAt &&
-    Date.now() - new Date(createdAt).getTime() > 14 * 24 * 60 * 60 * 1000;
-
   const [copiedUserId, setCopiedUserId] = useState(false);
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   const copyUserId = () => {
     navigator.clipboard.writeText(id);
     setCopiedUserId(true);
     toast({
-      description: "User ID copied!"
-    })
-    setOpenPopover(false)
+      description: "User ID copied!",
+    });
+    setOpenPopover(false);
     setTimeout(() => setCopiedUserId(false), 3000);
   };
 
@@ -224,7 +257,7 @@ const UserCard = ({
             </div>
           </div>
 
-          {expiredInvite && <Badge variant="gray">Expired</Badge>}
+        
         </div>
         <div className="flex items-center space-x-3">
           {currentTab === "Members" ? (

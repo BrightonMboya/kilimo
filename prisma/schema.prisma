@@ -11,7 +11,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// this of this as workspaces under organization
+// thimk of this as workspaces under organization
 model Project {
   id                   String                 @id @default(cuid())
   name                 String
@@ -155,13 +155,13 @@ model Account {
 //   updatedAt DateTime @updatedAt
 // }
 
-// model VerificationToken {
-//   identifier String
-//   token      String
-//   expires    DateTime
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
 
-//   @@id([identifier, token])
-// }
+  @@id([identifier, token])
+}
 
 model Organization {
   id                   String                 @id @default(cuid())
