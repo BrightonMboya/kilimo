@@ -119,6 +119,9 @@ model User {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   ProjectUsers     ProjectUsers[]
+  Farmers          Farmers[]
+  Harvests         Harvests[]
+  Reports          Reports[]
 
   @@index(source)
   @@index(defaultWorkspace)
@@ -163,20 +166,8 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
-model Organization {
-  id                   String                 @id @default(cuid())
-  name                 String
-  country              String?
-  emailAddress         String                 @unique
-  farmers              Farmers[]
-  harvests             Harvests[]
-  Warehouses           Warehouses[]
-  reports              Reports[]
-  ReportTrackingEvents ReportTrackingEvents[]
-}
-
 model Farmers {
-  id                String       @id @default(cuid())
+  id                String     @id @default(cuid())
   fullName          String
   // gender          String
   phoneNumber       String?
@@ -187,11 +178,16 @@ model Farmers {
   quantityCanSupply Int
   // nationalId      FarmersNationalId?
   // profilePicture  FarmersProfilePictures?
-  organization_id   String
-  organization      Organization @relation(fields: [organization_id], references: [id])
   harvests          Harvests[]
-  Project           Project?     @relation(fields: [projectId], references: [id])
-  projectId         String?
+  Project           Project    @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id        String
+
+  // User who created the farmer
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 // model FarmersNationalId {
@@ -207,20 +203,25 @@ model Farmers {
 // }
 
 model Harvests {
-  id              String       @id @default(cuid())
-  date            DateTime
-  name            String
-  crop            String
-  size            Int
-  inputsUsed      String
-  unit            String
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
-  Farmers         Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
-  farmersId       String
-  reports         Reports[]
-  Project         Project?     @relation(fields: [projectId], references: [id])
-  projectId       String?
+  id         String    @id @default(cuid())
+  date       DateTime
+  name       String
+  crop       String
+  size       Int
+  inputsUsed String
+  unit       String
+  Farmers    Farmers   @relation(fields: [farmersId], references: [id], onDelete: Cascade)
+  farmersId  String
+  reports    Reports[]
+  Project    Project   @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id String
+
+  // User who created the harvest
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 model Equipments {
@@ -236,16 +237,14 @@ model Equipments {
 }
 
 model Warehouses {
-  id              String       @id @default(cuid())
-  name            String
-  description     String
-  maxCapacity     Int
-  unit            String
-  inventory       Inventory[]
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
-  Project         Project?     @relation(fields: [projectId], references: [id])
-  projectId       String?
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  maxCapacity Int
+  unit        String
+  inventory   Inventory[]
+  Project     Project     @relation(fields: [project_id], references: [id])
+  project_id  String
 }
 
 model Inventory {
@@ -270,22 +269,26 @@ model Reports {
   finishedTracking     Boolean                @default(false)
   Harvests             Harvests               @relation(fields: [harvestsId], references: [id])
   harvestsId           String
-  Organization         Organization           @relation(fields: [organization_id], references: [id])
-  organization_id      String
   ReportTrackingEvents ReportTrackingEvents[]
-  Project              Project?               @relation(fields: [projectId], references: [id])
-  projectId            String?
+  Project              Project                @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id           String
+  // User who created the harvest
+  user                 User?                  @relation(fields: [userId], references: [id])
+  userId               String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 model ReportTrackingEvents {
-  id              String       @id @default(cuid())
-  eventName       String
-  dateCreated     DateTime
-  description     String
-  reportId        String
-  reports         Reports      @relation(fields: [reportId], references: [id])
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
-  Project         Project?     @relation(fields: [projectId], references: [id])
-  projectId       String?
+  id          String   @id @default(cuid())
+  eventName   String
+  dateCreated DateTime
+  description String
+  reportId    String
+  reports     Reports  @relation(fields: [reportId], references: [id])
+  Project     Project  @relation(fields: [project_id], references: [id])
+  project_id  String
+
+  @@index(project_id)
 }
