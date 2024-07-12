@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppRouter } from "~/server/api/root";
 import { inferProcedureInput } from "@trpc/server";
@@ -12,12 +12,16 @@ import Header from "~/components/Layout/header/header";
 import { ToastAction } from "~/components/ui/Toast";
 import { useToast } from "~/utils/hooks/useToast";
 
-import { farmersSchema, FarmersValidationSchema as ValidationSchema } from "../_components/schema";
+import {
+  farmersSchema,
+  FarmersValidationSchema as ValidationSchema,
+} from "../_components/schema";
 import NewFarmerForm from "../_components/new-farmer-form";
 import { Toaster } from "~/components/ui/Toaster";
 
 export default function Page() {
   const router = useRouter();
+  const params = useParams();
   const { toast } = useToast();
   const {
     register,
@@ -40,18 +44,24 @@ export default function Page() {
       const prevData = utils.farmers.fetchByOrganization.getData();
 
       // set the data to include the new added one
-      utils.farmers.fetchByOrganization.setData(undefined, (old) => [
-        // @ts-ignore
-        ...old,
-        data,
-      ]);
+      utils.farmers.fetchByOrganization.setData(
+        { workspaceSlug: params.accountSlug as unknown as string },
+        (old) => [
+          // @ts-ignore
+          ...old,
+          data,
+        ],
+      );
       return { prevData };
     },
     onSettled: () => {
       utils.farmers.fetchByOrganization.invalidate();
     },
     onError: (error, data, ctx) => {
-      utils.farmers.fetchByOrganization.setData(undefined, ctx?.prevData);
+      utils.farmers.fetchByOrganization.setData(
+        { workspaceSlug: params.accountSlug as unknown as string },
+        ctx?.prevData,
+      );
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
@@ -63,10 +73,11 @@ export default function Page() {
   });
 
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
-    router.push("/dashboard/farmers");
+    router.push(`/dashboard/${params.accountSlug}/farmers`);
     type Input = inferProcedureInput<AppRouter["farmers"]["addFarmer"]>;
     const input: Input = {
       ...data,
+      workspaceSlug: params.accountSlug as unknown as string,
     };
 
     try {

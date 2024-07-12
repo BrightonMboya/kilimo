@@ -3,13 +3,34 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import z from "zod";
 import { harvestsSchema } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 import { TRPCError } from "@trpc/server";
+import { TRPCClientError } from "@trpc/client";
 
 const harvests = createTRPCRouter({
   create: protectedProcedure
     .input(
-      harvestsSchema,
+      harvestsSchema.merge(
+        z.object({
+          workspaceSlug: z.string(),
+        }),
+      ),
     )
     .mutation(async ({ ctx, input }) => {
+      // find the specific workspace
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      if (!workspace) {
+        throw new TRPCClientError(
+          `No workspace found with the name ${input.workspaceSlug}`,
+        );
+      }
       try {
         const newHarvest = await ctx.db.harvests.create({
           data: {
@@ -19,7 +40,7 @@ const harvests = createTRPCRouter({
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organization_id: ctx?.user?.id,
+            project_id: workspace.id,
             size: input.size,
           },
         });
@@ -31,11 +52,31 @@ const harvests = createTRPCRouter({
     }),
 
   fetchByOrganization: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      workspaceSlug: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      // we need to get the project in the first place
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      if (!workspace) {
+        throw new TRPCClientError(
+          `No workspace found with the name ${input.workspaceSlug}`,
+        );
+      }
+
       try {
         return await ctx.db.harvests.findMany({
           where: {
-            organization_id: ctx.user?.id,
+            project_id: workspace.id,
           },
           include: {
             Farmers: {

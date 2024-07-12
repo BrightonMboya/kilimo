@@ -7,9 +7,13 @@ import Button from "~/components/ui/Button";
 import Link from "next/link";
 import Header from "~/components/Layout/header/header";
 import { EmptyState } from "~/components/shared/empty/empty-state";
+import { useParams } from "next/navigation";
 
 export default function Index() {
-  const { data, isLoading } = api.harvests.fetchByOrganization.useQuery();
+  const params = useParams();
+  const { data, isLoading } = api.harvests.fetchByOrganization.useQuery({
+    workspaceSlug: params.accountSlug as unknown as string,
+  });
 
   return (
     <main className="">

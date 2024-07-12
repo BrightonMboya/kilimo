@@ -8,9 +8,23 @@ import { TRPCError } from "@trpc/server";
 const farmers = createTRPCRouter({
   addFarmer: protectedProcedure
     .input(
-      farmersSchema,
+      farmersSchema.merge(
+        z.object({
+          workspaceSlug: z.string(),
+        }),
+      ),
     )
     .mutation(async ({ ctx, input }) => {
+      // first we get the workspace
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.farmers.create({
           data: {
@@ -21,7 +35,8 @@ const farmers = createTRPCRouter({
             country: input.country,
             crops: input.crops,
             quantityCanSupply: input.quantityCanSupply,
-            organization_id: ctx?.user.id,
+            project_id: workspace?.id!,
+            // user: ctx.session?.user!
           },
         });
       } catch (cause) {
@@ -62,29 +77,48 @@ const farmers = createTRPCRouter({
     },
   ),
 
+  // fetch all farmers belonging to a specific workspace/ project
   fetchByOrganization: protectedProcedure
-    .query(async ({ ctx }) => {
-      try {
-        return await ctx.db.farmers.findMany({
-          where: {
-            organization_id: ctx?.user.id,
-          },
-        });
-      } catch (cause) {
-        console.log(cause);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to load farmers",
-        });
+    .input(z.object({
+      workspaceSlug: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      // we need to get the project in the first place
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      if (!workspace) {
+        throw new TRPCClientError(
+          `No workspace found with the name ${input.workspaceSlug}`,
+        );
       }
+
+      return await ctx.db.farmers.findMany({
+        where: {
+          project_id: workspace?.id,
+        },
+      });
     }),
 
   farmersNamesAndIds: protectedProcedure
+    .input(
+      z.object({
+        workspaceSlug: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       try {
         const farmers = await ctx.db.farmers.findMany({
           where: {
-            organization_id: ctx?.user?.id,
+            // organization_id: ctx?.user?.id,
+            project_id: "",
           },
           select: {
             id: true,

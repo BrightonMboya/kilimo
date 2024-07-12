@@ -9,14 +9,30 @@ import { EmptyState } from "~/components/shared/empty/empty-state";
 import Button from "~/components/ui/Button";
 import Header from "~/components/Layout/header/header";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useToast } from "~/utils/hooks";
+
 export default function Page() {
-  const { data, isLoading } = api.farmers.fetchByOrganization.useQuery();
+  const params = useParams();
+  const { data, isLoading, isError, error } =
+    api.farmers.fetchByOrganization.useQuery({
+      workspaceSlug: params.accountSlug as unknown as string,
+    });
+
+  const { toast } = useToast();
+  // if (isError && !isLoading) {
+  //   toast({
+  //     description: error.message,
+  //     variant: "destructive",
+  //   });
+  //   return;
+  // }
 
   return (
     <main className="">
       <Header classNames="" title="All Farmers">
         <div className="w-full lg:flex lg:justify-end">
-          <Link href="/dashboard/farmers/new">
+          <Link href={`/dashboard/${params.accountSlug}/farmers/new`}>
             <Button className="w-full lg:w-fit ">New Farmer</Button>
           </Link>
         </div>
@@ -28,7 +44,7 @@ export default function Page() {
           customContent={{
             title: "No Farmers found",
             text: "What are you waiting for? Create your first Farmer now!",
-            newButtonRoute: "/dashboard/farmers/new",
+            newButtonRoute: `/dashboard/${params.accountSlug}/farmers/new`,
             newButtonContent: "New Farmer",
           }}
         />
