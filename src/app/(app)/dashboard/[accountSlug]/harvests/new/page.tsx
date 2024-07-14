@@ -12,6 +12,7 @@ import {
   harvestsSchema,
   type HarvestSchemaType,
 } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
+import { useParams } from "next/navigation";
 
 export default function Page() {
   const {
@@ -27,6 +28,7 @@ export default function Page() {
   const { toast } = useToast();
   const utils = api.useUtils();
   const router = useRouter();
+  const params = useParams();
 
   const { mutateAsync, isLoading } = api.harvests.create.useMutation({
     onSuccess: () => {
@@ -37,7 +39,7 @@ export default function Page() {
     },
     onSettled: () => {
       utils.harvests.fetchByOrganization.invalidate();
-      router.push(`/dashboard/harvests`);
+      router.push(`/dashboard/${params.accountSlug}/harvests`);
     },
     // onMutate: (data) => {
     //   utils.harvests.fetchByOrganization.cancel();
@@ -63,6 +65,7 @@ export default function Page() {
     try {
       mutateAsync({
         ...data,
+        workspaceSlug: params.accountSlug as unknown as string,
       });
     } catch (cause) {
       console.log(cause);

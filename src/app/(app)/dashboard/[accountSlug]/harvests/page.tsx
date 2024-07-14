@@ -19,7 +19,7 @@ export default function Index() {
     <main className="">
       <Header classNames="" title="All Harvests">
         <div className="w-full lg:flex lg:justify-end">
-          <Link href="/dashboard/harvests/new">
+          <Link href={`/dashboard/${params.accountSlug}/harvests/new`}>
             <Button className="w-full lg:w-fit ">New Harvest</Button>
           </Link>
         </div>
@@ -29,7 +29,7 @@ export default function Index() {
           customContent={{
             title: "No Harvests found",
             text: "What are you waiting for? Create your first Harvest now!",
-            newButtonRoute: "/dashboard/harvests/new",
+            newButtonRoute: `/dashboard/${params.accountSlug}/harvests/new`,
             newButtonContent: "New Harvest",
           }}
         />

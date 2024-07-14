@@ -13,13 +13,16 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useToast } from "~/utils/hooks/useToast";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 import NewHarvestForm from "~/components/harvests/NewHarvestForm";
+import { useParams } from "next/navigation";
 
 import { Toaster } from "~/components/ui/Toaster";
 export default function Page() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const harvestId = searchParams.get("harvestId");
   const { data, isLoading } = api.harvests.fetchById.useQuery({
     harvestId: harvestId as unknown as string,
+    workspaceSlug: params.accountSlug as unknown as string,
   });
   const { toast } = useToast();
   const router = useRouter();
@@ -67,13 +70,14 @@ export default function Page() {
         title: "Harvest updated",
         duration: 9000,
       });
-      router.push("/dashboard/harvests");
+      router.push(`/dashboard/${params.accountSlug}/harvests`);
     },
   });
   const onSubmit: SubmitHandler<HarvestSchemaType> = (data) => {
     try {
       editHarvestRouter.mutateAsync({
         id: harvestId as unknown as string,
+        workspaceSlug: params.accountSlug as unknown as string,
         ...data,
       });
     } catch (cause) {

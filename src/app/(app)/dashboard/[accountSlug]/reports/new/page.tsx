@@ -7,6 +7,7 @@ import { useToast } from "~/utils/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import { Toaster } from "~/components/ui/Toaster";
+import { useParams } from "next/navigation";
 
 export default function Page() {
   const {
@@ -22,6 +23,7 @@ export default function Page() {
   const { toast } = useToast();
   const utils = api.useUtils();
   const router = useRouter();
+  const params = useParams();
   const { mutateAsync, isLoading, isError } = api.reports.add.useMutation({
     onSuccess: () => {
       toast({
@@ -41,7 +43,7 @@ export default function Page() {
     },
     onSettled: () => {
       utils.reports.fetchByOrganization.invalidate();
-      router.push(`/dashboard/reports`);
+      router.push(`/dashboard/$params.accountSlug}/reports`);
     },
   });
 
@@ -49,7 +51,10 @@ export default function Page() {
     data: IReportSchema,
   ) => {
     try {
-      mutateAsync(data);
+      mutateAsync({
+        ...data,
+        workspaceSlug: params.accountSlug as unknown as string,
+      });
     } catch (cause) {
       console.log(cause);
     }

@@ -96,13 +96,24 @@ const harvests = createTRPCRouter({
     .input(
       z.object({
         harvestId: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.harvests.findUnique({
           where: {
             id: input.harvestId,
+            project_id: workspace?.id,
           },
         });
       } catch (cause) {
@@ -114,9 +125,18 @@ const harvests = createTRPCRouter({
   editHarvest: protectedProcedure
     .input(
       harvestsSchema
-        .merge(z.object({ id: z.string() })),
+        .merge(z.object({ id: z.string(), workspaceSlug: z.string() })),
     )
     .mutation(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         const updatedHarvest = await ctx.db.harvests.update({
           where: {
@@ -129,7 +149,7 @@ const harvests = createTRPCRouter({
             unit: input.unit,
             inputsUsed: input.inputsUsed,
             farmersId: input.farmerId,
-            organization_id: ctx?.user?.id,
+            project_id: workspace?.id,
             size: input.size,
           },
         });
@@ -144,13 +164,24 @@ const harvests = createTRPCRouter({
     .input(
       z.object({
         harvestId: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         const deletedHarvest = await ctx.db.harvests.delete({
           where: {
             id: input.harvestId,
+            project_id: workspace?.id,
           },
         });
         return deletedHarvest;
@@ -165,11 +196,23 @@ const harvests = createTRPCRouter({
     }),
 
   harvestsNamesAndId: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      workspaceSlug: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.harvests.findMany({
           where: {
-            organization_id: ctx.user?.id,
+            project_id: workspace?.id,
           },
           select: {
             id: true,

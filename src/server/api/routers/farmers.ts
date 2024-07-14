@@ -49,13 +49,26 @@ const farmers = createTRPCRouter({
     }),
 
   editFarmer: protectedProcedure.input(
-    farmersSchema.merge(z.object({ id: z.string() })),
+    farmersSchema.merge(
+      z.object({ id: z.string(), workspaceSlug: z.string() }),
+    ),
   ).mutation(
     async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
       try {
         return await ctx.db.farmers.update({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
           data: {
             fullName: input.fullName,
@@ -114,11 +127,19 @@ const farmers = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         const farmers = await ctx.db.farmers.findMany({
           where: {
-            // organization_id: ctx?.user?.id,
-            project_id: "",
+            project_id: workspace?.id,
           },
           select: {
             id: true,
@@ -136,13 +157,25 @@ const farmers = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .query(async ({ input, ctx }) => {
       try {
+        const workspace = await ctx.db.project.findUnique({
+          where: {
+            slug: input.workspaceSlug,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+
         const farmer = await ctx.db.farmers.findFirst({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
         });
         return farmer;
@@ -159,13 +192,24 @@ const farmers = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const workspace = await ctx.db.project.findUnique({
+          where: {
+            slug: input.workspaceSlug,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
         await ctx.db.farmers.delete({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
         });
         return true;

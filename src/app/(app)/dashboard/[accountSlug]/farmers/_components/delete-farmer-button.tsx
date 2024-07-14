@@ -27,6 +27,7 @@ import { z } from "zod";
 import { api } from "~/trpc/react";
 import { useToast } from "~/utils/hooks/useToast";
 import { LoaderButton } from "~/components/shared/LoaderButton";
+import { useParams } from "next/navigation";
 
 export const deleteSchema = z.object({
   confirm: z.string().refine((v) => v === "delete", {
@@ -38,6 +39,7 @@ export default function DeleteFarmerButton({ farmerId }: { farmerId: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
   const utils = api.useUtils();
+  const params = useParams();
   const { mutateAsync, isLoading } = api.farmers.delete.useMutation({
     onSuccess: () => {
       toast({
@@ -54,11 +56,17 @@ export default function DeleteFarmerButton({ farmerId }: { farmerId: string }) {
       utils.farmers.fetchByOrganization.cancel();
       const prevData = utils.farmers.fetchByOrganization.getData();
       const newData = prevData?.filter((farmer) => farmer.id !== data.id);
-      utils.farmers.fetchByOrganization.setData(undefined, newData);
+      utils.farmers.fetchByOrganization.setData(
+        { workspaceSlug: params.accountSlug as unknown as string },
+        newData,
+      );
       return { prevData };
     },
     onError: (err, data, ctx) => {
-      utils.farmers.fetchByOrganization.setData(undefined, ctx?.prevData);
+      utils.farmers.fetchByOrganization.setData(
+        { workspaceSlug: params.accountSlug as unknown as string },
+        ctx?.prevData,
+      );
       toast({
         title: "Error",
         description: `${err.message}`,
@@ -71,12 +79,13 @@ export default function DeleteFarmerButton({ farmerId }: { farmerId: string }) {
   const form = useForm<z.infer<typeof deleteSchema>>({
     resolver: zodResolver(deleteSchema),
     defaultValues: {
-      confirm: "",
+      confirm: "delete",
     },
   });
   function onSubmit() {
     mutateAsync({
       id: farmerId,
+      workspaceSlug: params.accountSlug as unknown as string,
     });
   }
   return (

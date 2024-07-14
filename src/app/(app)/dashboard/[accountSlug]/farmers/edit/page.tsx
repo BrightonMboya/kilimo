@@ -13,15 +13,17 @@ import {
 } from "../_components/schema";
 import EditFarmerForm from "./_components/edit-farmer-form";
 import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { useToast } from "~/utils/hooks/useToast";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 
 export default function Page({ params }: { params: { farmersId: string } }) {
   const searchParams = useSearchParams();
+  const param = useParams();
   const farmerId = searchParams.get("id");
   const { data, isLoading } = api.farmers.fetchFarmerById.useQuery({
     id: farmerId as unknown as string,
+    workspaceSlug: param.accountSlug as unknown as string,
   });
   const { toast } = useToast();
   const router = useRouter();
@@ -63,20 +65,20 @@ export default function Page({ params }: { params: { farmersId: string } }) {
         title: "Farmer updated",
         duration: 9000,
       });
-      
     },
     onSettled: () => {
       toast({
         title: "Farmer updated",
         duration: 9000,
       });
-      router.push("/dashboard/farmers");
+      router.push(`/dashboard/${param.accountSlug}/farmers`);
     },
   });
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
     try {
       editFarmerRouter.mutateAsync({
         id: farmerId as unknown as string,
+        workspaceSlug: param.accountSlug as unknown as string,
         ...data,
       });
     } catch (cause) {

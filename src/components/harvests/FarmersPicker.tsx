@@ -21,7 +21,7 @@ import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 import { ScrollArea } from "../ui/scroll-area";
-
+import { useParams } from "next/navigation";
 interface Props {
   field: ControllerRenderProps<HarvestSchemaType, "farmerId">;
 }
@@ -29,8 +29,11 @@ interface Props {
 export default function FarmersPicker({ field }: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
+  const params = useParams();
 
-  const { data, isLoading } = api.farmers.farmersNamesAndIds.useQuery();
+  const { data, isLoading } = api.farmers.farmersNamesAndIds.useQuery({
+    workspaceSlug: params.accountSlug as unknown as string,
+  });
 
   return (
     <div className=" w-full bg-white">

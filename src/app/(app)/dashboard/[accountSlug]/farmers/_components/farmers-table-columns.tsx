@@ -1,3 +1,4 @@
+"use client";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -15,6 +16,9 @@ import { ColumnDef } from "@tanstack/react-table";
 import Button from "~/components/ui/Button";
 import { api } from "~/trpc/react";
 import DeleteFarmerButton from "./delete-farmer-button";
+import { useParams } from "next/navigation";
+
+
 
 export const columns: ColumnDef<Farmers>[] = [
   {
@@ -95,6 +99,7 @@ export const columns: ColumnDef<Farmers>[] = [
     cell: ({ row }) => {
       const farmer = row.original;
       const { mutateAsync } = api.farmers.delete.useMutation({});
+      const params = useParams()
 
       return (
         <DropdownMenu>
@@ -116,7 +121,7 @@ export const columns: ColumnDef<Farmers>[] = [
             <DropdownMenuItem>
               <Link
                 href={{
-                  pathname: `/dashboard/farmers/edit`,
+                  pathname: `/dashboard/${params.accountSlug}/farmers/edit`,
                   query: { id: farmer.id },
                 }}
               >

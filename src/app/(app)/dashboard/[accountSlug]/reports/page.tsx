@@ -8,17 +8,20 @@ import Header from "~/components/Layout/header/header";
 import { EmptyState } from "~/components/shared/empty/empty-state";
 import SuperLink from "~/components/shared/SuperLink";
 import ReportsTable from "./_components/ReportsTable";
-import {Toaster} from "~/components/ui/Toaster";
+import { Toaster } from "~/components/ui/Toaster";
+import { useParams } from "next/navigation";
 
 export default function Page() {
-  const { data, isLoading, isError } =
-    api.reports.fetchByOrganization.useQuery();
+  const params = useParams();
+  const { data, isLoading, isError } = api.reports.fetchByOrganization.useQuery(
+    { workspaceSlug: params.accountSlug as unknown as string },
+  );
   return (
     <main className="">
       <Toaster />
       <Header classNames="" title="Reports">
         <div className="w-full lg:flex lg:justify-end">
-          <SuperLink href="/dashboard/reports/new">
+          <SuperLink href={`/dashboard/${params.accountSlug}/reports/new`}>
             <Button className="w-full lg:w-fit ">New Report</Button>
           </SuperLink>
         </div>
@@ -28,7 +31,7 @@ export default function Page() {
           customContent={{
             title: "No Reports found",
             text: "Reports are the core of your food traceability, Create your first Report now!",
-            newButtonRoute: "/dashboard/reports/new",
+            newButtonRoute: `/dashboard/${params.accountSlug}/reports/new`,
             newButtonContent: "New Report",
           }}
         />

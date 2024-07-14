@@ -46,12 +46,14 @@ export const sendEmail = async ({
         ? "reggie@jani-ai.com"
         : process.env.NEXT_PUBLIC_IS_DUB
           ? "developer@jani-ai.com"
-          : `${process.env.NEXT_PUBLIC_APP_NAME} <system@${process.env.NEXT_PUBLIC_APP_DOMAIN}>`,
+          // : `${process.env.NEXT_PUBLIC_APP_NAME} <system@${process.env.NEXT_PUBLIC_APP_DOMAIN}>`
+          : "developer@jani-ai.com",
     To: email,
     Bcc: bcc,
     ReplyTo: process.env.NEXT_PUBLIC_IS_DUB
       ? "reggie@jani-ai.com"
-      : `support@${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+      // : `support@${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+      : "developer@jani-ai.com",
     Subject: subject,
     ...(text && { TextBody: text }),
     ...(react && { HtmlBody: render(react) }),

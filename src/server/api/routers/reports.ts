@@ -9,11 +9,21 @@ import z from "zod";
 
 const reports = createTRPCRouter({
   fetchByOrganization: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({ workspaceSlug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.reports.findMany({
           where: {
-            organization_id: ctx?.user.id,
+            project_id: workspace?.id,
           },
           include: {
             Harvests: {
@@ -29,22 +39,33 @@ const reports = createTRPCRouter({
       }
     }),
   add: protectedProcedure
-    .input(reportSchema)
+    .input(reportSchema.merge(z.object({
+      workspaceSlug: z.string(),
+    })))
     .mutation(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.reports.create({
           data: {
             name: input.name,
             dateCreated: input.dateCreated,
             harvestsId: input.harvestId,
-            organization_id: ctx.user?.id,
+            project_id: workspace?.id!,
             ReportTrackingEvents: {
               createMany: {
                 data: input.trackingEvents.map((event) => ({
                   eventName: event.eventName,
                   dateCreated: event.dateCreated,
                   description: event.description,
-                  organization_id: ctx.user?.id,
+                  project_id: workspace?.id!,
                 })),
               },
             },
@@ -60,6 +81,7 @@ const reports = createTRPCRouter({
     .input(reportSchema.merge(
       z.object({
         id: z.string(),
+        workspaceSlug: z.string(),
       }),
     ))
     .mutation(async ({ ctx, input }) => {
@@ -68,25 +90,32 @@ const reports = createTRPCRouter({
         const oldEvents = input.trackingEvents.filter((event) =>
           !event.isItNew
         );
-        console.log(oldEvents);
-        console.log(newEvents, "new ones");
+        const workspace = await ctx.db.project.findUnique({
+          where: {
+            slug: input.workspaceSlug,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
 
         return await ctx.db.reports.update({
           where: {
             id: input.id,
-            organization_id: ctx?.user?.id,
+            project_id: workspace?.id,
           },
           data: {
             name: input.name,
             dateCreated: input.dateCreated,
             harvestsId: input.harvestId,
-            organization_id: ctx.user?.id,
+            project_id: workspace?.id,
             ReportTrackingEvents: {
               update: oldEvents
                 .map((event) => ({
                   where: {
                     id: event.id,
-                    organization_id: ctx.user?.id,
+                    project_id: workspace?.id,
                   },
                   data: {
                     eventName: event.eventName,
@@ -100,7 +129,7 @@ const reports = createTRPCRouter({
                     eventName: event.eventName,
                     dateCreated: event.dateCreated,
                     description: event.description,
-                    organization_id: ctx.user?.id,
+                    project_id: workspace?.id!,
                   })),
               },
             },
@@ -113,12 +142,21 @@ const reports = createTRPCRouter({
     }),
 
   fetchById: protectedProcedure
-    .input(z.object({ reportId: z.string() }))
+    .input(z.object({ reportId: z.string(), workspaceSlug: z.string() }))
     .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.reports.findFirst({
           where: {
-            organization_id: ctx?.user.id,
+            project_id: workspace?.id,
             id: input.reportId,
           },
           include: {
