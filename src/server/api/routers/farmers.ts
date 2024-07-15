@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { farmersSchema } from "~/app/(app)/dashboard/farmers/_components/schema";
+import { farmersSchema } from "~/app/(app)/dashboard/[accountSlug]/farmers/_components/schema";
 import z from "zod";
 import { FAILED_TO_CREATE, NOT_FOUND_ERROR } from "~/utils/constants";
 import { TRPCClientError } from "@trpc/client";
@@ -8,9 +8,23 @@ import { TRPCError } from "@trpc/server";
 const farmers = createTRPCRouter({
   addFarmer: protectedProcedure
     .input(
-      farmersSchema,
+      farmersSchema.merge(
+        z.object({
+          workspaceSlug: z.string(),
+        }),
+      ),
     )
     .mutation(async ({ ctx, input }) => {
+      // first we get the workspace
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         return await ctx.db.farmers.create({
           data: {
@@ -21,7 +35,8 @@ const farmers = createTRPCRouter({
             country: input.country,
             crops: input.crops,
             quantityCanSupply: input.quantityCanSupply,
-            organization_id: ctx?.user.id,
+            project_id: workspace?.id!,
+            // user: ctx.session?.user!
           },
         });
       } catch (cause) {
@@ -34,13 +49,26 @@ const farmers = createTRPCRouter({
     }),
 
   editFarmer: protectedProcedure.input(
-    farmersSchema.merge(z.object({ id: z.string() })),
+    farmersSchema.merge(
+      z.object({ id: z.string(), workspaceSlug: z.string() }),
+    ),
   ).mutation(
     async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
       try {
         return await ctx.db.farmers.update({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
           data: {
             fullName: input.fullName,
@@ -62,29 +90,56 @@ const farmers = createTRPCRouter({
     },
   ),
 
+  // fetch all farmers belonging to a specific workspace/ project
   fetchByOrganization: protectedProcedure
-    .query(async ({ ctx }) => {
-      try {
-        return await ctx.db.farmers.findMany({
-          where: {
-            organization_id: ctx?.user.id,
-          },
-        });
-      } catch (cause) {
-        console.log(cause);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to load farmers",
-        });
+    .input(z.object({
+      workspaceSlug: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      // we need to get the project in the first place
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      if (!workspace) {
+        throw new TRPCClientError(
+          `No workspace found with the name ${input.workspaceSlug}`,
+        );
       }
+
+      return await ctx.db.farmers.findMany({
+        where: {
+          project_id: workspace?.id,
+        },
+      });
     }),
 
   farmersNamesAndIds: protectedProcedure
+    .input(
+      z.object({
+        workspaceSlug: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
+      const workspace = await ctx.db.project.findUnique({
+        where: {
+          slug: input.workspaceSlug,
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
       try {
         const farmers = await ctx.db.farmers.findMany({
           where: {
-            organization_id: ctx?.user?.id,
+            project_id: workspace?.id,
           },
           select: {
             id: true,
@@ -102,13 +157,25 @@ const farmers = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .query(async ({ input, ctx }) => {
       try {
+        const workspace = await ctx.db.project.findUnique({
+          where: {
+            slug: input.workspaceSlug,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
+
         const farmer = await ctx.db.farmers.findFirst({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
         });
         return farmer;
@@ -125,13 +192,24 @@ const farmers = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
+        workspaceSlug: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const workspace = await ctx.db.project.findUnique({
+          where: {
+            slug: input.workspaceSlug,
+          },
+          select: {
+            id: true,
+            name: true,
+          },
+        });
         await ctx.db.farmers.delete({
           where: {
             id: input.id,
+            project_id: workspace?.id,
           },
         });
         return true;

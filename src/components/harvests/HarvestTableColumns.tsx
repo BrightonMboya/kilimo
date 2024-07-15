@@ -9,13 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { format } from "date-fns";
-import { Button } from "../ui";
+import Button from "~/components/ui/Button";
 import Link from "next/link";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { type Harvests } from "./HarvestTable";
 import { useToast } from "~/utils/hooks/useToast";
 import { api } from "~/trpc/react";
+import { useParams } from "next/navigation";
 
 export const columns: ColumnDef<Harvests>[] = [
   {
@@ -90,6 +91,7 @@ export const columns: ColumnDef<Harvests>[] = [
       const harvest = row.original;
       const { toast } = useToast();
       const utils = api.useUtils();
+      const params = useParams();
       const { mutateAsync, isLoading } = api.harvests.delete.useMutation({
         onSuccess: () => {
           toast({
@@ -100,19 +102,25 @@ export const columns: ColumnDef<Harvests>[] = [
           utils.harvests.fetchByOrganization.invalidate();
           const prevData = utils.harvests.fetchByOrganization.getData();
           const newData = prevData?.filter((h) => h.id !== harvest.harvestId);
-          utils.harvests.fetchByOrganization.setData(undefined, newData);
+          utils.harvests.fetchByOrganization.setData(
+            { workspaceSlug: params.accountSlug as unknown as string },
+            newData,
+          );
           return { prevData };
         },
         onSettled: () => {
-            utils.harvests.fetchByOrganization.invalidate();
+          utils.harvests.fetchByOrganization.invalidate();
         },
         onError: (error, data, ctx) => {
-            utils.harvests.fetchByOrganization.setData(undefined, ctx?.prevData);
-            toast({
-                description: "Harvest deletion failed",
-                variant: "destructive",
-                duration: 3000,
-            })
+          utils.harvests.fetchByOrganization.setData(
+            { workspaceSlug: params.accountSlug as unknown as string },
+            ctx?.prevData,
+          );
+          toast({
+            description: "Harvest deletion failed",
+            variant: "destructive",
+            duration: 3000,
+          });
         },
       });
 
@@ -149,7 +157,7 @@ export const columns: ColumnDef<Harvests>[] = [
             <DropdownMenuItem>
               <Link
                 href={{
-                  pathname: `/dashboard/harvests/edit/`,
+                  pathname: `/dashboard/${params.accountSlug}/harvests/edit/`,
                   query: { harvestId: harvest.id },
                 }}
               >
@@ -162,7 +170,10 @@ export const columns: ColumnDef<Harvests>[] = [
                 toast({
                   description: "Harvest deleted",
                 });
-                mutateAsync({ harvestId: harvest.id });
+                mutateAsync({
+                  harvestId: harvest.id,
+                  workspaceSlug: params.accountSlug as unknown as string,
+                });
               }}
               disabled={isLoading}
             >

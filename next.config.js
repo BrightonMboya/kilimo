@@ -24,7 +24,12 @@ const config = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["images.unsplash.com"],
+    domains: [
+      "images.unsplash.com",
+      "avatars.githubusercontent.com",
+      "api.dicebear.com",
+      "lh3.googleusercontent.com",
+    ],
   },
 };
 

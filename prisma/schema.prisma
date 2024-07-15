@@ -11,20 +11,163 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Organization {
+// thimk of this as workspaces under organization
+model Project {
   id                   String                 @id @default(cuid())
   name                 String
-  country              String?
-  emailAddress         String                 @unique
+  slug                 String                 @unique
+  logo                 String?
+  plan                 String                 @default("free")
+  stripeId             String?                @unique // Stripe subscription ID
+  billingCycleStart    Int // day of the month when the billing cycle starts
+  stripeConnectId      String?                @unique // for Stripe Connect
+  inviteCode           String?                @unique
+  reportLimit          Int                    @default(5)
+  farmersLimit         Int                    @default(10)
+  harvestsLimit        Int                    @default(5)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  usageLastChecked     DateTime               @default(now())
   farmers              Farmers[]
   harvests             Harvests[]
   Warehouses           Warehouses[]
   reports              Reports[]
   ReportTrackingEvents ReportTrackingEvents[]
+
+  users      ProjectUsers[]
+  invites    ProjectInvite[]
+  sentEmails SentEmail[]
+
+  customers Customer[]
+
+  @@index(usageLastChecked(sort: Asc))
+}
+
+// this table is for members of org working on a certain project
+model ProjectUsers {
+  id        String   @id @default(cuid())
+  role      Role     @default(member)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+
+  @@unique([userId, projectId])
+  @@index([projectId])
+}
+
+enum Role {
+  owner
+  member
+}
+
+// think of these as your organization who are paying
+model Customer {
+  id               String  @id @default(cuid())
+  name             String?
+  email            String?
+  avatar           String?
+  externalId       String?
+  project          Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId        String
+  projectConnectId String?
+  stripeCustomerId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, externalId])
+  @@unique([projectConnectId, externalId])
+  @@index(projectId)
+  @@index(projectConnectId)
+  @@index(externalId)
+}
+
+model ProjectInvite {
+  email     String
+  expires   DateTime
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
+  createdAt DateTime @default(now())
+
+  @@unique([email, projectId])
+  @@index([projectId])
+}
+
+model SentEmail {
+  id        String   @id @default(cuid())
+  type      String
+  createdAt DateTime @default(now())
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
+
+  @@index([projectId])
+}
+
+model User {
+  id               String         @id @default(cuid())
+  name             String?
+  email            String?        @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  // sessions      Session[]
+  source           String?
+  defaultWorkspace String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  ProjectUsers     ProjectUsers[]
+  Farmers          Farmers[]
+  Harvests         Harvests[]
+  Reports          Reports[]
+
+  @@index(source)
+  @@index(defaultWorkspace)
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+// model Session {
+//   sessionToken String   @unique
+//   userId       String
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
 }
 
 model Farmers {
-  id                String       @id @default(cuid())
+  id                String     @id @default(cuid())
   fullName          String
   // gender          String
   phoneNumber       String?
@@ -35,9 +178,16 @@ model Farmers {
   quantityCanSupply Int
   // nationalId      FarmersNationalId?
   // profilePicture  FarmersProfilePictures?
-  organization_id   String
-  organization      Organization @relation(fields: [organization_id], references: [id])
   harvests          Harvests[]
+  Project           Project    @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id        String
+
+  // User who created the farmer
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 // model FarmersNationalId {
@@ -53,18 +203,25 @@ model Farmers {
 // }
 
 model Harvests {
-  id              String       @id @default(cuid())
-  date            DateTime
-  name            String
-  crop            String
-  size            Int
-  inputsUsed      String
-  unit            String
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
-  Farmers         Farmers      @relation(fields: [farmersId], references: [id], onDelete: Cascade)
-  farmersId       String
-  reports         Reports[]
+  id         String    @id @default(cuid())
+  date       DateTime
+  name       String
+  crop       String
+  size       Int
+  inputsUsed String
+  unit       String
+  Farmers    Farmers   @relation(fields: [farmersId], references: [id], onDelete: Cascade)
+  farmersId  String
+  reports    Reports[]
+  Project    Project   @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id String
+
+  // User who created the harvest
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 model Equipments {
@@ -80,14 +237,14 @@ model Equipments {
 }
 
 model Warehouses {
-  id              String       @id @default(cuid())
-  name            String
-  description     String
-  maxCapacity     Int
-  unit            String
-  inventory       Inventory[]
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  maxCapacity Int
+  unit        String
+  inventory   Inventory[]
+  Project     Project     @relation(fields: [project_id], references: [id])
+  project_id  String
 }
 
 model Inventory {
@@ -112,18 +269,26 @@ model Reports {
   finishedTracking     Boolean                @default(false)
   Harvests             Harvests               @relation(fields: [harvestsId], references: [id])
   harvestsId           String
-  Organization         Organization           @relation(fields: [organization_id], references: [id])
-  organization_id      String
   ReportTrackingEvents ReportTrackingEvents[]
+  Project              Project                @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  project_id           String
+  // User who created the harvest
+  user                 User?                  @relation(fields: [userId], references: [id])
+  userId               String?
+
+  @@index(userId)
+  @@index(project_id)
 }
 
 model ReportTrackingEvents {
-  id              String       @id @default(cuid())
-  eventName       String
-  dateCreated     DateTime
-  description     String
-  reportId        String
-  reports         Reports      @relation(fields: [reportId], references: [id])
-  Organization    Organization @relation(fields: [organization_id], references: [id])
-  organization_id String
+  id          String   @id @default(cuid())
+  eventName   String
+  dateCreated DateTime
+  description String
+  reportId    String
+  reports     Reports  @relation(fields: [reportId], references: [id])
+  Project     Project  @relation(fields: [project_id], references: [id])
+  project_id  String
+
+  @@index(project_id)
 }

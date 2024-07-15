@@ -1,32 +1,29 @@
 import "~/styles/globals.css";
-
-import { createClient } from "~/utils/supabase/server";
-import { redirect } from "next/navigation";
 import Layout from "~/components/Layout/Layout";
 import { Toaster } from "~/components/ui/Toaster";
-
+import { SessionProvider } from "next-auth/react";
+import { auth } from "~/utils/lib/auth/auth";
+import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  // console.log(user, ">>>>>>>");
-  if (!user) {
-    return redirect("/auth/sign-in");
+  const session = await auth();
+  if (session === null) {
+    redirect("/login")
   }
   return (
-    <html lang="en">
-      <body className="">
-        <Layout>
-          <main className="bg-[#FCFCFD] min-h-screen px-5 ">{children}</main>
-          <Toaster />
-        </Layout>
-      </body>
-    </html>
+    <SessionProvider session={session}>
+      <html lang="en">
+        <body className="">
+          <Layout>
+            <main className="min-h-screen bg-[#FCFCFD] px-5 ">{children}</main>
+            <Toaster />
+          </Layout>
+        </body>
+      </html>
+    </SessionProvider>
   );
 }
