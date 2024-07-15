@@ -7,7 +7,7 @@ import {
 } from "react-hook-form";
 import Input from "~/components/shared/Input";
 import { DatePicker } from "../ui/DatePicker";
-import { type HarvestSchemaType } from "~/app/(app)/dashboard/harvests/_components/schema";
+import { type HarvestSchemaType } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";
 import FarmersPicker from "./FarmersPicker";
 import { Card } from "../shared/empty/Card";
 import Button from "../ui/Button";

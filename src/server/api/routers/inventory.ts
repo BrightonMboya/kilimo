@@ -1,6 +1,6 @@
 import { FAILED_TO_CREATE } from "~/utils/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { inventorySchema } from "~/app/(app)/dashboard/inventory/_components/schema";
+import { inventorySchema } from "~/app/(app)/dashboard/[accountSlug]/inventory/_components/schema";
 
 const inventory = createTRPCRouter({
   create: protectedProcedure
@@ -19,5 +19,4 @@ const inventory = createTRPCRouter({
     }),
 });
 
-
-export default inventory
+export default inventory;

@@ -10,15 +10,16 @@ interface Props {
   imageUrl: string;
   preload: boolean;
   rounded: boolean;
+  alt?: string;
 }
 
-export default function BlurImage({ imageUrl, preload, rounded }: Props) {
+export default function BlurImage({ imageUrl, preload, rounded, alt }: Props) {
   const [isLoading, setLoading] = useState(true);
   return (
     <div className="group cursor-pointer">
       <div className="aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8  w-full overflow-hidden rounded-lg bg-gray-200">
         <Image
-          alt="Thumbnail"
+          alt={alt || "Thumbnail"}
           src={imageUrl}
           layout="fill"
           objectFit="cover"

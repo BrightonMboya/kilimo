@@ -1,4 +1,4 @@
-import { Button } from "~/components/ui";
+import  Button  from "~/components/ui/Button";
 import styles from "./gradient.module.css";
 import Link from "next/link";
 

@@ -108,3 +108,17 @@
        margin: 0;
      }
 }
+
+/* animate spinner */
+@keyframes spinner {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-spinner {
+  animation: spinner 1.2s linear infinite;
+}

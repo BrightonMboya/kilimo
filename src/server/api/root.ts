@@ -8,6 +8,7 @@ import {
   organization,
   reports,
   warehouses,
+  workspace
 } from "./routers";
 
 /**
@@ -24,6 +25,7 @@ export const appRouter = createTRPCRouter({
   farmers,
   auth,
   reports,
+  workspace
 });
 
 // export type definition of API
