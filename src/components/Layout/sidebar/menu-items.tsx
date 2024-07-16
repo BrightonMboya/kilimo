@@ -3,6 +3,7 @@ import { useMainMenuItems } from "~/utils/hooks/use-main-menu-items";
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import WorkspaceSwitcher from "~/components/auth/workspaces/workspace-switcher";
+import LogoutButton from "~/components/auth/logout-button";
 
 const MenuItems = () => {
   const params = useParams();
@@ -59,6 +60,10 @@ const MenuItems = () => {
                 </Link>
               </li>
             ))}
+
+            <li>
+              <LogoutButton />
+            </li>
           </ul>
         </div>
       </div>
