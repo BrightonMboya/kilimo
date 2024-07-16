@@ -21,7 +21,7 @@ export const defaultReportEventsObjects = {
   description: "",
   harvestId: "",
   dateCreated: new Date(),
-  isItNew: "",
+  isItNew: false,
 };
 
 export const trackingEventsSchema = z.object({

@@ -7,6 +7,14 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  // hack to resolve the react email package on edge
+  experimental: {
+    serverComponentsExternalPackages: [
+      "@react-email/components",
+      "@react-email/render",
+      "@react-email/tailwind",
+    ],
+  },
 
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
@@ -24,11 +32,19 @@ const config = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: [
-      "images.unsplash.com",
-      "avatars.githubusercontent.com",
-      "api.dicebear.com",
-      "lh3.googleusercontent.com",
+    remotePatterns: [
+      {
+        hostname: "images.unsplash.com",
+      },
+      {
+        hostname: "avatars.githubusercontent.com", // for github users url
+      },
+      {
+        hostname: "api.dicebear.com", // for the avatar url
+      },
+      {
+        hostname: "lh3.googleusercontent.com", // for Google account urls
+      },
     ],
   },
 };

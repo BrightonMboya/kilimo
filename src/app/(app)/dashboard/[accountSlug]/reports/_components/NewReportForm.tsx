@@ -42,7 +42,7 @@ export default function NewReportForm(props: Props) {
             className="w-full"
             hideLabel
             {...register("name")}
-            // error={errors?.name?.message}
+            error={errors?.name?.message}
           />
         </FormRow>
 
@@ -96,9 +96,7 @@ export default function NewReportForm(props: Props) {
           errors={errors}
         />
 
-        <Button className="mt-10 w-full" type="submit"
-        disabled={isLoading}
-        >
+        <Button className="mt-10 w-full" type="submit" disabled={isLoading}>
           Create Report
         </Button>
       </section>

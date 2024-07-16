@@ -22,16 +22,16 @@ export function useMainMenuItems({ accountSlug }: { accountSlug: string }) {
       to: `/dashboard/${accountSlug}/reports`,
       label: "Reports",
     },
-    {
-      icon: <Icon icon="shoppingCart" />,
-      to: `/dashboard/${accountSlug}/orders`,
-      label: "Orders",
-    },
-    {
-      icon: <Icon icon="currencyDollar" />,
-      to: `/dashboard/${accountSlug}/sales`,
-      label: "Sales",
-    },
+    // {
+    //   icon: <Icon icon="shoppingCart" />,
+    //   to: `/dashboard/${accountSlug}/orders`,
+    //   label: "Orders",
+    // },
+    // {
+    //   icon: <Icon icon="currencyDollar" />,
+    //   to: `/dashboard/${accountSlug}/sales`,
+    //   label: "Sales",
+    // },
 
     {
       icon: <Icon icon="settings" />,

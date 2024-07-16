@@ -10,12 +10,13 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { format } from "date-fns";
 import Link from "next/link";
-import Button  from "~/components/ui/Button";
+import Button from "~/components/ui/Button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 import { type ReportsTableData } from "./schema";
 import { useToast } from "~/utils/hooks/useToast";
 import { api } from "~/trpc/react";
+import { useParams } from "next/navigation";
 
 export const columns: ColumnDef<ReportsTableData>[] = [
   {
@@ -87,6 +88,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       const report = row.original;
       const { toast } = useToast();
       const utils = api.useUtils();
+      const params = useParams();
       const finishedTrackingHandler =
         api.reports.markAsFinishedTracking.useMutation({
           onSuccess: () => {
@@ -103,17 +105,23 @@ export const columns: ColumnDef<ReportsTableData>[] = [
               }
               return r;
             });
-            utils.reports.fetchByOrganization.setData(undefined, newData);
+            utils.reports.fetchByOrganization.setData(
+              { workspaceSlug: params.accountSlug as unknown as string },
+              newData,
+            );
             return { prevData };
           },
           onSettled: () => {
             utils.reports.fetchByOrganization.invalidate();
-             toast({
-               description: "Report marked as complete",
-             });
+            toast({
+              description: "Report marked as complete",
+            });
           },
           onError: (error, data, ctx) => {
-            utils.reports.fetchByOrganization.setData(undefined, ctx?.prevData);
+            utils.reports.fetchByOrganization.setData(
+              { workspaceSlug: params.accountSlug as unknown as string },
+              ctx?.prevData,
+            );
             toast({
               description: "Failed to mark the tracking as complete",
               variant: "destructive",
@@ -124,21 +132,27 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       const { mutateAsync, isLoading } = api.reports.delete.useMutation({
         onSuccess: () => {
           toast({
-            description: "",
+            description: "Report deleted succesfully",
           });
         },
         onMutate: (report) => {
           utils.reports.fetchByOrganization.invalidate();
           const prevData = utils.reports.fetchByOrganization.getData();
           const newData = prevData?.filter((r) => r.id !== report?.reportId);
-          utils.reports.fetchByOrganization.setData(undefined, newData);
+          utils.reports.fetchByOrganization.setData(
+            { workspaceSlug: params.accountSlug as unknown as string },
+            newData,
+          );
           return { prevData };
         },
         onSettled: () => {
           utils.reports.fetchByOrganization.invalidate();
         },
         onError: (error, data, ctx) => {
-          utils.reports.fetchByOrganization.setData(undefined, ctx?.prevData);
+          utils.reports.fetchByOrganization.setData(
+            { workspaceSlug: params.accountSlug as unknown as string },
+            ctx?.prevData,
+          );
           toast({
             description: "Report deletion failed",
             variant: "destructive",
@@ -160,7 +174,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             <DropdownMenuItem>
               <Link
                 href={{
-                  pathname: `/dashboard/reports/view`,
+                  pathname: `/dashboard/${params.accountSlug}/reports/view`,
                   query: { reportId: report.id },
                 }}
               >
@@ -181,7 +195,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             <DropdownMenuItem>
               <Link
                 href={{
-                  pathname: `/dashboard/reports/edit/`,
+                  pathname: `/dashboard/${params.accountSlug}/reports/edit/`,
                   query: { reportId: report.id },
                 }}
               >
@@ -191,7 +205,10 @@ export const columns: ColumnDef<ReportsTableData>[] = [
 
             <DropdownMenuItem
               onClick={() => {
-                finishedTrackingHandler.mutateAsync({ reportId: report.id });
+                finishedTrackingHandler.mutateAsync({
+                  reportId: report.id,
+                  workspaceSlug: params.accountSlug as unknown as string,
+                });
               }}
               className="cursor-pointer"
             >
@@ -202,9 +219,12 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             <DropdownMenuItem
               onClick={() => {
                 toast({
-                  description: "Harvest deleted",
+                  description: "Report deleted",
                 });
-                mutateAsync({ reportId: report.id });
+                mutateAsync({
+                  reportId: report.id,
+                  workspaceSlug: params.accountSlug as unknown as string,
+                });
               }}
               disabled={isLoading}
             >
