@@ -2,9 +2,9 @@
 import { Button } from "./Auth-Button";
 import { Github, Google } from "../ui/icons";
 import { useMediaQuery } from "~/utils/hooks/useMediaQuery";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -44,7 +44,7 @@ export default function LoginForm() {
           onClick={() => {
             setClickedGoogle(true);
             signIn("google", {
-              ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+              callbackUrl: "/welcome/redirect",
             });
           }}
           loading={clickedGoogle}

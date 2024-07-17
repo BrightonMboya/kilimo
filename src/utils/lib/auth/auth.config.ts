@@ -7,7 +7,6 @@ import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 
-
 export default {
   providers: [
     GitHub({
@@ -19,6 +18,7 @@ export default {
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
       allowDangerousEmailAccountLinking: true,
+      checks: ["none"],
     }),
   ],
   callbacks: {
@@ -100,7 +100,4 @@ export default {
       return session;
     },
   },
-  
-
-  
 } satisfies NextAuthConfig;
