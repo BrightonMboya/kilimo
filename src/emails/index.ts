@@ -61,6 +61,6 @@ export const sendEmail = async ({
       MessageStream: "broadcast",
     }),
   });
-  console.log(emailResponse, "{}{}{}{][][][][][]")
+  // console.log(emailResponse, "{}{}{}{][][][][][]")
   return emailResponse
 };

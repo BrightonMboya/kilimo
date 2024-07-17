@@ -20,6 +20,7 @@ import HarvestPicker from "./HarvestPicker";
 import { useEffect } from "react";
 import { api } from "~/trpc/react";
 import LoadingSkeleton, { Spinner } from "~/components/ui/LoadingSkeleton";
+import { useParams } from "next/navigation";
 
 interface Props {
   register: UseFormRegister<IReportSchema>;
@@ -33,12 +34,14 @@ interface Props {
 
 const EditReportForm = (props: Props) => {
   const { control, register, setValue, errors, reportId, isMutating } = props;
+  const params = useParams();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "trackingEvents",
   });
   const { data, isLoading, isError } = api.reports.fetchById.useQuery({
     reportId: reportId,
+    workspaceSlug: params.accountSlug as unknown as string,
   });
 
   useEffect(() => {
