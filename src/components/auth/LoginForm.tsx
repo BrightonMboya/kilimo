@@ -56,7 +56,7 @@ export default function LoginForm() {
           onClick={() => {
             setClickedGithub(true);
             signIn("github", {
-              ...(next && next.length > 0 ? { callbackUrl: next } : {}),
+              callbackUrl: "/welcome/redirect",
             });
           }}
           loading={clickedGithub}

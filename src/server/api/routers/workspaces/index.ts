@@ -5,6 +5,7 @@ import { fetchAllWorkspaces } from "./fetch-all-workspaces";
 import { getUsersAndInvites } from "./getUsersAndInvites";
 import { editWorkspace } from "./edit-workspace";
 import { invites } from "./invites";
+import { deleteTeamInvite } from "./delete-team-invite";
 
 const workspace = mergeRouters(
   addWorkSpace,
@@ -13,5 +14,6 @@ const workspace = mergeRouters(
   getUsersAndInvites,
   editWorkspace,
   invites,
+  deleteTeamInvite,
 );
 export default workspace;

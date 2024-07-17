@@ -44,7 +44,7 @@ const MenuItems = () => {
 
         <div className="lower-menu">
           <ul className="menu mb-6">
-            {menuItemsBottom.map((item) => (
+            {/* {menuItemsBottom.map((item) => (
               <li key={item.label}>
                 <Link
                   className="hover:bg-primary-50 hover:text-primary-600 my-1 flex items-center gap-3 rounded px-3 py-2.5 text-[16px] font-semibold text-gray-700 transition-all duration-75"
@@ -59,7 +59,7 @@ const MenuItems = () => {
                   </span>
                 </Link>
               </li>
-            ))}
+            ))} */}
 
             <li>
               <LogoutButton />
