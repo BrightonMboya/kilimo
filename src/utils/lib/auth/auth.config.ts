@@ -7,6 +7,7 @@ import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 
+
 export default {
   providers: [
     GitHub({

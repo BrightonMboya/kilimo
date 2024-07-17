@@ -3,11 +3,11 @@ import Icon from "~/components/ui/icons/icons";
 
 export function useMainMenuItems({ accountSlug }: { accountSlug: string }) {
   let menuItemsTop = [
-    {
-      icon: <Icon icon="graph" />,
-      to: "dashboard",
-      label: "Dashboard",
-    },
+    // {
+    //   icon: <Icon icon="graph" />,
+    //   to: "dashboard",
+    //   label: "Dashboard",
+    // },
     {
       icon: <Icon icon="farmers" />,
       to: `/dashboard/${accountSlug}/farmers`,

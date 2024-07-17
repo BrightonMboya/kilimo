@@ -4,10 +4,26 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "../../../server/db";
 import { sendEmail } from "~/emails";
 import WelcomeEmail from "~/emails/welcome-email";
-import { redirect } from "next/navigation";
+import Postmark from "next-auth/providers/postmark"
+
 
 const additionalConfig = {
   ...authConfig,
+  providers: [
+    ...authConfig.providers,
+    Postmark({
+      server: process.env.EMAIL_SERVER,
+      from: process.env.EMAIL_FROM,
+      sendVerificationRequest({
+        identifier: email,
+        url,
+        provider: { server, from },
+      }) {
+        // your function
+      },
+    }),
+    
+  ],
   events: {
     async signIn(message) {
       if (message.isNewUser) {
@@ -45,19 +61,7 @@ const additionalConfig = {
         }
       }
 
-      // // check if the user is already available and we redirect them to their workspace
-      // const user = await db.user.findUnique({
-      //   where: {
-      //     email: message.user.email!,
-      //   },
-      //   select: {
-      //     defaultWorkspace: true,
-      //   },
-      // });
-
-      // if (user?.defaultWorkspace) {
-      //   redirect(`/dashboard/${user?.defaultWorkspace}/farmers`);
-      // }
+     
     },
   },
 } satisfies NextAuthConfig;
