@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
-
+import { Prisma } from "@prisma/client";
 
 export const deleteTeamInvite = createTRPCRouter({
   deleteInvite: protectedProcedure

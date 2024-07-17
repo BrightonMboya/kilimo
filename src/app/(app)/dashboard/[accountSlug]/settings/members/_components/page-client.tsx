@@ -2,14 +2,8 @@
 
 import { useInviteCodeModal } from "~/components/auth/workspaces/modals/invite-code-modal";
 import { useInviteTeammateModal } from "~/components/auth/workspaces/modals/invite-team-modal";
-import { Link as LinkIcon, ThreeDots } from "~/components/ui/icons";
-import {
-  Avatar,
-  Badge,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui";
+import { Link as LinkIcon } from "~/components/ui/icons";
+import { Avatar, Badge } from "~/components/ui";
 import { Button } from "~/components/auth/Auth-Button";
 import { useState } from "react";
 import { api } from "~/trpc/react";
@@ -18,9 +12,7 @@ import { TooltipProvider } from "~/components/ui";
 import { format } from "date-fns";
 import UserPlaceholder from "./UserPlaceholder";
 import UserCard from "./UserCard";
-import { UserMinus } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
+import { useToast } from "~/utils/hooks";
 
 const tabs: Array<"Members" | "Invitations"> = ["Members", "Invitations"];
 
@@ -175,13 +167,23 @@ const InvitationUsers = ({ user, isOwner }: any) => {
   const expiredInvite =
     user.createdAt &&
     Date.now() - new Date(user?.createdAt).getTime() > 14 * 24 * 60 * 60 * 1000;
+  const utils = api.useUtils();
+  const { toast } = useToast();
 
   const { isLoading, mutateAsync } = api.workspace.deleteInvite.useMutation({
     onSuccess: () => {
-      toast("Invite deleted succesfully");
+    toast({
+      description: "Team member deleted succesfully"
+    })
+      console.log("Get the money");
     },
     onError: () => {
-      toast("Failed to delete the invite");
+     toast({
+       description: "Team member deleted succesfully",
+     });
+    },
+    onSettled: () => {
+      utils.workspace.getUsersAndInvites.invalidate();
     },
   });
 
@@ -194,7 +196,10 @@ const InvitationUsers = ({ user, isOwner }: any) => {
         workspaceSlug: params.accountSlug as unknown as string,
       });
     } catch (ex) {
-      toast("Failed to delete the invite");
+     toast({
+       description: "Failed to delete the invite",
+       variant: "destructive"
+     });
     }
   };
 
@@ -210,7 +215,7 @@ const InvitationUsers = ({ user, isOwner }: any) => {
         </div>
         {expiredInvite && <Badge variant="gray">Expired</Badge>}
       </div>
-
+    
       {isOwner && (
         <Button
           variant="danger"

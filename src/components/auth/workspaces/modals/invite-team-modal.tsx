@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { api } from "~/trpc/react";
+import { toast } from "sonner";
 
 function InviteTeammateModal({
   showInviteTeammateModal,
@@ -19,7 +20,6 @@ function InviteTeammateModal({
   slug,
   logo,
   workspaceName,
-
 }: {
   showInviteTeammateModal: boolean;
   setShowInviteTeammateModal: Dispatch<SetStateAction<boolean>>;
@@ -27,23 +27,38 @@ function InviteTeammateModal({
   slug: string;
   logo: string;
   workspaceName: string;
-
 }) {
   const [inviting, setInviting] = useState(false);
   const [email, setEmail] = useState("");
   const { isMobile } = useMediaQuery();
-  const { isLoading, mutateAsync } = api.workspace.sendInvite.useMutation({});
+  const utils = api.useUtils();
+  const { isLoading, mutateAsync } = api.workspace.sendInvite.useMutation({
+    onSuccess: () => {
+      toast("Invite sent out succesfully");
+    },
+    onError(error, variables, context) {
+      toast(`Failed to send invite, ${error.message}`);
+    },
+    onSettled: () => {
+      utils.workspace.getUsersAndInvites.invalidate();
+      setShowInviteTeammateModal(false);
+    },
+  });
 
-  async function submitHandler() {
-
-    const res = await mutateAsync({
-      email,
-      usersLimit: 0,
-      workspaceId: id,
-      workspaceName,
-      workspaceSlug: slug,
-    });
-    console.log(res);
+  async function submitHandler(e) {
+    e.preventDefault();
+    try {
+      const res = await mutateAsync({
+        email,
+        usersLimit: 0,
+        workspaceId: id,
+        workspaceName,
+        workspaceSlug: slug,
+      });
+    } catch (cause) {
+      toast("Failed to send invite");
+    }
+    // console.log(res);
   }
 
   return (
@@ -70,29 +85,6 @@ function InviteTeammateModal({
         </p>
       </div>
       <form
-        // onSubmit={async (e) => {
-        //   e.preventDefault();
-        //   setInviting(true);
-        //   fetch(`/api/workspaces/${id}/invites`, {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify({ email }),
-        //   }).then(async (res) => {
-        //     if (res.status === 200) {
-        //       await mutate(`/api/workspaces/${id}/invites`);
-        //       toast.success("Invitation sent!");
-        //       slug &&
-        //         va.track("User invited teammate", {
-        //           workspace: slug,
-        //         });
-        //       setShowInviteTeammateModal(false);
-        //     } else {
-        //       const { error } = await res.json();
-        //       toast.error(error.message);
-        //     }
-        //     setInviting(false);
-        //   });
-        // }}
         onSubmit={submitHandler}
         className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 text-left sm:px-16"
       >
@@ -115,7 +107,12 @@ function InviteTeammateModal({
             />
           </div>
         </div>
-        <Button loading={isLoading} text="Send invite" type="button" onClick={submitHandler} />
+        <Button
+          loading={isLoading}
+          text="Send invite"
+          type="button"
+          onClick={submitHandler}
+        />
       </form>
     </Modal>
   );
@@ -131,7 +128,6 @@ export function useInviteTeammateModal({
   slug: string;
   logo: string;
   workspaceName: string;
-
 }) {
   const [showInviteTeammateModal, setShowInviteTeammateModal] = useState(false);
 
@@ -143,7 +139,6 @@ export function useInviteTeammateModal({
         id={id}
         logo={logo}
         slug={slug}
-
         workspaceName={workspaceName}
       />
     );
