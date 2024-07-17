@@ -43,13 +43,14 @@ export default function Page() {
     },
     onSettled: () => {
       utils.reports.fetchByOrganization.invalidate();
-      router.push(`/dashboard/$params.accountSlug}/reports`);
+      router.push(`/dashboard/${params.accountSlug}/reports`);
     },
   });
 
   const onSubmit: SubmitHandler<IReportSchema> = async (
     data: IReportSchema,
   ) => {
+    console.log("I am submitting the report")
     try {
       mutateAsync({
         ...data,
@@ -59,6 +60,7 @@ export default function Page() {
       console.log(cause);
     }
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Toaster />

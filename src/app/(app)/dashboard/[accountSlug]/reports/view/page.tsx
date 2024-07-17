@@ -5,14 +5,16 @@ import { EmptyState } from "~/components/shared/empty/empty-state";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 import { api } from "~/trpc/react";
 import { format } from "date-fns";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import PDFReport from "../_components/PDFReport";
 
 export default function Page() {
   const searchParams = useSearchParams();
   const reportId = searchParams.get("reportId");
+  const params = useParams();
   const { data, isLoading, isError } = api.reports.fetchById.useQuery({
     reportId: reportId as unknown as string,
+    workspaceSlug: params.accountSlug as unknown as string,
   });
 
   return (

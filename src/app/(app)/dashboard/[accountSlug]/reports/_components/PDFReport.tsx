@@ -53,14 +53,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const PDFReport = ({ data }) => (
+const PDFReport = ({ data }: any) => (
   <PDFViewer width="100%" height="800px">
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.section}>
           <Text style={styles.heading}>{data.name}</Text>
           <Text style={styles.paragraph}>
-            Organization Name: {data.Organization.name}
+            Organization Name: {data.Project.name}
           </Text>
           <Text style={styles.paragraph}>Report ID: {data.id}</Text>
           <Text style={styles.paragraph}>

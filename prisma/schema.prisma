@@ -286,7 +286,7 @@ model ReportTrackingEvents {
   dateCreated DateTime
   description String
   reportId    String
-  reports     Reports  @relation(fields: [reportId], references: [id])
+  reports     Reports  @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Project     Project  @relation(fields: [project_id], references: [id])
   project_id  String
 

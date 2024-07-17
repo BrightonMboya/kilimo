@@ -1,4 +1,5 @@
 import { SettingsNav } from "./_components/settingsNav";
+import { Toaster } from "~/components/ui";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           // { path: "notifications", label: "Notifications" },
         ]}
       />
-
+      <Toaster />
       <main className="mt-8">{children}</main>
     </div>
   );

@@ -78,14 +78,18 @@ const Nav = () => {
           <div>
             <li>
               <Link href="/">
-                <div className="relative hidden h-[65px] w-[148px] lg:block">
+                <div className="relative hidden h-full w-full lg:block">
                   <Image
                     src="/static/images/jani-white.png"
                     style={{
                       borderRadius: "12px",
+
                     }}
                     alt="logo"
-                    layout="fill"
+                    className="h-full w-full "
+                    width={250}
+                    height={150}
+                    // layout="fill"
                   />
                 </div>
               </Link>
@@ -113,7 +117,7 @@ const Nav = () => {
             <li>
               <Link href="https://cal.com/brightonmboya/15min">
                 <button className="font-semi-bold rounded-md bg-white px-4 py-2 text-black">
-                  Book an Enteprise Demo
+                  Book an Enterprise Demo
                 </button>
               </Link>
             </li>

@@ -4,13 +4,14 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type IReportSchema, reportSchema } from "../_components/schema";
 import { api } from "~/trpc/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { inferProcedureInput } from "@trpc/server";
 import { AppRouter } from "~/server/api/root";
 import { useToast } from "~/utils/hooks/useToast";
 
 export default function Page() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const reportId = searchParams.get("reportId");
   const {
     register,
@@ -29,19 +30,19 @@ export default function Page() {
 
   const { isLoading, mutateAsync } = api.reports.edit.useMutation({
     onSuccess: () => {
-       toast({
-         description: "Report edited succesfully",
-         // title: "Succesfully edited the report"
-       });
+      toast({
+        description: "Report edited succesfully",
+        // title: "Succesfully edited the report"
+      });
     },
     onSettled: (report) => {
       toast({
         description: "Report edited succesfully",
         // title: "Succesfully edited the report"
-      })
+      });
       utils.reports.fetchByOrganization.invalidate();
       reset();
-      router.push(`/dashboard/reports/view/?reportId=${report?.id}`);
+      router.push(`/dashboard/${params.accountSlug}/reports/view/?reportId=${report?.id}`);
     },
     // onMutate: (report) => {
     //   utils.reports.fetchByOrganization.invalidate();
@@ -52,7 +53,7 @@ export default function Page() {
       toast({
         title: "Failed to edit the report",
         description: "Check the all the required fields and try again",
-        variant: "destructive"
+        variant: "destructive",
       });
     },
   });
@@ -66,6 +67,7 @@ export default function Page() {
       const input: Input = {
         ...data,
         id: reportId!,
+        workspaceSlug: params.accountSlug as unknown as string,
       };
       mutateAsync(input);
     } catch (cause) {

@@ -8,17 +8,16 @@ import { TooltipProvider } from "~/components/ui";
 import { Toaster } from "sonner";
 import ModalProvider from "~/components/auth/workspaces/WorskpaceModalProvider";
 
-
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Jani AI | A food traceability software",
+    default: "Jani AI",
     template: "%s | Jani AI",
   },
   description:
     "Jani AI allows you to track food and other resources across the supply chain, letting you provide transparency and trust to your clients.",
   openGraph: {
-    title: "Jani AI | Track food from farm to fork",
+    title: "Jani AI",
     description: "A food traceability software",
     url: baseUrl,
     siteName:
