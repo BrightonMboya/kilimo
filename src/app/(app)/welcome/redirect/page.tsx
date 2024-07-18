@@ -11,6 +11,10 @@ export default function Page() {
   const workspace = data?.workspaces[0];
 
   useEffect(() => {
+    if (!workspace?.slug) {
+      router.push("/dashboard/welcome");
+    }
+
     if (workspace?.slug && !isLoading) {
       router.push(`/dashboard/${workspace?.slug}/farmers`);
     }
