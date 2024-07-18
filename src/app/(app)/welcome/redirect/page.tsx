@@ -12,7 +12,7 @@ export default function Page() {
 
   useEffect(() => {
     if (!workspace?.slug) {
-      router.push("/dashboard/welcome");
+      router.push("/welcome");
     }
 
     if (workspace?.slug && !isLoading) {
