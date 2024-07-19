@@ -6,7 +6,7 @@ import { db } from "~/server/db";
 import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
-import * as Sentry from "@sentry/browser"
+
 
 
 export default {
@@ -107,5 +107,6 @@ export default {
       // })
       return session;
     },
+  
   },
 } satisfies NextAuthConfig;

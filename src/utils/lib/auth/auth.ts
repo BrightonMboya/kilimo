@@ -66,6 +66,7 @@ const additionalConfig = {
       Sentry.setUser(null)
     }
   },
+  secret: process.env.AUTH_SECRET
 } satisfies NextAuthConfig;
 
 export const config = {
