@@ -14,4 +14,6 @@ export const db = globalForPrisma.prisma ??
       : ["error"],
   }).$extends(withAccelerate());
 
+
+
 if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;

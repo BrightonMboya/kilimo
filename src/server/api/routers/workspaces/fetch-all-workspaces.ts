@@ -6,6 +6,7 @@ import { TRPCClientError } from "@trpc/client";
 export const fetchAllWorkspaces = createTRPCRouter({
      fetchAllWorkspaces: protectedProcedure
     .query(async ({ ctx }) => {
+
       const workspaces = await ctx.db.project.findMany({
         where: {
           users: {
@@ -24,6 +25,7 @@ export const fetchAllWorkspaces = createTRPCRouter({
             },
           },
         },
+
       });
 
       // const formattedWorkspaces = workspaces.map((project) =>
@@ -31,7 +33,7 @@ export const fetchAllWorkspaces = createTRPCRouter({
       // );
 
       const freeWorkspaces = workspaces?.filter(
-        (workspace) =>
+        (workspace: { plan: string; users: any[]; }) =>
           workspace.plan === "free" &&
           workspace?.users &&
           workspace?.users[0]!.role === "owner",
