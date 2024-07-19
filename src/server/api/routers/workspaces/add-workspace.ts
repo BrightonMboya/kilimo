@@ -21,7 +21,7 @@ export const addWorkSpace = createTRPCRouter({
         // @ts-ignore
         (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
       ) {
-        return "Project already in use";
+         throw new TRPCClientError("Project already in use")
       }
       const project = await ctx.db.project.findUnique({
         where: {
@@ -32,7 +32,7 @@ export const addWorkSpace = createTRPCRouter({
         },
       });
       if (project) {
-        return "Project already in use";
+        throw new TRPCClientError("Project already in use")
       } else {
         // lets check if the person can create more than one workspaces
         const freeWorkspaces = await ctx.db.project.count({
@@ -47,11 +47,14 @@ export const addWorkSpace = createTRPCRouter({
           },
         });
 
+
         if (freeWorkspaces >= 1) {
           throw new TRPCClientError(
             "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
           );
         }
+
+        console.log(ctx?.session, "lllllllll")
 
         const workspaceResponse = await ctx.db.project.create({
           data: {

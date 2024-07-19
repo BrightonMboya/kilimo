@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 import { db } from "~/server/db";
 import { createClient } from "~/utils/supabase/server";
 import { auth } from "~/utils/lib/auth/auth";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -25,19 +26,18 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   // const headers = opts.headers;
   // const authToken = headers.get("authorization");
 
-  const supabase = createClient()
-  const session = await auth()
-  const user = session?.user
+  const supabase = createClient();
+  const session = await auth();
+  const user = session?.user;
 
   // const { user } = authToken ? await getUserAsAdmin(authToken) : { user: null };
-
 
   return {
     ...opts,
     db,
     user,
     supabase,
-    session
+    session,
   };
 };
 /**
@@ -68,7 +68,16 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  *
  * These are the pieces you use to build your tRPC API. You should import these a lot in the
  * "/src/server/api/routers" directory.
+ *
+ *  We will extend this ctx with sentryMIddleware such that we can catch the trpc errors and pipe them
+ * to our sentry dashboard
  */
+
+const sentryMiddleware = t.middleware(
+  Sentry.trpcMiddleware({
+    attachRpcInput: true,
+  }),
+);
 
 /**
  * This is how you create new routers and sub-routers in your tRPC API.
@@ -101,4 +110,6 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+const withSentryMiddleware  = sentryMiddleware.unstable_pipe(enforceUserIsAuthed)
+
+export const protectedProcedure = t.procedure.use(withSentryMiddleware);
