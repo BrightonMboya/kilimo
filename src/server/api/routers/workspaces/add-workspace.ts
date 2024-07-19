@@ -17,12 +17,12 @@ export const addWorkSpace = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // try {
       // check if the slug exists
-      if (
-        // @ts-ignore
-        (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
-      ) {
-         throw new TRPCClientError("Project already in use")
-      }
+      // if (
+      //   // @ts-ignore
+      //   (await isReservedKey(input.slug)) || DEFAULT_REDIRECTS[input.slug]
+      // ) {
+      //    throw new TRPCClientError("Project already in use")
+      // }
       const project = await ctx.db.project.findUnique({
         where: {
           slug: input.slug,
@@ -34,27 +34,27 @@ export const addWorkSpace = createTRPCRouter({
       if (project) {
         throw new TRPCClientError("Project already in use")
       } else {
-        // lets check if the person can create more than one workspaces
-        const freeWorkspaces = await ctx.db.project.count({
-          where: {
-            plan: "free",
-            users: {
-              some: {
-                userId: ctx?.user?.id,
-                role: "owner",
-              },
-            },
-          },
-        });
+        // // lets check if the person can create more than one workspaces
+        // const freeWorkspaces = await ctx.db.project.count({
+        //   where: {
+        //     plan: "free",
+        //     users: {
+        //       some: {
+        //         userId: ctx?.user?.id,
+        //         role: "owner",
+        //       },
+        //     },
+        //   },
+        // });
 
 
-        if (freeWorkspaces >= 1) {
-          throw new TRPCClientError(
-            "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
-          );
-        }
+        // if (freeWorkspaces >= 1) {
+        //   throw new TRPCClientError(
+        //     "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
+        //   );
+        // }
 
-        console.log(ctx?.session, "lllllllll")
+
 
         const workspaceResponse = await ctx.db.project.create({
           data: {
