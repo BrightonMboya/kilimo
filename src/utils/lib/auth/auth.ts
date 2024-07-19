@@ -4,11 +4,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "../../../server/db";
 import { sendEmail } from "~/emails";
 import WelcomeEmail from "~/emails/welcome-email";
-import Postmark from "next-auth/providers/postmark"
-
+import Postmark from "next-auth/providers/postmark";
+import * as Sentry from "@sentry/nextjs";
 
 const additionalConfig = {
-  ...authConfig,
   providers: [
     ...authConfig.providers,
     Postmark({
@@ -22,10 +21,11 @@ const additionalConfig = {
         // your function
       },
     }),
-    
   ],
   events: {
     async signIn(message) {
+      // set the user on the sentry env
+      Sentry.setUser({ id: message?.user?.id });
       if (message.isNewUser) {
         const email = message.user.email as string;
         const user = await db.user.findUnique({
@@ -60,9 +60,11 @@ const additionalConfig = {
           ]);
         }
       }
-
-     
     },
+
+    async signOut(message) {
+      Sentry.setUser(null)
+    }
   },
 } satisfies NextAuthConfig;
 

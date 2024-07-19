@@ -3,6 +3,8 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { db } from "~/server/db";
+
 const SENTRY_DSN = process.env.SENTRY_DSN;
 
 Sentry.init({
@@ -15,4 +17,9 @@ Sentry.init({
   debug: false,
   // Uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: process.env.NODE_ENV === 'development',
+
+  // integrating sentry with the prisma adapter
+  integrations: [
+    Sentry.prismaIntegration(),
+  ],
 });

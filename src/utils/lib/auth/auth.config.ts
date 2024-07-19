@@ -6,6 +6,7 @@ import { db } from "~/server/db";
 import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
+import * as Sentry from "@sentry/browser"
 
 
 export default {
@@ -92,12 +93,18 @@ export default {
 
       return token;
     },
-    session: async ({ session, token }) => {
+    session: async ({ session, token, user }) => {
       session.user = {
         id: token.sub,
         // @ts-ignore
         ...(token || session).user,
       };
+      // const scope = Sentry.getCurrentScope()
+ 
+      // scope.setUser({
+      //   id: user.id,
+      //   email: user.email,
+      // })
       return session;
     },
   },

@@ -65,9 +65,9 @@ function AddWorkspaceModalHelper({
   const onSubmit = async () => {
     try {
       const res = await mutateAsync({ slug: slug, name: name });
-      if (res === "Project already in use") {
-        setSlugError("Slug is already in use.");
-      }
+      // if (res === "Project already in use") {
+      //   setSlugError("Slug is already in use.");
+      // }
       if (res) {
         va.track("Created Workspace");
         router.push(`/dashboard/${slug}/farmers`);
