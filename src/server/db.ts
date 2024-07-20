@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client/edge";
-import { withAccelerate } from "@prisma/extension-accelerate";
+import { PrismaClient } from "@prisma/client";
+// import { withAccelerate } from "@prisma/extension-accelerate";
 
 import { env } from "~/env";
 
@@ -12,8 +12,7 @@ export const db = globalForPrisma.prisma ??
     log: env.NODE_ENV === "development"
       ? ["query", "error", "warn"]
       : ["error"],
-  }).$extends(withAccelerate());
-
-
+  });
+// .$extends(withAccelerate());
 
 if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
