@@ -26,41 +26,41 @@ const additionalConfig = {
     async signIn(message) {
       console.log(message.user, "............??????")
       // set the user on the sentry env
-      // Sentry.setUser({ id: message?.user?.id });
-      // if (message.isNewUser) {
-      //   const email = message.user.email as string;
-      //   const user = await db.user.findUnique({
-      //     where: { email },
-      //     select: {
-      //       id: true,
-      //       name: true,
-      //       email: true,
-      //       image: true,
-      //       createdAt: true,
-      //     },
-      //   });
-      //   if (!user) {
-      //     return;
-      //   }
+      Sentry.setUser({ id: message?.user?.id });
+      if (message.isNewUser) {
+        const email = message.user.email as string;
+        const user = await db.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            createdAt: true,
+          },
+        });
+        if (!user) {
+          return;
+        }
         // only send the welcome email if the user was created in the last 10s
         // (this is a workaround because the `isNewUser` flag is triggered when a user does `dangerousEmailAccountLinking`)
-      //   if (
-      //     user.createdAt &&
-      //     new Date(user.createdAt).getTime() > Date.now() - 10000
-      //   ) {
-      //     await Promise.allSettled([
-      //       sendEmail({
-      //         subject: "Welcome to Jani AI!",
-      //         email,
-      //         react: WelcomeEmail({
-      //           email,
-      //           name: user.name || null,
-      //         }),
-      //         marketing: true,
-      //       }),
-      //     ]);
-      //   }
-      // }
+        if (
+          user.createdAt &&
+          new Date(user.createdAt).getTime() > Date.now() - 10000
+        ) {
+          await Promise.allSettled([
+            sendEmail({
+              subject: "Welcome to Jani AI!",
+              email,
+              react: WelcomeEmail({
+                email,
+                name: user.name || null,
+              }),
+              marketing: true,
+            }),
+          ]);
+        }
+      }
     },
 
     async signOut(message) {
