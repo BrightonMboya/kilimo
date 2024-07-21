@@ -11,6 +11,7 @@ import { waitUntil } from "@vercel/functions";
 import { TRPCClientError } from "@trpc/client";
 import { WorkspaceSchema } from "./schema";
 
+
 export const addWorkSpace = createTRPCRouter({
   addWorkSpace: publicProcedure
     .input(z.object({ slug: z.string(), name: z.string() }))

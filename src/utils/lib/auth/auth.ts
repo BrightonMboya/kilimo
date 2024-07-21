@@ -24,7 +24,6 @@ const additionalConfig = {
   ],
   events: {
     async signIn(message) {
-      console.log(message.user, "............??????")
       // set the user on the sentry env
       Sentry.setUser({ id: message?.user?.id });
       if (message.isNewUser) {
@@ -64,10 +63,11 @@ const additionalConfig = {
     },
 
     async signOut(message) {
-      // Sentry.setUser(null)
-    }
+      Sentry.setUser(null)
+    },
   },
-  secret: process.env.AUTH_SECRET
+  secret: process.env.AUTH_SECRET,
+  callbacks: authConfig.callbacks,
 } satisfies NextAuthConfig;
 
 export const config = {
