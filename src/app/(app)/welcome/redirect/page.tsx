@@ -11,12 +11,14 @@ export default function Page() {
   const workspace = data?.workspaces[0];
 
   useEffect(() => {
-    if (!workspace?.slug) {
-      router.push("/welcome");
-    }
+    if (!isLoading) {
+      if (!workspace?.slug) {
+        router.push("/welcome");
+      }
 
-    if (workspace?.slug && !isLoading) {
-      router.push(`/dashboard/${workspace?.slug}/farmers`);
+      if (workspace?.slug && !isLoading) {
+        router.push(`/dashboard/${workspace?.slug}/farmers`);
+      }
     }
   }, [workspace]);
 
