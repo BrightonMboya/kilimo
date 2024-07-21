@@ -25,7 +25,7 @@ export default {
   ],
   callbacks: {
     signIn: async ({ user, account, profile }) => {
-      console.log({ user, account, profile });
+      // console.log({ user, account, profile });
       // if (!user.email || (await isBlacklistedEmail(user.email))) {
       //   return false;
       // }
