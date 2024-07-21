@@ -1,3 +1,6 @@
+
+
+import {  auth } from "~/utils/lib/auth/auth";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -23,6 +26,12 @@ export const addWorkSpace = createTRPCRouter({
       // ) {
       //    throw new TRPCClientError("Project already in use")
       // }
+
+      const user =await auth()
+      console.log("[///////////////////////////////////////////////////////]", )
+      console.log("[user-session]", user);
+
+
       const project = await ctx.db.project.findUnique({
         where: {
           slug: input.slug,

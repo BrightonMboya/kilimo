@@ -25,6 +25,7 @@ export default {
   ],
   callbacks: {
     signIn: async ({ user, account, profile }) => {
+      console.log("[sign-in]", )
       console.log({ user, account, profile });
       // if (!user.email || (await isBlacklistedEmail(user.email))) {
       //   return false;
@@ -100,13 +101,13 @@ export default {
         ...(token || session).user,
       };
       // const scope = Sentry.getCurrentScope()
- 
+
       // scope.setUser({
       //   id: user.id,
       //   email: user.email,
       // })
       return session;
     },
-  
+
   },
 } satisfies NextAuthConfig;

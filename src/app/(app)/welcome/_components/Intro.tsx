@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
@@ -21,7 +22,7 @@ export default function Intro() {
           loading ? "scale-[25%] blur-md" : "scale-100 blur-0"
         }  h-[20vh] w-screen object-cover transition-all duration-1000`}
       ></div>
-      
+
         <motion.div
           variants={{
             show: {
@@ -47,7 +48,7 @@ export default function Intro() {
             Get Started
           </motion.button>
         </motion.div>
-     
+
     </motion.div>
   );
 }

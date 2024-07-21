@@ -22,6 +22,8 @@ const additionalConfig = {
       },
     }),
   ],
+
+  callbacks:authConfig.callbacks,
   events: {
     async signIn(message) {
       console.log(message.user, "............??????")
