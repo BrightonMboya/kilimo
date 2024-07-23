@@ -1,4 +1,4 @@
-import  Button  from "~/components/ui/Button";
+import Button from "~/components/ui/Button";
 import styles from "./gradient.module.css";
 import Link from "next/link";
 
@@ -11,9 +11,7 @@ export default function HeroSection() {
             <div className="-mx-4 flex flex-wrap items-center">
               <div className="w-full px-4">
                 <div className="px-5 text-black">
-                  <h1
-                    className="text-balance text-3xl font-extrabold tracking-tight md:text-5xl lg:text-7xl "
-                  >
+                  <h1 className="text-balance text-3xl font-extrabold tracking-tight md:text-5xl lg:text-7xl ">
                     Helping AgriBusinesses{" "}
                     <span className="underline decoration-primary decoration-dashed underline-offset-4">
                       track resources
@@ -31,6 +29,17 @@ export default function HeroSection() {
                       <Link href="https://cal.com/brightonmboya/15min">
                         <Button className="lg:py-6 lg:text-xl" size="lg">
                           Contact Sales
+                        </Button>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/register">
+                        <Button
+                          className="lg:py-6 lg:text-xl"
+                          size="lg"
+                          variant="outline"
+                        >
+                          Get Started
                         </Button>
                       </Link>
                     </li>
