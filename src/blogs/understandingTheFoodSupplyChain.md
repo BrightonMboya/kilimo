@@ -1,6 +1,6 @@
 ---
 title: "Understanding the Food Supply Chain"
-coverImage: "https://cinboalcjwoysuykfknx.supabase.co/storage/v1/object/public/images/OG/buildingForUnderPrivilegeCommunities.png"
+coverImage: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGZvb2R8ZW58MHwwfDB8fHww.jpg"
 date: "2024-23-07"
 author:
   name: Brighton Mboya
