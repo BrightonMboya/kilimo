@@ -8,18 +8,18 @@ import {
   HeroSection,
   Pricing,
 } from "~/components/landingPage";
-
+import BlogReview from "~/components/blogs/BlogReview";
 
 function Page() {
   return (
     <Layout>
-    
       <HeroSection />
       <Features />
       <About />
       <Call2Action />
       {/* <Pricing /> */}
       <Faq />
+      <BlogReview />
     </Layout>
   );
 }
