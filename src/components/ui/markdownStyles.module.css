@@ -14,5 +14,5 @@
 }
 
 .markdown h3 {
-  @apply text-green mb-4 mt-8 text-2xl font-medium leading-snug;
+  @apply text-primary mb-4 mt-8 text-2xl font-medium leading-snug;
 }
