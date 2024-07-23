@@ -19,6 +19,20 @@ const nextConfig = {
     ],
   },
 
+  // this hack below is to get fs module to work within server components
+ webpack(config) {
+   config.resolve.fallback = {
+
+      // if you miss it, all the other options in fallback, specified
+      // by next.js will be dropped.
+      ...config.resolve.fallback,  
+
+      fs: false, // the solution
+    };
+    
+    return config;
+  },
+
   /**
    * If you are using `appDir` then you must comment the below `i18n` config out.
    *
@@ -28,6 +42,7 @@ const nextConfig = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  // who gives a damn about eslint while you can just ship stuff
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -52,7 +67,6 @@ const nextConfig = {
   },
 };
 
-// export default config;
 
 const sentryConfig = {
   // For all available options, see:
