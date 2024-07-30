@@ -38,4 +38,6 @@ export * from "./file-upload";
 export * from "./logo";
 export * from "./copy-button";
 export * from "./badge";
-export * from "./icon-menu"
+export * from "./icon-menu";
+export * from "./switch";
+export * from "./link-logo";

@@ -17,6 +17,7 @@ import { type ReportsTableData } from "./schema";
 import { useToast } from "~/utils/hooks/useToast";
 import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
+import { useReportQRModal } from "./reports_qr_modal";
 
 export const columns: ColumnDef<ReportsTableData>[] = [
   {
@@ -90,8 +91,11 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       const utils = api.useUtils();
       const params = useParams();
       const { setShowReportQRModal, ReportQRModal } = useReportQRModal({
-        props,
+        props: {
+          report_id: report.id,
+        },
       });
+
       const finishedTrackingHandler =
         api.reports.markAsFinishedTracking.useMutation({
           onSuccess: () => {
@@ -165,80 +169,96 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       });
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link
-                href={{
-                  pathname: `/dashboard/${params.accountSlug}/reports/view`,
-                  query: { reportId: report.id },
-                }}
-              >
-                View Details
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                navigator.clipboard.writeText(report.name);
-                toast({
-                  description: "Report Name copied to clipboard",
-                });
-              }}
-            >
-              Copy Report Name
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={() => {}}>Get QR Code</DropdownMenuItem>
-
-            <DropdownMenuItem>
-              <Link
-                href={{
-                  pathname: `/dashboard/${params.accountSlug}/reports/edit/`,
-                  query: { reportId: report.id },
-                }}
-              >
-                Continue to track the report
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => {
-                finishedTrackingHandler.mutateAsync({
-                  reportId: report.id,
-                  workspaceSlug: params.accountSlug as unknown as string,
-                });
-              }}
-              className="cursor-pointer"
-            >
-              Mark the report as complete
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem>Download the report as PDF</DropdownMenuItem> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                toast({
-                  description: "Report deleted",
-                });
-                mutateAsync({
-                  reportId: report.id,
-                  workspaceSlug: params.accountSlug as unknown as string,
-                });
-              }}
-              disabled={isLoading}
-            >
-              <Button variant="destructive" disabled={isLoading} type="button">
-                Delete this report
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
               </Button>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Link
+                  href={{
+                    pathname: `/dashboard/${params.accountSlug}/reports/view`,
+                    query: { reportId: report.id },
+                  }}
+                >
+                  View Details
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(report.name);
+                  toast({
+                    description: "Report Name copied to clipboard",
+                  });
+                }}
+              >
+                Copy Report Name
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReportQRModal(true);
+                  }}
+                >
+                  Get QR Code
+                </button>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Link
+                  href={{
+                    pathname: `/dashboard/${params.accountSlug}/reports/edit/`,
+                    query: { reportId: report.id },
+                  }}
+                >
+                  Continue to track the report
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => {
+                  finishedTrackingHandler.mutateAsync({
+                    reportId: report.id,
+                    workspaceSlug: params.accountSlug as unknown as string,
+                  });
+                }}
+                className="cursor-pointer"
+              >
+                Mark the report as complete
+              </DropdownMenuItem>
+              {/* <DropdownMenuItem>Download the report as PDF</DropdownMenuItem> */}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  toast({
+                    description: "Report deleted",
+                  });
+                  mutateAsync({
+                    reportId: report.id,
+                    workspaceSlug: params.accountSlug as unknown as string,
+                  });
+                }}
+                disabled={isLoading}
+              >
+                <Button
+                  variant="destructive"
+                  disabled={isLoading}
+                  type="button"
+                >
+                  Delete this report
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ReportQRModal />
+        </>
       );
     },
   },
