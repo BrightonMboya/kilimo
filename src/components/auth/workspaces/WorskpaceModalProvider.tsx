@@ -1,7 +1,5 @@
 "use client";
 import { useAddWorkspaceModal } from "./add-workspace-modal";
-// import { DEFAULT_LINK_PROPS, getUrlFromString } from "@dub/utils";
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import {
   Dispatch,
@@ -11,8 +9,6 @@ import {
   useEffect,
 } from "react";
 import { api } from "~/trpc/react";
-
-
 
 
 export const ModalContext = createContext<{
