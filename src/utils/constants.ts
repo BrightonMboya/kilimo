@@ -48,3 +48,23 @@ export const APP_DOMAIN =
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
       ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
       : "http://localhost:3000";
+
+
+export const GOOGLE_FAVICON_URL = "https://www.google.com/s2/favicons?sz=64&domain_url=";
+
+
+
+export const FADE_IN_ANIMATION_SETTINGS = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.2 },
+};
+
+
+export const APP_HOSTNAMES = new Set([
+  `app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+  `preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+  "localhost:3000",
+  "localhost",
+]);

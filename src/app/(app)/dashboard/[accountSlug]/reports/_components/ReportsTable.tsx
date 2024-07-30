@@ -33,10 +33,7 @@ import {
 import { columns } from "./ReportsTableColumn";
 import { type ReportsTableData } from "./schema";
 
-
-
-
-export default function ReportsTable({ data }: {data: ReportsTableData[]}) {
+export default function ReportsTable({ data }: { data: ReportsTableData[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],

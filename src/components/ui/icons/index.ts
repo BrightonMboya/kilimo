@@ -9,3 +9,5 @@ export { default as ThreeDots } from "./three-dots";
 export { default as Link } from "./link";
 export { default as CheckCircleFill } from "./check-circle-fill";
 export { default as Clipboard } from "./Clipboard";
+export { default as Download } from "./download";
+export { default as Photo } from "./photo";

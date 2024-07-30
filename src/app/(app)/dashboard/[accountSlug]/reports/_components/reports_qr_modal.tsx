@@ -1,29 +1,20 @@
 "use client";
 
 import { QRCodeSVG, getQRAsCanvas, getQRAsSVGDataUri } from "~/utils/lib/qr";
-import { api } from "~/trpc/react";
-// import useWorkspace from "@/lib/swr/use-workspace"; fetch workspace from the above import
-// import { QRLinkProps } from "@/lib/types";
-import { Clipboard, Download } from "@/ui/shared/icons";
 import {
+  Clipboard,
+  Download,
   IconMenu,
-  InfoTooltip,
-  LinkLogo,
+  Popover,
+  Tooltip,
   Modal,
   Photo,
-  Popover,
-  SimpleTooltipContent,
-  Switch,
-  Tooltip,
-  TooltipContent,
-  useRouterStuff,
-} from "@dub/ui";
-import {
-  APP_HOSTNAMES,
-  FADE_IN_ANIMATION_SETTINGS,
-  getApexDomain,
-  linkConstructor,
-} from "@dub/utils";
+  LinkLogo,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui";
+
+import {  FADE_IN_ANIMATION_SETTINGS } from "~/utils";
 import { motion } from "framer-motion";
 import { Check, ChevronRight, Link2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -36,35 +27,41 @@ import {
   useState,
 } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
+import { useToast } from "~/utils/hooks";
 
-function LinkQRModalHelper({
-  showLinkQRModal,
-  setShowLinkQRModal,
+export interface QRReportProps {
+  report_id: string;
+  key?: string;
+  url?: string;
+}
+
+function ReportQRModalHelper({
+  showReportQRModal,
+  setShowReportQRModal,
   props,
 }: {
-  showLinkQRModal: boolean;
-  setShowLinkQRModal: Dispatch<SetStateAction<boolean>>;
-  props: QRLinkProps;
+  showReportQRModal: boolean;
+  setShowReportQRModal: Dispatch<SetStateAction<boolean>>;
+  props: QRReportProps;
 }) {
   return (
-    <Modal showModal={showLinkQRModal} setShowModal={setShowLinkQRModal}>
-      <QRCodePicker props={props} setShowLinkQRModal={setShowLinkQRModal} />
+    <Modal showModal={showReportQRModal} setShowModal={setShowReportQRModal}>
+      <QRCodePicker props={props} setShowReportQRModal={setShowReportQRModal} />
     </Modal>
   );
 }
 
 export function QRCodePicker({
   props,
-  setShowLinkQRModal,
+  setShowReportQRModal,
 }: {
-  props: QRLinkProps;
-  setShowLinkQRModal: Dispatch<SetStateAction<boolean>>;
+  props: QRReportProps;
+  setShowReportQRModal: Dispatch<SetStateAction<boolean>>;
 }) {
   const anchorRef = useRef<HTMLAnchorElement>(null);
-  const { logo, plan } = useWorkspace();
-  const apexDomain = props.url ? getApexDomain(props.url) : null;
+  const apexDomain = props.url ? props.url : null;
 
   function download(url: string, extension: string) {
     if (!anchorRef.current) return;
@@ -78,13 +75,14 @@ export function QRCodePicker({
 
   const qrData = useMemo(
     () => ({
-      value: linkConstructor({
-        key: props.key,
-        domain: props.domain,
-        searchParams: {
-          qr: "1",
-        },
-      }),
+      // value: linkConstructor({
+      //   key: props.key,
+      //   domain: props.report_id,
+      //   searchParams: {
+      //     qr: "1",
+      //   },
+      // }),
+      value: `https://www.jani-ai.com/qr?reportId=${props.report_id}`,
       bgColor: "#ffffff",
       fgColor,
       size: 1024,
@@ -92,7 +90,7 @@ export function QRCodePicker({
       ...(showLogo && {
         imageSettings: {
           src:
-            logo && plan !== "free" ? logo : "https://dub.co/_static/logo.svg",
+            "/static/images/brand/jani-icon-black.png",
           height: 256,
           width: 256,
           excavate: true,
@@ -118,6 +116,7 @@ export function QRCodePicker({
     }
   };
   const [copiedURL, setCopiedURL] = useState(false);
+  const { toast } = useToast();
 
   return (
     <>
@@ -154,7 +153,7 @@ export function QRCodePicker({
           setFgColor={setFgColor}
           showLogo={showLogo}
           setShowLogo={setShowLogo}
-          setShowLinkQRModal={setShowLinkQRModal}
+          setShowReportQRModal={setShowReportQRModal}
         />
 
         <div className="grid grid-cols-2 gap-2 px-4 sm:px-16">
@@ -168,12 +167,20 @@ export function QRCodePicker({
           >
             <>
               <button
-                onClick={async () => {
-                  toast.promise(copyToClipboard, {
-                    loading: "Copying QR code to clipboard...",
-                    success: "Copied QR code to clipboard!",
-                    error: "Failed to copy",
+                // onClick={async () => {
+                //   toast.promise(copyToClipboard, {
+                //     loading: "Copying QR code to clipboard...",
+                //     success: "Copied QR code to clipboard!",
+                //     error: "Failed to copy",
+                //   });
+                // }}
+                onClick={() => {
+                  copyToClipboard;
+                  toast({
+                    description: "Copied QR code to clipboard!",
                   });
+                  setCopiedURL(true);
+                  setTimeout(() => setCopiedURL(false), 2000);
                 }}
                 className="w-full rounded-md p-2 text-left text-sm font-medium text-gray-500 transition-all duration-75 hover:bg-gray-100"
               >
@@ -190,16 +197,13 @@ export function QRCodePicker({
               </button>
               <button
                 onClick={() => {
+                  // here we copy the qr code link which will point out to the specified page
                   navigator.clipboard.writeText(
-                    `https://api.dub.co/qr?url=${linkConstructor({
-                      key: props.key,
-                      domain: props.domain,
-                      searchParams: {
-                        qr: "1",
-                      },
-                    })}`,
+                    `https://jani-ai.com/qr?reportId=${props.report_id}`,
                   );
-                  toast.success("Copied QR code URL to clipboard!");
+                  https: toast({
+                    description: "Copied QR code URL to clipboard!",
+                  });
                   setCopiedURL(true);
                   setTimeout(() => setCopiedURL(false), 2000);
                 }}
@@ -235,10 +239,7 @@ export function QRCodePicker({
                       ...(qrData.imageSettings && {
                         imageSettings: {
                           ...qrData.imageSettings,
-                          src:
-                            logo && plan !== "free"
-                              ? logo
-                              : "https://dub.co/_static/logo.svg",
+                          src: "/static/images/brand/jani-icon-black.png",
                         },
                       }),
                     }),
@@ -289,20 +290,16 @@ export function QRCodePicker({
 function AdvancedSettings({
   qrData,
   setFgColor,
-  showLogo,
-  setShowLogo,
-  setShowLinkQRModal,
-}) {
+  // showLogo,
+  // setShowLogo,
+  // setShowReportQRModal,
+}: any) {
   const { slug } = useParams() as { slug?: string };
-  const { plan, logo } = useWorkspace();
   const [expanded, setExpanded] = useState(false);
 
   const debouncedSetFgColor = useDebouncedCallback((color) => {
     setFgColor(color);
   }, 100);
-
-  const { queryParams } = useRouterStuff();
-
   return (
     <div>
       <div className="px-4 sm:px-16">
@@ -325,75 +322,6 @@ function AdvancedSettings({
           {...FADE_IN_ANIMATION_SETTINGS}
           className="mt-4 grid gap-5 border-b border-t border-gray-200 bg-white px-4 py-8 sm:px-16"
         >
-          <div>
-            <label
-              htmlFor="logo-toggle"
-              className="flex items-center space-x-1"
-            >
-              <p className="text-sm font-medium text-gray-700">Logo</p>
-              {plan !== "free" && (
-                <InfoTooltip
-                  content={
-                    <SimpleTooltipContent
-                      title=""
-                      cta="How to update my QR Code logo?"
-                      href="https://dub.co/help/article/custom-qr-codes"
-                    />
-                  }
-                />
-              )}
-            </label>
-            {plan !== "free" ? (
-              <div className="mt-1 flex items-center space-x-2">
-                <Switch
-                  fn={setShowLogo}
-                  checked={showLogo}
-                  trackDimensions="h-6 w-12"
-                  thumbDimensions="w-5 h-5"
-                  thumbTranslate="translate-x-6"
-                />
-                <p className="text-sm text-gray-600">
-                  Show {!slug || (!logo && process.env.NEXT_PUBLIC_APP_NAME)}{" "}
-                  Logo
-                </p>
-              </div>
-            ) : (
-              <Tooltip
-                content={
-                  <TooltipContent
-                    title="You need to be on the Pro plan and above to customize your QR Code logo."
-                    cta="Upgrade to Pro"
-                    {...(APP_HOSTNAMES.has(window.location.hostname)
-                      ? {
-                          onClick: () => {
-                            setShowLinkQRModal(false);
-                            queryParams({
-                              set: {
-                                upgrade: "pro",
-                              },
-                            });
-                          },
-                        }
-                      : { href: "https://dub.co/pricing" })}
-                  />
-                }
-              >
-                <div className="pointer-events-none mt-1 flex cursor-not-allowed items-center space-x-2 sm:pointer-events-auto">
-                  <Switch
-                    fn={setShowLogo}
-                    checked={showLogo}
-                    trackDimensions="h-6 w-12"
-                    thumbDimensions="w-5 h-5"
-                    thumbTranslate="translate-x-6"
-                    disabled={true}
-                  />
-                  <p className="text-sm text-gray-600">
-                    Show {process.env.NEXT_PUBLIC_APP_NAME} Logo
-                  </p>
-                </div>
-              </Tooltip>
-            )}
-          </div>
           <div>
             <label
               htmlFor="color"
@@ -446,38 +374,38 @@ function QrDropdown({
 }) {
   const [openPopover, setOpenPopover] = useState(false);
   return (
-    <Popover
-      content={<div className="grid w-full gap-1 p-2 sm:w-40">{children}</div>}
-      align="center"
-      openPopover={openPopover}
-      setOpenPopover={setOpenPopover}
-    >
-      <button
-        onClick={() => setOpenPopover(!openPopover)}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-black px-5 py-1.5 text-sm text-white transition-all hover:bg-white hover:text-black"
-      >
-        {button}
-      </button>
+    <Popover open={openPopover} onOpenChange={setOpenPopover}>
+      <PopoverTrigger>
+        <button
+          type="button"
+          onClick={() => setOpenPopover(!openPopover)}
+          className="flex w-full items-center justify-center gap-2 rounded-md border bg-primary px-5 py-1.5 text-sm text-white transition-all hover:bg-white hover:text-black"
+        >
+          {button}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent>
+        <div className="grid w-full gap-1 p-2 sm:w-40">{children}</div>
+      </PopoverContent>
     </Popover>
   );
 }
 
-export function useLinkQRModal({ props }: { props: QRLinkProps }) {
-  const [showLinkQRModal, setShowLinkQRModal] = useState(false);
+export function useReportQRModal({ props }: { props: QRReportProps }) {
+  const [showReportQRModal, setShowReportQRModal] = useState(false);
 
-  const LinkQRModal = useCallback(() => {
+  const ReportQRModal = useCallback(() => {
     return (
-      <LinkQRModalHelper
-        showLinkQRModal={showLinkQRModal}
-        setShowLinkQRModal={setShowLinkQRModal}
+      <ReportQRModalHelper
+        showReportQRModal={showReportQRModal}
+        setShowReportQRModal={setShowReportQRModal}
         props={props}
       />
     );
-  }, [showLinkQRModal, setShowLinkQRModal, props]);
+  }, [showReportQRModal, setShowReportQRModal, props]);
 
   return useMemo(
-    () => ({ showLinkQRModal, setShowLinkQRModal, LinkQRModal }),
-    [showLinkQRModal, setShowLinkQRModal, LinkQRModal],
+    () => ({ showReportQRModal, setShowReportQRModal, ReportQRModal }),
+    [showReportQRModal, setShowReportQRModal, ReportQRModal],
   );
 }
-å

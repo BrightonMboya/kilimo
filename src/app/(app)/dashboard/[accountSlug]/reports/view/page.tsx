@@ -1,10 +1,8 @@
 "use client";
 import React from "react";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { EmptyState } from "~/components/shared/empty/empty-state";
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 import { api } from "~/trpc/react";
-import { format } from "date-fns";
 import { useSearchParams, useParams } from "next/navigation";
 import PDFReport from "../_components/PDFReport";
 
