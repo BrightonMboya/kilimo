@@ -34,10 +34,9 @@ model Project {
   Warehouses           Warehouses[]
   reports              Reports[]
   ReportTrackingEvents ReportTrackingEvents[]
-
-  users      ProjectUsers[]
-  invites    ProjectInvite[]
-  sentEmails SentEmail[]
+  users                ProjectUsers[]
+  invites              ProjectInvite[]
+  sentEmails           SentEmail[]
 
   customers Customer[]
 

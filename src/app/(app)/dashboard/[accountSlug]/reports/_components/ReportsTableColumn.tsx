@@ -89,6 +89,9 @@ export const columns: ColumnDef<ReportsTableData>[] = [
       const { toast } = useToast();
       const utils = api.useUtils();
       const params = useParams();
+      const { setShowReportQRModal, ReportQRModal } = useReportQRModal({
+        props,
+      });
       const finishedTrackingHandler =
         api.reports.markAsFinishedTracking.useMutation({
           onSuccess: () => {
@@ -191,6 +194,8 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             >
               Copy Report Name
             </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => {}}>Get QR Code</DropdownMenuItem>
 
             <DropdownMenuItem>
               <Link
