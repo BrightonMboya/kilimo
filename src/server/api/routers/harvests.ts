@@ -115,6 +115,13 @@ const harvests = createTRPCRouter({
             id: input.harvestId,
             project_id: workspace?.id,
           },
+          include: {
+            Farmers: {
+              select: {
+                fullName: true,
+              },
+            },
+          },
         });
       } catch (cause) {
         console.log(cause);
