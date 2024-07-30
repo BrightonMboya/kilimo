@@ -1,8 +1,9 @@
 "use client";
 
-import { QRCodeSVG, getQRAsCanvas, getQRAsSVGDataUri } from "@/lib/qr";
-import useWorkspace from "@/lib/swr/use-workspace";
-import { QRLinkProps } from "@/lib/types";
+import { QRCodeSVG, getQRAsCanvas, getQRAsSVGDataUri } from "~/utils/lib/qr";
+import { api } from "~/trpc/react";
+// import useWorkspace from "@/lib/swr/use-workspace"; fetch workspace from the above import
+// import { QRLinkProps } from "@/lib/types";
 import { Clipboard, Download } from "@/ui/shared/icons";
 import {
   IconMenu,
