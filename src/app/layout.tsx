@@ -38,13 +38,16 @@ export const metadata: Metadata = {
   },
 };
 
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.className} font-sans`}>
+    <html lang="en" className={`${GeistSans.className}`}
+  
+    >
       <body className={`${GeistSans.className} font-sans`}>
         <Toaster closeButton className="pointer-events-auto" />
         <TRPCReactProvider headers={headers()}>
