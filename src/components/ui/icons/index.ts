@@ -8,3 +8,4 @@ export { default as Copy } from "./copy";
 export { default as ThreeDots } from "./three-dots";
 export { default as Link } from "./link";
 export { default as CheckCircleFill } from "./check-circle-fill";
+export { default as Clipboard } from "./Clipboard";
