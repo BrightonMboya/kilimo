@@ -42,6 +42,7 @@ export default function Page() {
       unit: data?.unit,
       inputsUsed: data?.inputsUsed,
       size: data?.size,
+      farmerName: data?.Farmers.fullName,
     },
   });
 
@@ -54,6 +55,7 @@ export default function Page() {
       setValue("inputsUsed", data.inputsUsed);
       setValue("size", data.size);
       setValue("farmerId", data.farmersId);
+      setValue("farmerName", data.Farmers.fullName);
     }
   }, [data, setValue]);
 

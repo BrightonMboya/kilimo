@@ -7,6 +7,7 @@ export const harvestsSchema = z.object({
   size: z.number(),
   unit: z.string().min(1),
   inputsUsed: z.string().min(1),
+  farmerName: z.string().optional(),
 });
 
 export type HarvestSchemaType = z.infer<typeof harvestsSchema>;
