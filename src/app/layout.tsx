@@ -49,7 +49,8 @@ export default function RootLayout({
   
     >
       <body className={`${GeistSans.className} font-sans`}>
-        <Toaster closeButton className="pointer-events-auto" />
+        {/* <Toaster closeButton className="pointer-events-auto" />  */}
+        <Toaster/>
         <TRPCReactProvider headers={headers()}>
           <ModalProvider>{children}</ModalProvider>
         </TRPCReactProvider>

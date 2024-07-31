@@ -9,6 +9,9 @@ import {
   useMemo,
   useState,
 } from "react";
+import { api } from "~/trpc/react";
+import { useParams } from "next/navigation";
+import { useToast } from "~/utils/hooks";
 
 
 function InviteCodeModal({
@@ -29,6 +32,32 @@ function InviteCodeModal({
   }, [inviteCode]);
 
   const [resetting, setResetting] = useState(false);
+  const params = useParams();
+  const {toast} = useToast()
+  const utils = api.useUtils()
+
+  const {isLoading, mutateAsync} = api.workspace.resetInviteLink.useMutation({
+    onError: (error) => {
+      console.log(error)
+      toast({
+        description: "Failed to reset the invite link",
+        variant: "destructive"
+      })
+    },
+    onSettled: () => {
+      toast({
+        description: "Invite code reset succesfully"
+      })
+      utils.workspace.getSpecificWorkspace.invalidate()
+    },
+    onSuccess: () => {
+      alert("This is the on Success")
+      toast({
+        description: "Invite code reset succesfully"
+      })
+      utils.workspace.getSpecificWorkspace.invalidate()
+    }
+  })
 
   return (
     <Modal
@@ -53,15 +82,9 @@ function InviteCodeModal({
         <Button
           text="Reset invite link"
           variant="secondary"
-          loading={resetting}
+          loading={isLoading}
           onClick={() => {
-            setResetting(true);
-            fetch(`/api/workspaces/${id}/invites/reset`, {
-              method: "POST",
-            }).then(async () => {
-              //   await mutate();
-              setResetting(false);
-            });
+            mutateAsync({workspaceSlug: params.accountSlug as unknown as string})
           }}
         />
       </div>

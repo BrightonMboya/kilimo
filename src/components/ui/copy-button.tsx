@@ -3,7 +3,7 @@
 import { cn } from "~/utils";
 import { LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useToast } from "~/utils/hooks";
 import { Copy, Tick } from "./icons";
 
 export function CopyButton({
@@ -17,13 +17,17 @@ export function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   const Comp = icon || Copy;
+  const {toast} = useToast()
   return (
     <button
       onClick={(e) => {
         e.stopPropagation();
         setCopied(true);
         navigator.clipboard.writeText(value).then(() => {
-          toast.success("Copied to clipboard!");
+          toast({
+            description: "Copied to clipboard!"
+          })
+
         });
         setTimeout(() => setCopied(false), 3000);
       }}

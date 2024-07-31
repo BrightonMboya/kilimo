@@ -1,9 +1,6 @@
-// import { getSession } from "@/lib/auth";
 import { auth } from "~/utils/lib/auth/auth";
 import { db } from "~/server/db";
-// import { LoadingSpinner, Logo } from "@dub/ui";
 import LoadingSpinner from "~/components/ui/LoadingSpinner";
-import { Logo } from "~/components/ui";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -27,9 +24,9 @@ export default function InvitesPage({
     code: string;
   };
 }) {
+
   return (
     <div className="flex h-screen flex-col items-center justify-center space-y-6 text-center">
-      {/* <Logo className="h-12 w-12" /> */}
       <Suspense
         fallback={
           <>
@@ -90,17 +87,17 @@ async function VerifyInvite({ code }: { code: string }) {
 
   // check if user is already in the workspace
   if (workspace.users.length > 0) {
-    redirect(`/${workspace.slug}`);
+    redirect(`/dashboard/${workspace.slug}/farmers`);
   }
 
-  if (workspace._count.users >= 7) {
-    return (
-      <PageCopy
-        title="User Limit Reached"
-        message="The workspace you are trying to join is currently full. Please contact the workspace owner for more information."
-      />
-    );
-  }
+  // if (workspace._count.users >= 7) {
+  //   return (
+  //     <PageCopy
+  //       title="User Limit Reached"
+  //       message="The workspace you are trying to join is currently full. Please contact the workspace owner for more information."
+  //     />
+  //   );
+  // }
 
   await db.projectUsers.create({
     data: {

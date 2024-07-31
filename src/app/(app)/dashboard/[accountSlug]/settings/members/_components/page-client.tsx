@@ -49,7 +49,7 @@ export default function WorkspacePeopleClient() {
 
   return (
     <>
-      <TooltipProvider>
+      {/* <TooltipProvider> */}
         <InviteTeammateModal />
         <InviteCodeModal />
         <div className="rounded-lg border border-gray-200 bg-white">
@@ -157,7 +157,7 @@ export default function WorkspacePeopleClient() {
               ))}
           </div>
         </div>
-      </TooltipProvider>
+      {/* </TooltipProvider> */}
     </>
   );
 }
