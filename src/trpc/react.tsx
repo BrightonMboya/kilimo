@@ -50,11 +50,11 @@ export function TRPCReactProvider(props: {
           url: getUrl(),
           async headers() {
             const heads = new Map(props.headers);
-            const { data } = await supabase().auth.getSession();
+            // const { data } = await supabase().auth.getSession();
 
-            if (data.session) {
-              heads.set("authorization", data.session.access_token);
-            }
+            // if (data.session) {
+            //   heads.set("authorization", data.session.access_token);
+            // }
 
             heads.set("x-trpc-source", "react");
 
