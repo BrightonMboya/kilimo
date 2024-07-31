@@ -7,8 +7,6 @@ import { JWT } from "next-auth/jwt";
 import { User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 
-
-
 export default {
   providers: [
     GitHub({
@@ -100,13 +98,12 @@ export default {
         ...(token || session).user,
       };
       // const scope = Sentry.getCurrentScope()
- 
+
       // scope.setUser({
       //   id: user.id,
       //   email: user.email,
       // })
       return session;
     },
-  
   },
 } satisfies NextAuthConfig;

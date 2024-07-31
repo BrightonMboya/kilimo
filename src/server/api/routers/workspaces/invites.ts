@@ -68,7 +68,7 @@ export const invites = createTRPCRouter({
           },
         });
       } catch (error) {
-        if (error.code === "P2002") {
+        if (error?.code === "P2002") {
           throw new TRPCError({
             message: "User has already beeen invited to this workspace",
             code: "BAD_REQUEST",
@@ -76,10 +76,12 @@ export const invites = createTRPCRouter({
         }
       }
 
+
       await ctx.db.verificationToken.create({
         data: {
           identifier: input.email,
           token: await hashToken(token, { secret: true }),
+          // token,
           expires,
         },
       });
@@ -92,7 +94,7 @@ export const invites = createTRPCRouter({
       });
 
       const url =
-        `${process.env.NEXTAUTH_URL}/api/auth/callback/email?${params}`;
+        `${process.env.NEXTAUTH_URL}/api/auth/callback/postmark?${params}`;
 
       return await sendEmail({
         subject:

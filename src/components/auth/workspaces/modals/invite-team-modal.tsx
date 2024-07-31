@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { api } from "~/trpc/react";
-import { toast } from "sonner";
+import { useToast } from "~/utils/hooks";
 
 function InviteTeammateModal({
   showInviteTeammateModal,
@@ -29,23 +29,32 @@ function InviteTeammateModal({
   workspaceName: string;
 }) {
   const [inviting, setInviting] = useState(false);
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const { isMobile } = useMediaQuery();
   const utils = api.useUtils();
   const { isLoading, mutateAsync } = api.workspace.sendInvite.useMutation({
     onSuccess: () => {
-      toast("Invite sent out succesfully");
+      toast({
+        description: "Invite sent out succesfully",
+      });
     },
     onError(error, variables, context) {
-      toast(`Failed to send invite, ${error.message}`);
+      toast({
+        description: `Failed to send invite, ${error.message}`,
+        variant: "destructive",
+      });
     },
     onSettled: () => {
+      toast({
+        description: "Invite sent out succesfully",
+      });
       utils.workspace.getUsersAndInvites.invalidate();
       setShowInviteTeammateModal(false);
     },
   });
 
-  async function submitHandler(e) {
+  async function submitHandler(e: any) {
     e.preventDefault();
     try {
       const res = await mutateAsync({
@@ -56,7 +65,10 @@ function InviteTeammateModal({
         workspaceSlug: slug,
       });
     } catch (cause) {
-      toast("Failed to send invite");
+      toast({
+        description: "Failed to send invite",
+        variant: "destructive",
+      });
     }
     // console.log(res);
   }
