@@ -6,19 +6,36 @@ import { sendEmail } from "~/emails";
 import WelcomeEmail from "~/emails/welcome-email";
 import Postmark from "next-auth/providers/postmark";
 import * as Sentry from "@sentry/nextjs";
+import EmailProvider from "next-auth/providers/postmark";
+import LoginLink from "~/emails/login-link";
 
 const additionalConfig = {
   providers: [
     ...authConfig.providers,
+    // EmailProvider({
+    //   sendVerificationRequest({ identifier, url }) {
+    //     if (process.env.NODE_ENV === "development") {
+    //       console.log(`Login link: ${url}`);
+    //       return;
+    //     } else {
+    //       sendEmail({
+    //         email: identifier,
+    //         subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
+    //         react: LoginLink({ url, email: identifier }),
+    //       });
+    //     }
+    //   },
+    // }),
     Postmark({
+      apiKey: process.env.POSTMARK_API_KEY,
       server: process.env.EMAIL_SERVER,
-      from: process.env.EMAIL_FROM,
-      sendVerificationRequest({
-        identifier: email,
-        url,
-        provider: { server, from },
-      }) {
-        // your function
+      from: "reggie@jani-ai.com",
+      sendVerificationRequest({ identifier, url }) {
+        sendEmail({
+          email: identifier,
+          subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
+          react: LoginLink({ url, email: identifier }),
+        });
       },
     }),
   ],
@@ -63,7 +80,7 @@ const additionalConfig = {
     },
 
     async signOut(message) {
-      Sentry.setUser(null)
+      Sentry.setUser(null);
     },
   },
   secret: process.env.AUTH_SECRET,

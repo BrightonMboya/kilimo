@@ -31,14 +31,12 @@ function InviteCodeModal({
     return `${APP_DOMAIN}/invites/${inviteCode}`;
   }, [inviteCode]);
 
-  const [resetting, setResetting] = useState(false);
   const params = useParams();
   const {toast} = useToast()
   const utils = api.useUtils()
 
   const {isLoading, mutateAsync} = api.workspace.resetInviteLink.useMutation({
     onError: (error) => {
-      console.log(error)
       toast({
         description: "Failed to reset the invite link",
         variant: "destructive"

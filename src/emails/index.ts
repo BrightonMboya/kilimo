@@ -38,7 +38,7 @@ export const sendEmail = async ({
   //   );
   //   return Promise.resolve();
   // }
-  console.log("Trying to send an email")
+
 
   const emailResponse = client!.sendEmail({
     From:

@@ -175,9 +175,11 @@ const InvitationUsers = ({ user, isOwner }: any) => {
     toast({
       description: "Team member deleted succesfully"
     })
-      console.log("Get the money");
     },
     onError: () => {
+      toast({
+        description: "Team member deleted succesfully",
+      });
      toast({
        description: "Team member deleted succesfully",
      });

@@ -3,7 +3,6 @@ import { db } from "~/server/db";
 import LoadingSpinner from "~/components/ui/LoadingSpinner";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-
 export const runtime = "nodejs";
 
 const PageCopy = ({ title, message }: { title: string; message: string }) => {
@@ -24,7 +23,6 @@ export default function InvitesPage({
     code: string;
   };
 }) {
-
   return (
     <div className="flex h-screen flex-col items-center justify-center space-y-6 text-center">
       <Suspense
@@ -99,12 +97,17 @@ async function VerifyInvite({ code }: { code: string }) {
   //   );
   // }
 
-  await db.projectUsers.create({
-    data: {
-      userId: session?.user?.id!,
-      projectId: workspace.id!,
-    },
-  });
+  
+  try {
+    await db.projectUsers.create({
+      data: {
+        userId: session?.user?.id!,
+        projectId: workspace.id!,
+      },
+    });
+  } catch (cause) {
+    console.log(cause);
+  }
 
-  redirect(`/${workspace.slug}`);
+  redirect(`/dashboard/${workspace.slug}/farmers`);
 }
