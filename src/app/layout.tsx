@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { baseUrl } from "./sitemap";
 import { TooltipProvider } from "~/components/ui";
 import { Toaster } from "sonner";
+import { Toaster as ShadToaster } from "~/components/ui";
 import ModalProvider from "~/components/auth/workspaces/WorskpaceModalProvider";
 
 export const metadata: Metadata = {
@@ -38,19 +39,17 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${GeistSans.className}`}
-  
-    >
+    <html lang="en" className={`${GeistSans.className}`}>
       <body className={`${GeistSans.className} font-sans`}>
         {/* <Toaster closeButton className="pointer-events-auto" />  */}
-        <Toaster/>
+        <Toaster />
+        <ShadToaster />
         <TRPCReactProvider headers={headers()}>
           <ModalProvider>{children}</ModalProvider>
         </TRPCReactProvider>
