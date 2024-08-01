@@ -79,7 +79,7 @@ function InviteTeammateModal({
       setShowModal={setShowInviteTeammateModal}
     >
       <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
-        {logo ? (
+        {/* {logo ? (
           <BlurImage
             src={logo}
             alt={"Invite Teammate"}
@@ -89,7 +89,7 @@ function InviteTeammateModal({
           />
         ) : (
           <Logo />
-        )}
+        )} */}
         <h3 className="text-lg font-medium">Invite Teammate</h3>
         <p className="text-center text-sm text-gray-500">
           Invite a teammate to join your workspace. Invitations will be valid

@@ -12,6 +12,13 @@ export default function RegisterForm() {
   const [clickedGoogle, setClickedGoogle] = useState(false);
   const [clickedGithub, setClickedGithub] = useState(false);
 
+  // check if the user got here as a result of workspace invite
+  const invite = searchParams.get("invite");
+
+  const callbackUrl = invite
+    ? `/invites/accept?email=${searchParams.get("email")}&workspaceSlug=${searchParams.get("workspaceSlug")}`
+    : "/welcome";
+
   useEffect(() => {
     // when leave page, reset state
     return () => {
@@ -28,7 +35,7 @@ export default function RegisterForm() {
         onClick={() => {
           setClickedGoogle(true);
           signIn("google", {
-            callbackUrl: "/welcome",
+            callbackUrl,
           });
         }}
         loading={clickedGoogle}
@@ -39,7 +46,7 @@ export default function RegisterForm() {
         onClick={() => {
           setClickedGithub(true);
           signIn("github", {
-            callbackUrl: "/welcome",
+            callbackUrl,
           });
         }}
         loading={clickedGithub}

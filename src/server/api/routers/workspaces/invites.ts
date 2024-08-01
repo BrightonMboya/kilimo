@@ -59,6 +59,7 @@ export const invites = createTRPCRouter({
       // create a workspace invite record and a verification request token that lasts for a week
       // here we use a try catch to account for the case where the user has already been invited
       // for which prisma.projectInvite.create() will throw a unique constraint error
+
       try {
         await ctx.db.projectInvite.create({
           data: {
@@ -76,25 +77,26 @@ export const invites = createTRPCRouter({
         }
       }
 
-
       await ctx.db.verificationToken.create({
         data: {
           identifier: input.email,
           token: await hashToken(token, { secret: true }),
-          // token,
           expires,
         },
       });
 
       const params = new URLSearchParams({
         callbackUrl:
-          `${process.env.NEXTAUTH_URL}/${input.workspaceSlug}?invite=true`,
+          // `${process.env.NEXTAUTH_URL}/${input.workspaceSlug}?invite=true`,
+          `${process.env.NEXTAUTH_URL}/?invite=true`,
         email: input.email,
         token,
+        workspaceSlug: input.workspaceSlug,
       });
 
       const url =
-        `${process.env.NEXTAUTH_URL}/api/auth/callback/postmark?${params}`;
+        // `${process.env.NEXTAUTH_URL}/api/auth/callback/postmark?${params}`;
+        `${process.env.NEXTAUTH_URL}/invites?email=${input.email}&workspaceSlug=${input.workspaceSlug}`;
 
       return await sendEmail({
         subject:
