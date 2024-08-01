@@ -21,7 +21,7 @@ export default function Page() {
   const email = searchParams.get("email");
   const workspaceSlug = searchParams.get("workspaceSlug");
   const { toast } = useToast();
-  const router = useRouter()
+  const router = useRouter();
 
   const { mutateAsync, isLoading } = api.workspace.acceptInvite.useMutation({
     onError: (error) => {
@@ -29,8 +29,7 @@ export default function Page() {
     },
 
     onSettled: () => {
-      // router.push(`/dashboard/${workspaceSlug}/farmers`)
-      console.log("I have settled");
+      router.push(`/dashboard/${workspaceSlug}/farmers`);
     },
   });
   useEffect(() => {

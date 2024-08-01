@@ -40,7 +40,6 @@ export const acceptInvite = createTRPCRouter({
           },
         },
       });
-      console.log(invite, "------------->!!!!");
       if (!invite) {
         throw new TRPCClientError("Invalid Invite");
       }
