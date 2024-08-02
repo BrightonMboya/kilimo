@@ -33,6 +33,7 @@ export interface WorkspaceProps {
 }
 
 export interface UserProps {
+ 
   id: string;
   name: string;
   email: string;
