@@ -9,6 +9,10 @@
   @apply my-6;
 }
 
+.markdown ul {
+  list-style-type: circle
+}
+
 .markdown h2 {
   @apply mb-4 mt-12 text-3xl leading-snug;
 }
