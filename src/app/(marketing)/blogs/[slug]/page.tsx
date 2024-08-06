@@ -1,5 +1,5 @@
 import markdownToHtml from "~/utils/functions/markdownToHtml";
-import { getAllPosts, getPostBySlug } from "~/utils";
+import { getAllPosts, getPostBySlug } from "~/utils/functions/markdownConfig";
 import { Container } from "~/components/ui";
 import markdownStyles from "~/components/ui/markdownStyles.module.css";
 import Layout from "~/components/Layout/HomeLayout";
