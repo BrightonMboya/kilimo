@@ -5,11 +5,15 @@
 await import("./src/env.js");
 // Injected content via Sentry wizard below
 import { withSentryConfig } from "@sentry/nextjs";
+import NextMDX from "@next/mdx"
+
+const withMDX =  NextMDX()
 
 /** @type {import("next").NextConfig} */
 
-const nextConfig = {
+const nextConfig = withMDX({
   reactStrictMode: true,
+  pageExtensions: ["js", "jsx", "mdx", "md", "ts", "tsx"],
   // hack to resolve the react email package on edge
   experimental: {
     serverComponentsExternalPackages: [
@@ -17,20 +21,6 @@ const nextConfig = {
       "@react-email/render",
       "@react-email/tailwind",
     ],
-  },
-
-  // this hack below is to get fs module to work within server components
- webpack(config) {
-   config.resolve.fallback = {
-
-      // if you miss it, all the other options in fallback, specified
-      // by next.js will be dropped.
-      ...config.resolve.fallback,  
-
-      fs: false, // the solution
-    };
-    
-    return config;
   },
 
   /**
@@ -65,8 +55,7 @@ const nextConfig = {
       },
     ],
   },
-};
-
+});
 
 const sentryConfig = {
   // For all available options, see:

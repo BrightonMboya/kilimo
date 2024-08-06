@@ -1,4 +1,4 @@
-import { getAllPosts } from "~/utils";
+import { getAllPosts } from "~/utils/functions/markdownConfig";
 import PostList from "./PostList";
 
 interface PostProps {
