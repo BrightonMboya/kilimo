@@ -11,3 +11,4 @@ export { default as CheckCircleFill } from "./check-circle-fill";
 export { default as Clipboard } from "./Clipboard";
 export { default as Download } from "./download";
 export { default as Photo } from "./photo";
+export { default as LinkedIn } from "./linkedin";
