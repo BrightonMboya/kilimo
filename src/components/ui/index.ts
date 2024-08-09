@@ -43,3 +43,4 @@ export * from "./switch";
 export * from "./link-logo";
 export * from "./max-width-wrapper";
 export * from "./drawer";
+export * from "./pagination"
