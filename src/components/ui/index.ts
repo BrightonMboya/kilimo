@@ -41,4 +41,5 @@ export * from "./badge";
 export * from "./icon-menu";
 export * from "./switch";
 export * from "./link-logo";
-export * from "./max-width-wrapper"
+export * from "./max-width-wrapper";
+export * from "./drawer";
