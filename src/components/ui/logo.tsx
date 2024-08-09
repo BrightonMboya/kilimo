@@ -18,7 +18,7 @@ export function Logo({ className }: { className?: string }) {
     //   />
     // </svg>
     <img
-    src="/static/images/jani.png"
+    src="/static/images/jani.svg"
     />
   );
 }
