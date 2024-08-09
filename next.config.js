@@ -12,7 +12,7 @@ const withMDX = NextMDX();
 
 /** @type {import("next").NextConfig} */
 
-const nextConfig = {
+const nextConfig = withMDX({
   reactStrictMode: true,
   pageExtensions: ["js", "jsx", "mdx", "md", "ts", "tsx"],
   // hack to resolve the react email package on edge
@@ -56,7 +56,7 @@ const nextConfig = {
       },
     ],
   },
-};
+});
 
  
 

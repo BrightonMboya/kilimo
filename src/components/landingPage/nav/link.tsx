@@ -14,7 +14,8 @@ export const DesktopNavLink: React.FC<Props> = ({ href, label, external }) => {
       className={cn(
         "text-sm tracking-[0.07px] text-black duration-200 hover:text-black/60",
         {
-          "text-white": href.startsWith(`/${segment}`),
+          "text-black/90 underline decoration-primary decoration-dashed underline-offset-4":
+            href.startsWith(`/${segment}`),
         },
       )}
     >

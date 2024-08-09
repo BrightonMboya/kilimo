@@ -77,13 +77,13 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
             <div className="prose sm:prose-sm md:prose-md sm:mx-6">
               <div className="m-0 mb-8 flex items-center gap-5 p-0 text-xl font-medium leading-8">
                 <Link href="/blog">
-                  <span className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent ">
+                  <span className="bg-clip-text  ">
                     Blog
                   </span>
                 </Link>
-                <span className="">/</span>
+                <span className="text-black/40">/</span>
                 <Link href={`/blog?tag=${post.tags?.at(0)}`}>
-                  <span className="bg-gradient-to-r from-white to-white/60 bg-clip-text capitalize text-transparent">
+                  <span className=" bg-clip-text capitalize">
                     {post.tags?.at(0)}
                   </span>
                 </Link>
@@ -92,12 +92,12 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
               <h1 className="not-prose blog-heading-gradient text-left text-4xl font-medium leading-[56px] tracking-tight  sm:text-5xl sm:leading-[72px]">
                 {post.title}
               </h1>
-              <p className="not-prose mt-8 text-lg font-medium leading-8  lg:text-xl">
+              <p className="not-prose mt-8 text-lg font-medium leading-8 text-black/60 lg:text-xl">
                 {post.description}
               </p>
               <div className="flex flex-row justify-stretch gap-8 sm:mt-12 md:gap-16 lg:hidden ">
                 <div className="flex h-full flex-col">
-                  <p className="">Written by</p>
+                  <p className="text-black/50">Written by</p>
                   <div className="flex h-full flex-row">
                     <Avatar className="my-auto flex items-center">
                       <AvatarImage
@@ -109,20 +109,20 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                       />
                       <AvatarFallback />
                     </Avatar>
-                    <p className="m-0 ml-2 flex items-center justify-center text-nowrap p-0 pt-2">
+                    <p className="m-0 ml-2 flex items-center justify-center text-nowrap p-0 pt-2 text-black">
                       {author?.name}
                     </p>
                   </div>
                 </div>
                 <div className="flex h-full flex-col">
                   {" "}
-                  <p className="text-nowrap text-xs">
+                  <p className="text-nowrap text-xs text-black/50">
                     Published on
                   </p>
                   <div className="mt-2 flex sm:mt-6">
                     <time
                       dateTime={post.date}
-                      className="inline-flex items-center text-nowrap"
+                      className="inline-flex items-center text-nowrap text-black"
                     >
                       {format(parseISO(post.date), "MMM dd, yyyy")}
                     </time>
@@ -130,8 +130,69 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                 </div>
               </div>
             </div>
-            <div className="prose-sm md:prose-md prose-strong:text-white/90 prose-code:text-white/80 prose-code:bg-white/10 prose-code:px-2 prose-code:py-1 prose-code:border-white/20 prose-code:rounded-md prose-pre:p-0 prose-pre:m-0 prose-pre:leading-6 mt-12 text-white/60 sm:mx-6 lg:pr-24">
+            <div className="prose-sm md:prose-md prose-strong:text-black/90 prose-code:text-black/80 prose-code:bg-white/10 prose-code:px-2 prose-code:py-1 prose-code:border-white/20 prose-code:rounded-md prose-pre:p-0 prose-pre:m-0 prose-pre:leading-6 mt-12 text-black/60 sm:mx-6 lg:pr-24">
               <MDX code={post.mdx} />
+            </div>
+          </div>
+
+          <div className="prose not-prose top-24 hidden h-full items-start gap-4 space-y-4 pt-8 lg:sticky lg:mt-12 lg:flex lg:w-1/4 lg:flex-col">
+            <div className="not-prose flex flex-col gap-4 lg:gap-2">
+              <p className="text-sm text-black">Written by</p>
+              <div className="mt-1 flex h-full flex-col gap-2 xl:flex-row">
+                <Avatar className="mr-4 h-10 w-10">
+                  <AvatarImage
+                    alt={author?.name}
+                    src={author?.image.src}
+                    width={12}
+                    height={12}
+                    className="w-full"
+                  />
+                  <AvatarFallback />
+                </Avatar>
+                <p className="my-auto text-nowrap text-black">{author?.name}</p>
+              </div>
+            </div>
+            <div className="not-prose mt-4 flex flex-col gap-4 lg:gap-2">
+              <p className="text-nowrap text-sm text-black">Published on</p>
+              <time
+                dateTime={post.date}
+                className="inline-flex h-10 items-center text-nowrap text-black/60"
+              >
+                {format(parseISO(post.date), "MMM dd, yyyy")}
+              </time>
+            </div>
+            {post.tableOfContents?.length !== 0 ? (
+              <div className="not-prose flex flex-col gap-4 lg:gap-2">
+                <p className="prose text-nowrap text-sm text-black">
+                  Contents
+                </p>
+                <ul className="relative flex flex-col gap-1 overflow-hidden">
+                  {post.tableOfContents.map((heading) => {
+                    return (
+                      <li key={`#${heading.slug}`}>
+                        <Link
+                          data-level={heading.level}
+                          className={cn({
+                            "text-md mt-4 truncate bg-clip-text  font-medium text-black/60 ":
+                              heading.level === 1 || heading.level === 2,
+                            "ml-4 truncate  bg-clip-text text-sm  leading-8 text-black/60":
+                              heading.level === 3 || heading.level === 4,
+                          })}
+                          href={`#${heading.slug}`}
+                        >
+                          {heading.text}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
+            <div className="mt-4 flex flex-col">
+              <p className="text-md pt-10 text-black">Suggested</p>
+              <div>
+                <SuggestedBlogs currentPostSlug={post.url} />
+              </div>
             </div>
           </div>
         </div>
