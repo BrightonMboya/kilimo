@@ -2,7 +2,7 @@
 title: "Understanding the Food Supply Chain"
 image: "https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGZvb2R8ZW58MHwwfDB8fHww.jpg"
 date: 2024-07-23
-description: "Hello world"
+description: "Exploring the intricacies of the food supply chain in Sub-Saharan Africa, highlighting the roles of small-scale farmers, middlemen, and agribusinesses in the process."
 author: brighton
 tags: ["food-traceability"]
 ---

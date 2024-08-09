@@ -15,7 +15,7 @@ export const authors: Authors = {
   brighton: {
     name: "Brighton Mboya",
     role: "Engineer",
-    image: { src: "/images/team/dom.jpeg" },
+    image: { src: "/static/images/team/tony.jpg" },
   },
   reggie: {
     name: "Reggie Okoko",
