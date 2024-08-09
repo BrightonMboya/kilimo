@@ -14,27 +14,17 @@ const navigation = {
     { name: "Brand", href: "/brand" },
     { name: "Changelog", href: "/changelog" },
     { name: "Customers", href: "/customers" },
-    { name: "Enterprise", href: "/enterprise" },
+    // { name: "Enterprise", href: "/enterprise" },
     { name: "Pricing", href: "/pricing" },
     { name: "Help Center", href: "/help" },
   ],
-  // compare: COMPARE_PAGES.map(({ name, slug }) => ({
-  //   name,
-  //   href: `/compare/${slug}`,
-  // })),
   legal: [
     { name: "Privacy", href: "/privacy" },
     { name: "Terms", href: "/terms" },
   ],
-  // tools: ALL_TOOLS.map(({ name, slug }) => ({
-  //   name,
-  //   href: `/tools/${slug}`,
-  // })),
 };
 
 export default function Footer() {
-
-
   return (
     <footer className="mt-[50px]">
       <MaxWidthWrapper className="relative z-10 overflow-hidden border border-b-0 border-gray-200 bg-white/50 pb-60 pt-16 backdrop-blur-lg md:rounded-t-2xl">
@@ -91,7 +81,6 @@ export default function Footer() {
                 <YouTube className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#ff0000]" />
               </a> */}
             </div>
-            {/* <StatusBadge /> */}
           </div>
           <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2">
@@ -175,60 +164,3 @@ export default function Footer() {
     </footer>
   );
 }
-
-// function StatusBadge() {
-//   const { data } = useSWR<{
-//     ongoing_incidents: {
-//       name: string;
-//       current_worst_impact:
-//         | "degraded_performance"
-//         | "partial_outage"
-//         | "full_outage";
-//     }[];
-//   }>("https://status.dub.co/api/v1/summary", fetcher);
-
-//   const [color, setColor] = useState("bg-gray-200");
-//   const [status, setStatus] = useState("Loading status...");
-
-//   useEffect(() => {
-//     if (!data) return;
-//     const { ongoing_incidents } = data;
-//     if (ongoing_incidents.length > 0) {
-//       const { current_worst_impact, name } = ongoing_incidents[0];
-//       const color =
-//         current_worst_impact === "degraded_performance"
-//           ? "bg-yellow-500"
-//           : "bg-red-500";
-//       setStatus(name);
-//       setColor(color);
-//     } else {
-//       setStatus("All systems operational");
-//       setColor("bg-green-500");
-//     }
-//   }, [data]);
-
-//   return (
-//     <Link
-//       href="https://status.dub.co"
-//       target="_blank"
-//       className="group flex max-w-fit items-center space-x-2 rounded-md border border-gray-200 bg-white px-3 py-2 transition-colors hover:bg-gray-100"
-//     >
-//       <div className="relative h-3 w-3">
-//         <div
-//           className={cn(
-//             "absolute inset-0 m-auto h-3 w-3 animate-ping items-center justify-center rounded-full group-hover:animate-none",
-//             color,
-//             status === "Loading status..." && "animate-none",
-//           )}
-//         />
-//         <div
-//           className={cn(
-//             "absolute inset-0 z-10 m-auto h-3 w-3 rounded-full",
-//             color,
-//           )}
-//         />
-//       </div>
-//       <p className="text-sm font-medium text-gray-800">{status}</p>
-//     </Link>
-//   );
-// }

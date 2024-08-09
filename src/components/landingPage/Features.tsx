@@ -1,6 +1,3 @@
-import Image from "next/image";
-
-
 export default function Features() {
   return (
     <section className=" flex flex-col items-center justify-center pb-8 pt-20 text-black lg:pb-[70px] lg:pt-[120px]">
