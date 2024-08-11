@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn } from "~/utils/utils";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import { Spinner } from "../ui/LoadingSkeleton";
 import { ControllerRenderProps } from "react-hook-form";
 import { type HarvestSchemaType } from "~/app/(app)/dashboard/[accountSlug]/harvests/_components/schema";

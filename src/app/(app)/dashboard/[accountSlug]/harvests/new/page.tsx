@@ -30,7 +30,7 @@ export default function Page() {
   const router = useRouter();
   const params = useParams();
 
-  const { mutateAsync, isLoading } = api.harvests.create.useMutation({
+  const { mutateAsync, isPending } = api.harvests.create.useMutation({
     onSuccess: () => {
       toast({
         description: "Succesfully added a new harvest",
@@ -84,7 +84,7 @@ export default function Page() {
           register={register}
           control={control}
           errors={errors}
-          isLoading={isLoading}
+          isLoading={isPending}
         />
       </form>
     </main>

@@ -16,7 +16,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { cn } from "~/utils/utils";
-import { api } from "~/utils/api";
+import { api } from "~/trpc/react";
 import { Spinner } from "~/components/ui/LoadingSkeleton";
 import { type ControllerRenderProps } from "react-hook-form";
 import { type IReportSchema } from "./schema";
