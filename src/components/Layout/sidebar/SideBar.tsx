@@ -20,7 +20,7 @@ export default function Sidebar() {
         id="header"
         className="flex items-center justify-between border-b bg-white p-4 md:hidden"
       >
-        <Link href="." title="Home" className="block h-[32px]">
+        <Link href="/" title="Home" className="block h-[32px]">
           <img src="/static/images/jani.png" alt="logo" className="h-full" />
         </Link>
         <div className="flex items-center space-x-4">

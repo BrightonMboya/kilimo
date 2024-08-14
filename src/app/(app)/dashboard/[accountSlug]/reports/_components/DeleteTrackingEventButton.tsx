@@ -52,7 +52,7 @@ export default function DeleteTrackingEventButton(props: Props) {
   });
   const { toast } = useToast();
   const utils = api.useUtils();
-  const { isLoading, mutateAsync } =
+  const { isPending, mutateAsync } =
     api.reports.deleteTrackingEvent.useMutation({
       onMutate: () => {},
       onError: (err, event, ctx) => {
@@ -123,7 +123,7 @@ export default function DeleteTrackingEventButton(props: Props) {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <LoaderButton
-                isLoading={isLoading}
+                isLoading={isPending}
                 variant="destructive"
                 type="button"
                 onClick={onSubmit}

@@ -101,7 +101,7 @@ export default function Page() {
               register={register}
               errors={errors}
               control={control}
-              isLoading={editHarvestRouter.isLoading}
+              isLoading={editHarvestRouter.isPending}
             />
           </form>
         </main>

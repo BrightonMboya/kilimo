@@ -28,7 +28,7 @@ export default function Page() {
   const { toast } = useToast();
   console.log(errors);
 
-  const { isLoading, mutateAsync } = api.reports.edit.useMutation({
+  const { isPending, mutateAsync } = api.reports.edit.useMutation({
     onSuccess: () => {
       toast({
         description: "Report edited succesfully",
@@ -83,7 +83,7 @@ export default function Page() {
         errors={errors}
         reportId={reportId!}
         onSubmit={onSubmit}
-        isMutating={isLoading}
+        isMutating={isPending}
       />
     </form>
   );

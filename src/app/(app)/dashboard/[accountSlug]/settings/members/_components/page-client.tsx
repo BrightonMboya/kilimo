@@ -168,7 +168,7 @@ const InvitationUsers = ({ user, isOwner }: any) => {
   const utils = api.useUtils();
   const { toast } = useToast();
 
-  const { isLoading, mutateAsync } = api.workspace.deleteInvite.useMutation({
+  const { isPending, mutateAsync } = api.workspace.deleteInvite.useMutation({
     onSuccess: () => {
       toast({
         description: "Team member deleted succesfully",
@@ -224,7 +224,7 @@ const InvitationUsers = ({ user, isOwner }: any) => {
           variant="danger"
           text="Remove Team Member"
           className="w-[200px]"
-          loading={isLoading}
+          loading={isPending}
           onClick={DeleteInvite}
           type="button"
         />
