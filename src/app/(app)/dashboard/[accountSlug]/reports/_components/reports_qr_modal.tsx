@@ -82,7 +82,7 @@ export function QRCodePicker({
       //     qr: "1",
       //   },
       // }),
-      value: `https://www.jani-ai.com/qr?reportId=${props.report_id}`,
+      value: `https://www.jani-ai.com/reports?reportId=${props.report_id}`,
       bgColor: "#ffffff",
       fgColor,
       size: 1024,

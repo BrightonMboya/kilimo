@@ -1,9 +1,9 @@
-import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import { createTRPCRouter, publicProcedure } from "../../trpc";
 import { z } from "zod";
 import { NOT_FOUND_ERROR } from "~/utils/constants";
 
 export const fetchById = createTRPCRouter({
-  fetchById: protectedProcedure
+  fetchById: publicProcedure
     .input(z.object({ reportId: z.string(), workspaceSlug: z.string() }))
     .query(async ({ ctx, input }) => {
       const workspace = await ctx.db.project.findUnique({
