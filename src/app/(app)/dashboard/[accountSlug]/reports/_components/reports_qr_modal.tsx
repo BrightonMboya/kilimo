@@ -199,7 +199,7 @@ export function QRCodePicker({
                 onClick={() => {
                   // here we copy the qr code link which will point out to the specified page
                   navigator.clipboard.writeText(
-                    `https://jani-ai.com/qr?reportId=${props.report_id}`,
+                    `https://jani-ai.com/reports?reportId=${props.report_id}`,
                   );
                   https: toast({
                     description: "Copied QR code URL to clipboard!",

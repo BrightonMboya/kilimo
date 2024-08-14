@@ -136,7 +136,7 @@ export const columns: ColumnDef<ReportsTableData>[] = [
             });
           },
         });
-      const { mutateAsync, isLoading } = api.reports.delete.useMutation({
+      const { mutateAsync, isPending } = api.reports.delete.useMutation({
         onSuccess: () => {
           toast({
             description: "Report deleted succesfully",
@@ -245,11 +245,11 @@ export const columns: ColumnDef<ReportsTableData>[] = [
                     workspaceSlug: params.accountSlug as unknown as string,
                   });
                 }}
-                disabled={isLoading}
+                disabled={isPending}
               >
                 <Button
                   variant="destructive"
-                  disabled={isLoading}
+                  disabled={isPending}
                   type="button"
                 >
                   Delete this report

@@ -104,7 +104,7 @@ export default function Page({ params }: { params: { farmersId: string } }) {
             errors={errors}
             onSubmit={onSubmit}
             handleSubmit={handleSubmit}
-            isLoading={editFarmerRouter.isLoading}
+            isLoading={editFarmerRouter.isPending}
           />
         </main>
       )}

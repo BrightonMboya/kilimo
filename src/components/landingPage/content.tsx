@@ -1,57 +1,34 @@
-// import {
-//   Blog,
-//   Book2,
-//   BulletList,
-//   ChartLine,
-//   Code,
-//   Go,
-//   Headset,
-//   HexadecagonStar,
-//   Hyperlink,
-//   OfficeBuilding,
-//   Paintbrush,
-//   Prisma,
-//   Python,
-//   QRCode,
-//   Raycast,
-//   Ruby,
-//   Stars2,
-//   Tinybird,
-//   Typescript,
-//   Users,
-//   WindowSettings,
-// } from "./icons";
 
 export const FEATURES_LIST = [
   {
     title: "Farmer Management",
     description: "Manage records for your farmers",
     // icon: ChartLine,
-    href: "/features/analytics",
+    href: "#",
   },
   {
     title: "Traceability Reports",
     description: "Reports that map out your supply chain",
     // icon: Hyperlink,
-    href: "/features/branded-links",
+    href: "#",
   },
   {
     title: "QR Codes",
     description: "Gorgeous QR codes for your traceability reports",
     // icon: QRCode,
-    href: "/features/qr-codes",
+    href: "#",
   },
   {
     title: "Personalization",
     description: "Personalize Your Reports",
     // icon: Paintbrush,
-    href: "/features/personalization",
+    href: "#",
   },
   {
     title: "Collaboration",
     description: "Collaborate With Your Team",
     // icon: Users,
-    href: "/features/collaboration",
+    href: "#",
   },
   
 ];
@@ -60,75 +37,16 @@ export const CUSTOMER_STORIES = [
   {
     // icon: Raycast,
     iconClassName: "group-hover:text-[#FF6363]",
-    title: "Raycast",
+    title: "Nestle",
     description:
-      "How Raycast added link-sharing features to Ray.so with Dub.co's link infrastructure",
+      "How Nestle tracks their resources from remote farmers in Ivory Coast",
     href: "/customers/raycast",
   },
-  {
-    // icon: Tinybird,
-    iconClassName: "group-hover:text-[#268472]",
-    title: "Tinybird",
-    description:
-      "How Tinybird uses Dub.co to enhance their digital marketing strategies",
-    href: "/customers/tinybird",
-  },
-  {
-    // icon: Prisma,
-    iconClassName: "group-hover:text-[#4C51BF]",
-    title: "Prisma",
-    description: "How Prisma uses Dub.co to improve insights for pris.ly links",
-    href: "/customers/prisma",
-  },
+  
 ];
 
-export const PROFILES = [
-  {
-    // icon: Code,
-    title: "Developers",
-    description: "API for efficient link management",
-    href: "/docs/introduction",
-  },
-  {
-    // icon: OfficeBuilding,
-    title: "Enterprise",
-    description: "Scalable link management solutions",
-    href: "/enterprise",
-  },
-];
 
-export const SDKS = [
-  {
-    // icon: Typescript,
-    iconClassName: "py-0.5 group-hover:text-[#3178C6]",
-    title: "Typescript",
-    // href: "/solutions/typescript",
-    href: "/docs/quickstart/typescript",
-  },
-  {
-    // icon: Python,
-    iconClassName:
-      "py-0.5 [&_.snake]:transition-colors group-hover:[&_.snake1]:text-[#3776ab] group-hover:[&_.snake2]:text-[#ffd343]",
-    title: "Python",
-    // href: "/solutions/python",
-    href: "/docs/quickstart/python",
-  },
-  {
-    // icon: Go,
-    iconClassName: "group-hover:text-[#00ACD7]",
-    title: "Go",
-    // href: "/solutions/go",
-    href: "/docs/quickstart/go",
-  },
-  {
-    // icon: Ruby,
-    iconClassName:
-      "py-[3px] grayscale brightness-150 transition-[filter] group-hover:grayscale-0 group-hover:brightness-100",
-    title: "Ruby",
-    // href: "/solutions/ruby",
-    href: "/docs/quickstart/ruby",
-  },
-];
+
 
 export const RESOURCES = [
   {

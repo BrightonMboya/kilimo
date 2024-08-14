@@ -37,7 +37,7 @@ export default function DeleteFarmerButton({ farmerId }: { farmerId: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
   const utils = api.useUtils();
-  const { mutateAsync, isLoading } = api.harvests.delete.useMutation({
+  const { mutateAsync, isPending } = api.harvests.delete.useMutation({
     onSuccess: () => {
       toast({
         title: "Success",
@@ -112,7 +112,7 @@ export default function DeleteFarmerButton({ farmerId }: { farmerId: string }) {
 
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <LoaderButton isLoading={isLoading} variant="destructive">
+              <LoaderButton isLoading={isPending} variant="destructive">
                 Delete
               </LoaderButton>
             </AlertDialogFooter>

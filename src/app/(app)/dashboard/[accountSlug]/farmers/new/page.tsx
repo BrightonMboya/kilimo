@@ -30,7 +30,7 @@ export default function Page() {
   } = useForm<ValidationSchema>({ resolver: zodResolver(farmersSchema) });
   const utils = api.useUtils();
 
-  const { isLoading, mutateAsync } = api.farmers.addFarmer.useMutation({
+  const { isPending, mutateAsync } = api.farmers.addFarmer.useMutation({
     onSuccess: () => {
       toast({
         description: "Farmer added succesfully",
@@ -104,7 +104,7 @@ export default function Page() {
         register={register}
         onSubmit={onSubmit}
         errors={errors}
-        isLoading={isLoading}
+        isLoading={isPending}
       />
     </main>
   );

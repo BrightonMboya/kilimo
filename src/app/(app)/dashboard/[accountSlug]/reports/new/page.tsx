@@ -24,7 +24,7 @@ export default function Page() {
   const utils = api.useUtils();
   const router = useRouter();
   const params = useParams();
-  const { mutateAsync, isLoading, isError } = api.reports.add.useMutation({
+  const { mutateAsync, isPending, isError } = api.reports.add.useMutation({
     onSuccess: () => {
       toast({
         title: "Report added",
@@ -50,7 +50,7 @@ export default function Page() {
   const onSubmit: SubmitHandler<IReportSchema> = async (
     data: IReportSchema,
   ) => {
-    console.log("I am submitting the report")
+    console.log("I am submitting the report");
     try {
       mutateAsync({
         ...data,
@@ -68,7 +68,7 @@ export default function Page() {
         register={register}
         control={control}
         errors={errors}
-        isLoading={isLoading}
+        isLoading={isPending}
       />
     </form>
   );

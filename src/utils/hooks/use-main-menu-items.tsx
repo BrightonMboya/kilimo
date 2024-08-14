@@ -40,12 +40,12 @@ export function useMainMenuItems({ accountSlug }: { accountSlug: string }) {
       label: "Settings",
       end: true,
     },
-    {
-      icon: <Icon icon="scanQR" />,
-      to: "scanner",
-      label: "Billing",
-      end: true,
-    },
+    // {
+    //   icon: <Icon icon="scanQR" />,
+    //   to:  `/dashboard/${accountSlug}/billing`,
+    //   label: "Billing",
+    //   end: true,
+    // },
   ];
   const menuItemsBottom = [
     {
