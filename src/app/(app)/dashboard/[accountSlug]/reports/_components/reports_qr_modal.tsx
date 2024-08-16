@@ -27,7 +27,6 @@ import {
   useState,
 } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-// import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { useToast } from "~/utils/hooks";
 
@@ -72,6 +71,9 @@ export function QRCodePicker({
 
   const [showLogo, setShowLogo] = useState(true);
   const [fgColor, setFgColor] = useState("#000000");
+   const params = useParams();
+
+
 
   const qrData = useMemo(
     () => ({
@@ -82,7 +84,7 @@ export function QRCodePicker({
       //     qr: "1",
       //   },
       // }),
-      value: `https://www.jani-ai.com/reports?reportId=${props.report_id}`,
+      value: `https://www.jani-ai.com/reports?reportId=${props.report_id}&workspaceSlug=${params.accountSlug as unknown as string}`,
       bgColor: "#ffffff",
       fgColor,
       size: 1024,
@@ -117,7 +119,6 @@ export function QRCodePicker({
   };
   const [copiedURL, setCopiedURL] = useState(false);
   const { toast } = useToast();
-
   return (
     <>
       <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
@@ -199,7 +200,7 @@ export function QRCodePicker({
                 onClick={() => {
                   // here we copy the qr code link which will point out to the specified page
                   navigator.clipboard.writeText(
-                    `https://jani-ai.com/reports?reportId=${props.report_id}`,
+                    `https://jani-ai.com/reports?reportId=${props.report_id}&workspaceSlug=${params.accountSlug as unknown as string}`,
                   );
                   https: toast({
                     description: "Copied QR code URL to clipboard!",
@@ -294,7 +295,7 @@ function AdvancedSettings({
   // setShowLogo,
   // setShowReportQRModal,
 }: any) {
-  const { slug } = useParams() as { slug?: string };
+
   const [expanded, setExpanded] = useState(false);
 
   const debouncedSetFgColor = useDebouncedCallback((color) => {
