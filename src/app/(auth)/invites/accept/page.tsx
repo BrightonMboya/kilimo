@@ -23,7 +23,7 @@ export default function Page() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const { mutateAsync, isLoading } = api.workspace.acceptInvite.useMutation({
+  const { mutateAsync, isPending } = api.workspace.acceptInvite.useMutation({
     onError: (error) => {
       toast({ description: error.message, variant: "destructive" });
     },
@@ -58,7 +58,7 @@ export default function Page() {
         title="Verifying Invite"
         message={`${process.env.NEXT_PUBLIC_APP_NAME} is verifying your invite link...`}
       />
-      {isLoading && <LoadingSpinner className="h-7 w-7" />}
+      {isPending && <LoadingSpinner className="h-7 w-7" />}
     </div>
   );
 }
