@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import PDFReport from "../../dashboard/[accountSlug]/reports/_components/PDFReport";
 import { useToast } from "~/utils/hooks";
 
-export default function ReportViewPage() {
+export default function ReportInfo() {
   const searchParams = useSearchParams();
   const reportId = searchParams.get("reportId");
   const workspaceSlug = searchParams.get("workspaceSlug");
