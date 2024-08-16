@@ -33,7 +33,7 @@ function InviteTeammateModal({
   const [email, setEmail] = useState("");
   const { isMobile } = useMediaQuery();
   const utils = api.useUtils();
-  const { isLoading, mutateAsync } = api.workspace.sendInvite.useMutation({
+  const { isPending, mutateAsync } = api.workspace.sendInvite.useMutation({
     onSuccess: () => {
       toast({
         description: "Invite sent out succesfully",
@@ -120,7 +120,7 @@ function InviteTeammateModal({
           </div>
         </div>
         <Button
-          loading={isLoading}
+          loading={isPending}
           text="Send invite"
           type="button"
           onClick={submitHandler}

@@ -20,7 +20,7 @@ export default function Index() {
     resolver: zodResolver(equipmentSchema),
   });
 
-  const { isLoading, mutateAsync } = api.equipments.create.useMutation({
+  const { isPending, mutateAsync } = api.equipments.create.useMutation({
     onSuccess: () => {
       toast({
         description: "New Equipment Added Succesfully",
@@ -51,7 +51,7 @@ export default function Index() {
           register={register}
           errors={errors}
         />
-        <Button disabled={isLoading}>Save</Button>
+        <Button disabled={isPending}>Save</Button>
       </form>
     </main>
   );
