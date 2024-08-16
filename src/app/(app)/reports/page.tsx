@@ -1,6 +1,7 @@
 import React from "react";
-import ReportViewPage from "../dashboard/[accountSlug]/reports/view/_components/ReportViewPage";
+import ReportInfo from "./_components/ReportInfo";
+
 
 export default function Page() {
-  return <ReportViewPage />;
+  return <ReportInfo/>;
 }
