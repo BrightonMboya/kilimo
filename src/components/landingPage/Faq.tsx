@@ -9,7 +9,7 @@ export default function Faq() {
                 FAQ
               </span>
               <h2 className="mb-3 text-3xl font-bold leading-[1.2] text-black sm:text-4xl md:text-[40px]">
-                Any Questions? Look Here
+                Any Questions? Contact Us
               </h2>
             </div>
           </div>
@@ -31,10 +31,10 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold  sm:text-2xl lg:text-xl xl:text-2xl">
-                  What is Jani AI
+                  What is JANI AI
                 </h3>
                 <p className=" text-base lg:text-lg">
-                  Jani helps agribusinesses track their resources across the
+                  JANI AI helps agribusinesses track their resources across the
                   supply chain, generate reports easily, as well as record
                   keeping management.
                 </p>
@@ -58,8 +58,8 @@ export default function Faq() {
                   Why Open Source
                 </h3>
                 <p className=" text-base lg:text-lg">
-                  We believe that data and custom workflows is crucial to the
-                  success of any businesses. Jani allows businesses to fork the
+                  We believe that data and custom workflows are crucial to the
+                  the success of any business. JANI allows businesses to fork the
                   repo so that they can build their custom workflow and features
                   on top of our existing features.
                 </p>
@@ -85,9 +85,8 @@ export default function Faq() {
                   Why you should care
                 </h3>
                 <p className=" text-base lg:text-lg">
-                  We are what we eat. Giving the transparency to your clients on
-                  what processes and input goes to the food the buy will not
-                  only increase loyalty and trust but also increase your brand
+                  We are what we eat. Giving transparency to your clients on
+                  what processes and input go into the food they buy will increase loyalty, trust, and your brand
                   value.
                 </p>
               </div>
@@ -107,11 +106,11 @@ export default function Faq() {
               </div>
               <div className="w-full">
                 <h3 className="text-dark mb-4 text-xl font-semibold sm:text-2xl lg:text-xl xl:text-2xl">
-                  How can I self host?
+                  How can I self-host?
                 </h3>
                 <p className=" text-base lg:text-lg">
-                  With each software created, comes with a dedicated manual on
-                  how you can self host. Also, we gurantee 99% uptime for all
+                  Each software created comes with a dedicated manual on
+                  how you can self-host. JANI AI guarantees 99% uptime for all
                   the software shipped so that you can keep on focusing on your
                   business operations.
                 </p>
