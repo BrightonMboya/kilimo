@@ -14,12 +14,12 @@ export default function About() {
                   Manage your Agribusiness the Smart Way.
                 </h2>
                 <p className="text-body-color  mb-10 text-base leading-relaxed lg:text-lg">
-                  Recording your company data in excel sheet doesnt scale well
-                  enough and soon you will be having bunches of excel sheet that
+                  Recording your company data in an Excel sheet doesn't scale well
+                  enough and soon you will have Excel sheets that
                   is hard to keep track of.
                   <br />
                   <br />
-                  At Jani, we cover that for you and you can focus on the core
+                  At JANI, we cover that for you and you can focus on the core
                   operations of your business to increase revenue and growth.
                 </p>
 
@@ -58,7 +58,7 @@ export default function About() {
                         50
                       </span>
                       <span className="block text-base font-semibold text-white">
-                        Businesses using Jani
+                        Businesses using JANI AI
                       </span>
                       {/* <span className="block text-base font-medium text-white text-opacity-70">
                         fancy stat
