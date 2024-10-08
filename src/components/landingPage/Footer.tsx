@@ -37,7 +37,7 @@ export default function Footer() {
               <Logo />
             </Link>
             <p className="max-w-xs text-sm text-gray-500">
-              A modern way to track food from farm all the way to the fork,
+              A modern way to track food from farm to the fork,
               giving customers transparency and digitizing the supply chain.
             </p>
             <p className="text-sm leading-5 text-gray-400">
@@ -71,21 +71,21 @@ export default function Footer() {
                 <span className="sr-only">LinkedIn</span>
                 <LinkedIn className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#0077b5]" />
               </a>
-              {/* <a
-                href=""
+              {<a
+                href="https://www.linkedin.com/company/jani-ai/"
                 target="_blank"
                 rel="noreferrer"
                 className="group rounded-full border border-gray-200 p-2 transition-colors hover:bg-gray-100"
-              >
-                <span className="sr-only">YouTube</span>
+              >  
+                <span /* className="sr-only">YouTube</span>
                 <YouTube className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#ff0000]" />
-              </a> */}
+              </a> }
             </div>
           </div>
           <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2">
               <div>
-                <h3 className="text-sm font-semibold text-gray-800">
+                <h3 className="text-sm font-semibold text-gray-800"> */
                   Features
                 </h3>
                 <ul role="list" className="mt-4 space-y-4">
