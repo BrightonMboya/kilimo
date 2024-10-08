@@ -11,18 +11,18 @@ export default function Index() {
                 <h2 className="mb-2.5 text-3xl font-bold text-white md:text-[38px] md:leading-[1.44]">
                   <span>What Are You Waiting For? </span>
                   <span className="text-3xl font-normal md:text-[40px]">
-                    Get Started Now
+                    Start your JANI Now!
                   </span>
                 </h2>
                 <p className="mx-auto mb-6 max-w-[515px] text-wrap text-base leading-[1.5] text-white lg:max-w-none lg:text-xl">
-                  Go ahead and provide the best value to your clients with Jani.
+                  Go ahead and provide the best value to your clients with JANI AI.
                   Trace your resources from farm to fork, easily generate
                   reports for stakeholders, and provide transparency to your
                   clients.
                 </p>
                 <Link href="https://cal.com/brightonmboya/15min">
                   <p className="inline-block rounded-md border border-transparent bg-secondary px-7 py-3 text-base font-medium text-white transition">
-                    Start using Jani AI today
+                    Start using JANI AI today
                   </p>
                 </Link>
               </div>
