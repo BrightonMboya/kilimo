@@ -41,7 +41,7 @@ export default function Footer() {
               giving customers transparency and digitizing the supply chain.
             </p>
             <p className="text-sm leading-5 text-gray-400">
-              © {new Date().getFullYear()} Jani AI.
+              © {new Date().getFullYear()} JANI AI.
             </p>
             <div className="flex items-center space-x-3">
               {/* <a
