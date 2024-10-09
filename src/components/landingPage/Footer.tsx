@@ -37,7 +37,7 @@ export default function Footer() {
               <Logo />
             </Link>
             <p className="max-w-xs text-sm text-gray-500">
-              A modern way to track food from farm to the fork,
+             JANI AI is a modern way to track food from farm to fork,
               giving customers transparency and digitizing the supply chain.
             </p>
             <p className="text-sm leading-5 text-gray-400">
@@ -63,7 +63,7 @@ export default function Footer() {
                 <Github className="h-4 w-4 text-gray-600 transition-colors group-hover:text-black" />
               </a>
               <a
-                href="#"
+                href="www.linkedin.com/company/jani-ai"
                 target="_blank"
                 rel="noreferrer"
                 className="group rounded-full border border-gray-200 p-2 transition-colors hover:bg-gray-100"
@@ -71,13 +71,13 @@ export default function Footer() {
                 <span className="sr-only">LinkedIn</span>
                 <LinkedIn className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#0077b5]" />
               </a>
-              {<a
-                href="https://www.linkedin.com/company/jani-ai/"
+              {<a /* 
+                href="#"
                 target="_blank"
                 rel="noreferrer"
                 className="group rounded-full border border-gray-200 p-2 transition-colors hover:bg-gray-100"
               >  
-                <span /* className="sr-only">YouTube</span>
+                <span  className="sr-only">YouTube</span>
                 <YouTube className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#ff0000]" />
               </a> }
             </div>
