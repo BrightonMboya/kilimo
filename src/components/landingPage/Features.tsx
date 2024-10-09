@@ -42,8 +42,8 @@ export default function Features() {
                 Tailored to your workflow
               </h4>
               <p className="mb-8 text-lg lg:mb-9 ">
-                We have designed Jani to fit perfectly with your workflow so
-                that you can easily integrate it within your organization.
+                We have designed JANI AI to fit perfectly with your workflow so
+                that you can easily integrate within your organization.
               </p>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function Features() {
                 Own Your Data
               </h4>
               <p className="mb-8 text-lg lg:mb-9 ">
-                With Jani you can chose to self host your data as it is open
+                With JANI AI you can choose to self-host your data as it is open
                 source.
               </p>
             </div>
@@ -164,8 +164,8 @@ export default function Features() {
                 Open Sourced
               </h4>
               <p className="mb-8 text-lg lg:mb-9 ">
-                Jani AI is Open Sourced allowing anyone to contribute to the
-                software and also self host.
+                JANI AI is Open Sourced allowing anyone to contribute to the
+                software and also self-host.
               </p>
             </div>
           </div>
