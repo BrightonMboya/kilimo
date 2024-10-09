@@ -12,7 +12,7 @@ export default function HeroSection() {
               <div className="w-full px-4">
                 <div className="px-5 text-black">
                   <h1 className="text-balance text-3xl font-extrabold tracking-tight md:text-5xl lg:text-7xl ">
-                    Helping AgriBusinesses{" "}
+                    Helping Exporters{" "}
                     <span className="underline decoration-primary decoration-dashed underline-offset-4">
                       track resources
                     </span>{" "}
@@ -20,7 +20,7 @@ export default function HeroSection() {
                   </h1>
 
                   <p className="mx-auto mb-9 pt-5 text-xl font-medium sm:text-lg md:text-2xl lg:pt-7">
-                    Track your resources from the farm all the way up to the
+                    JANI AI Tracks your resources from the farm up to the
                     fork. Give your clients more observability and traceability
                     to increase trust and transparency.
                   </p>
@@ -39,7 +39,7 @@ export default function HeroSection() {
                           size="lg"
                           variant="outline"
                         >
-                          Get Started
+                          Start Your JANI
                         </Button>
                       </Link>
                     </li>
