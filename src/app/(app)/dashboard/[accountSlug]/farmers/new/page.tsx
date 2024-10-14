@@ -44,14 +44,14 @@ export default function Page() {
       const prevData = utils.farmers.fetchByOrganization.getData();
 
       // set the data to include the new added one
-      utils.farmers.fetchByOrganization.setData(
-        { workspaceSlug: params.accountSlug as unknown as string },
-        (old) => [
-          // @ts-ignore
-          ...old,
-          data,
-        ],
-      );
+      // utils.farmers.fetchByOrganization.setData(
+      //   { workspaceSlug: params.accountSlug as unknown as string },
+      //   (old) => [
+      //     // @ts-ignore
+      //     ...old,
+      //     data,
+      //   ],
+      // );
       return { prevData };
     },
     onSettled: () => {

@@ -26,6 +26,7 @@ const farmers = createTRPCRouter({
         },
       });
       try {
+
         return await ctx.db.farmers.create({
           data: {
             fullName: input.fullName,

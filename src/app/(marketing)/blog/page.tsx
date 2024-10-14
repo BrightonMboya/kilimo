@@ -12,10 +12,10 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Blog | Jani AI",
-  description: "Latest blog posts and news from Jani AI team.",
+  description: "Latest blog posts and news from JANI AI team.",
   openGraph: {
     title: "Blog | Jani AI",
-    description: "Latest blog posts and news from Jani AI team.",
+    description: "Latest blog posts and news from JANI AI team.",
     url: "https://jani-ai.com/blogs",
     siteName: "unkey.com",
     images: [
