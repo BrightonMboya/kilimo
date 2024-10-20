@@ -2,11 +2,11 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
-await import("./src/env.js");
+// await import("./src/env.js");
 // Injected content via Sentry wizard below
-import { withSentryConfig } from "@sentry/nextjs";
-import NextMDX from "@next/mdx";
-import { withContentCollections } from "@content-collections/next";
+const { withSentryConfig } = require("@sentry/nextjs");
+const NextMDX = require("@next/mdx")
+const { withContentCollections } = require("@content-collections/next");
 
 const withMDX = NextMDX();
 
@@ -96,5 +96,6 @@ const sentryConfig = {
   automaticVercelMonitors: true,
 };
 
-// export default withContentCollections(withSentryConfig(nextConfig, sentryConfig))
-export default withSentryConfig(nextConfig, sentryConfig);
+module.exports = withContentCollections(
+  withSentryConfig(nextConfig, sentryConfig),
+);
