@@ -13,6 +13,7 @@ import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import styles from "~/components/landingPage/gradient.module.css"
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({
@@ -74,7 +75,7 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
       <div className="container mx-auto scroll-smooth pt-48 sm:overflow-hidden md:overflow-visible ">
         <div className="flex w-full flex-row">
           <div className="flex w-full flex-col lg:w-3/4">
-            <div className="prose sm:prose-sm md:prose-md sm:mx-6">
+            <div className={`prose sm:prose-sm md:prose-md sm:mx-6 ${styles["gradient"]}`}>
               <div className="m-0 mb-8 flex items-center gap-5 p-0 text-xl font-medium leading-8">
                 <Link href="/blog">
                   <span className="bg-clip-text  ">
@@ -88,10 +89,7 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                   </span>
                 </Link>
               </div>
-
-              <h1 className="not-prose blog-heading-gradient text-left text-4xl font-medium leading-[56px] tracking-tight  sm:text-5xl sm:leading-[72px]">
-                {post.title}
-              </h1>
+              <h1 className="text-balance text-3xl font-bold tracking-tight md:text-4xl lg:text-6xl blog-heading-gradient">{post.title}</h1>
               <p className="not-prose mt-8 text-lg font-medium leading-8 text-black/60 lg:text-xl">
                 {post.description}
               </p>

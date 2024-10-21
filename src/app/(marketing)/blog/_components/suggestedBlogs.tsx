@@ -36,8 +36,8 @@ export function SuggestedBlogs({
                     height={400}
                   />
                 </Frame>
-                <p className="text-white">{post?.title}</p>
-                <p className="text-sm text-white/50">
+                <p className="">{post?.title}</p>
+                <p className="text-sm ">
                   {format(new Date(post?.date!), "MMM dd, yyyy")}
                 </p>
               </div>

@@ -44,31 +44,31 @@ export const MdxComponents = {
   h1: (props: any) => (
     <h2
       {...props}
-      className="blog-heading-gradient scroll-mt-20 pt-5 text-2xl font-medium leading-8 text-black/60"
+      className=" scroll-mt-20 pt-5 text-2xl lg:text-4xl font-extrabold leading-8 text-primary"
     />
   ),
   h2: (props: any) => (
     <h2
       {...props}
-      className="blog-heading-gradient scroll-mt-20 pt-5 text-2xl font-medium leading-8 text-black/60"
+      className=" scroll-mt-20 pt-5 text-2xl lg:text-3xl font-bold leading-8 text-primary "
     />
   ),
   h3: (props: any) => (
     <h3
       {...props}
-      className="blog-heading-gradient scroll-mt-20 pt-5 text-xl font-medium leading-8 text-black/60"
+      className=" scroll-mt-20 pt-5 text-xl font-medium leading-8 text-black/60"
     />
   ),
   h4: (props: any) => (
     <h4
       {...props}
-      className="blog-heading-gradient text-lg font-medium leading-8 text-black/60"
+      className=" text-lg font-medium leading-8 text-black/60"
     />
   ),
   p: (props: any) => (
     <p
       {...props}
-      className="text-left text-lg font-normal leading-8 text-black/60 pt-5"
+      className="text-left text-lg font-normal leading-8 text-black/90 pt-5"
     />
   ),
   code: (props: any) => (
@@ -77,8 +77,7 @@ export const MdxComponents = {
       {...props}
     />
   ),
-  // pre: (props: any) => <BlogCodeBlockSingle {...props} />,
-  // BlogCodeBlock,
+  
 };
 
 interface MDXProps {

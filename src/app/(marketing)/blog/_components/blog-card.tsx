@@ -27,8 +27,9 @@ export function BlogCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-3xl border border-transparent p-3 duration-150 ease-out hover:border-neutral-900 hover:bg-neutral-950 max-sm:h-full",
+        "flex flex-col rounded-3xl border border-transparent p-3 duration-150 ease-out max-sm:h-full hover:bg-gray-100 border-gray-100",
         className,
+         
       )}
     >
       <div className="w-full rounded-2xl bg-clip-border">
@@ -46,10 +47,10 @@ export function BlogCard({
         </Frame>
       </div>
       <div className="flex h-full flex-col px-1">
-        <div className="flex h-80 flex-col pb-2 pt-6">
-          <div className="flex-inline flex h-6 flex-wrap gap-4">
+        <div className="flex h-80 flex-col pb-2 pt-3">
+          <div className="flex-inline flex h-6 flex-wrap gap-2">
             {tags?.map((tag) => (
-              <div className="content-center rounded-md bg-white/10 px-[9px] text-sm text-white/50">
+              <div className="content-center rounded-md px-[9px] text-sm bg-primary/90 text-white/80">
                 {tag.charAt(0).toUpperCase() + tag.slice(1)}
               </div>
             ))}
@@ -58,7 +59,7 @@ export function BlogCard({
             {title}
           </h2>
 
-          <p className="mt-6 h-full text-base font-normal leading-6 text-white/60 sm:text-sm">
+          <p className="mt-6 h-full text-base font-normal leading-6 sm:text-sm">
             {subTitle}
           </p>
           {/* Todo: Needs ability to add multiple authors at some point */}
@@ -73,10 +74,10 @@ export function BlogCard({
                 />
                 <AvatarFallback />
               </Avatar>
-              <p className="ml-4 pt-3 text-sm font-medium text-white">
+              <p className="ml-4 pt-3 text-sm font-medium">
                 {author.name}
               </p>
-              <p className="ml-6 pt-3 text-sm font-normal text-white/50">
+              <p className="ml-6 pt-3 text-sm font-normal">
                 {format(new Date(publishDate!), "MMM dd, yyyy")}
               </p>
             </div>

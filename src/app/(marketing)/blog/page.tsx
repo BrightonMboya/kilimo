@@ -17,7 +17,7 @@ export const metadata = {
     title: "Blog | Jani AI",
     description: "Latest blog posts and news from JANI AI team.",
     url: "https://jani-ai.com/blogs",
-    siteName: "unkey.com",
+    siteName: "jani-ai.com",
     images: [
       {
         url: "",
