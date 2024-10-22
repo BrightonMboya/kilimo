@@ -90,9 +90,9 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                 </Link>
               </div>
               <h1 className="text-balance text-3xl font-bold tracking-tight md:text-4xl lg:text-6xl blog-heading-gradient">{post.title}</h1>
-              <p className="not-prose mt-8 text-lg font-medium leading-8 text-black/60 lg:text-xl">
+              {/* <p className="not-prose mt-8 text-lg font-medium leading-8 text-black/60 lg:text-xl">
                 {post.description}
-              </p>
+              </p> */}
               <div className="flex flex-row justify-stretch gap-8 sm:mt-12 md:gap-16 lg:hidden ">
                 <div className="flex h-full flex-col">
                   <p className="text-black/50">Written by</p>
