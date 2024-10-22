@@ -40,7 +40,8 @@ export function generateMetadata({
       siteName: "jani-ai.com",
       type: "article",
       images: {
-        url: `https://jani-ai.com${post.image}`,
+        // url: `https://jani-ai.com${post.image}`,
+        url: `${post.image}`,
         width: 1200,
         height: 800,
       },
