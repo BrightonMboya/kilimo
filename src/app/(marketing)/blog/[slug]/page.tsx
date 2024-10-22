@@ -32,6 +32,7 @@ export function generateMetadata({
   return {
     title: `${post.title} | Jani AI`,
     description: post.description,
+  
 
     openGraph: {
       title: `${post.title} | Jani AI`,
@@ -57,7 +58,8 @@ export function generateMetadata({
       site: "@jani-ai",
       creator: "@jani-ai",
       images: {
-        url: `https://jani-ai.com${post.image}`,
+        // url: `https://jani-ai.com${post.image}`,
+        url: `${post.image}`,
         width: 1200,
         height: 800,
       },
