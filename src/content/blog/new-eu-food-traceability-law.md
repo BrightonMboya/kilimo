@@ -32,7 +32,7 @@ Compliance with these regulations is not just about following rules – it's abo
 
 ## Real-World Impact
 
-The importance of these regulations becomes clear when we look at real-world scenarios. For instance, in 2004, a dioxin contamination in potato peels used for animal feed was quickly traced and contained thanks to the EU's traceability system. This prevented contaminated products from reaching consumers and minimized trade disruptions.
+The importance of these regulations becomes clear when we look at real-world scenarios. For instance, in 2004, a [dioxin contamination in potato peels] (https://www.foodnavigator.com/Article/2004/11/08/Dioxin-scare-highlights-value-of-EU-tracking-system) used for animal feed was quickly traced and contained thanks to the EU's traceability system. This prevented contaminated products from reaching consumers and minimized trade disruptions.
 
 ## How JANI AI Can Help
 

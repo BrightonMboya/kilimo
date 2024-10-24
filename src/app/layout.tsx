@@ -8,6 +8,7 @@ import { TooltipProvider } from "~/components/ui";
 import { Toaster } from "sonner";
 import { Toaster as ShadToaster } from "~/components/ui";
 import ModalProvider from "~/components/auth/workspaces/WorskpaceModalProvider";
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body className={`${GeistSans.className} font-sans`}>
         {/* <Toaster closeButton className="pointer-events-auto" />  */}
         <Toaster />
+        <Analytics/>
         {/* <ShadToaster /> */}
         <TRPCReactProvider headers={headers()}>
           <ModalProvider>{children}</ModalProvider>

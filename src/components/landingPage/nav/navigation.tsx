@@ -1,7 +1,6 @@
 "use client";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
@@ -9,7 +8,7 @@ import {
   Logo,
 } from "~/components/ui";
 import { cn } from "~/utils";
-import { motion, useAnimation } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -139,7 +138,7 @@ function MobileLinks({ className }: { className?: string }) {
               <li>
                 <MobileNavLink
                   onClick={() => setIsOpen(false)}
-                  href="/features"
+                  href="/features/farmerManagement"
                   label="Features"
                 />
               </li>
@@ -185,7 +184,7 @@ const DesktopLinks: React.FC<{ className: string }> = ({ className }) => (
       <DesktopNavLink href="/changelog" label="Changelog" />
     </li> */}
     <li>
-      <DesktopNavLink href="/features" label="Features" />
+      <DesktopNavLink href="/features/farmerManagement" label="Features" />
     </li>
     {/* <li>
       <DesktopNavLink href="/docs" label="Docs" />
