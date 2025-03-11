@@ -4,8 +4,6 @@ import {
   publicProcedure,
 } from "../../trpc";
 import { z } from "zod";
-import { isReservedKey } from "~/utils/lib/edge-config";
-import { DEFAULT_REDIRECTS } from "~/utils";
 import { nanoid } from "~/utils";
 import { waitUntil } from "@vercel/functions";
 import { TRPCClientError } from "@trpc/client";
