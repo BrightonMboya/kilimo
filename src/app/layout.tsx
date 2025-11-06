@@ -9,6 +9,7 @@ import { Toaster } from "sonner";
 import { Toaster as ShadToaster } from "~/components/ui";
 import ModalProvider from "~/components/auth/workspaces/WorskpaceModalProvider";
 import { Analytics } from "@vercel/analytics/react"
+import { Head } from "next/head"
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -47,6 +48,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.className}`}>
+    <Head>
+      <link rel="manifest" href="/manifest.json" />
+    </Head>
       <body className={`${GeistSans.className} font-sans`}>
         {/* <Toaster closeButton className="pointer-events-auto" />  */}
         <Toaster />

@@ -7,6 +7,9 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 const NextMDX = require("@next/mdx")
 const { withContentCollections } = require("@content-collections/next");
+const withPWA = require('next-pwa')({
+  dest: 'public'
+})
 
 const withMDX = NextMDX();
 
@@ -97,5 +100,5 @@ const sentryConfig = {
 };
 
 module.exports = withContentCollections(
-  withSentryConfig(nextConfig, sentryConfig),
+  withPWA(withSentryConfig(nextConfig, sentryConfig)),
 );

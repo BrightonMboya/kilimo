@@ -46,3 +46,12 @@ yarn-error.log*
 
 # content collection
 .content-collections
+
+certificates
+
+# pwa stuff
+
+**/public/sw.js
+**/public/sw.js.map
+**/public/workbox-*.js.map
+**/public.workbox-*.js
