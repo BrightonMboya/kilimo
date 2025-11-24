@@ -1,5 +1,6 @@
 import { Button } from "./Auth-Button";
-import { HOME_DOMAIN, constructMetadata } from "~/utils";
+import { constructMetadata } from "~/utils";
+import {HOME_DOMAIN} from "@kilimo/utils"
 import { Suspense } from "react";
 import LoginForm from "~/components/auth/LoginForm";
 

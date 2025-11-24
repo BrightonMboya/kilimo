@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "../../Auth-Button";
 import { CopyButton, Logo, Modal } from "~/components/ui";
-import { APP_DOMAIN } from "~/utils";
+import { APP_DOMAIN } from "@kilimo/utils";
 import {
   Dispatch,
   SetStateAction,

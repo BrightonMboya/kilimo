@@ -1,4 +1,4 @@
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import type React from "react";
 
 type BlogListProps = {

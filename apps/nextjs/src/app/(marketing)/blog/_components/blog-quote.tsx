@@ -1,4 +1,4 @@
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import { Minus } from "lucide-react";
 type BlogQuoteProps = {
   children?: React.ReactNode;

@@ -1,8 +1,8 @@
 "use client";
 
 import { api } from "~/trpc/react";
-import { PlanProps, WorkspaceProps } from "~/utils/types";
-import { ModalContext } from "./WorskpaceModalProvider";
+import { PlanProps, WorkspaceProps } from "@kilimo/utils";
+import * as WorskpaceModalProvider from "./WorskpaceModalProvider";
 import PlanBadge from "./plan-badge";
 import {
   BlurImage,
@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
   Tick,
 } from "~/components/ui";
-import { DICEBEAR_AVATAR_URL } from "~/utils";
+import { DICEBEAR_AVATAR_URL } from "@kilimo/utils";
 import { ChevronsUpDown, PlusCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -127,7 +127,7 @@ function WorkspaceList({
   workspaces: WorkspaceProps[];
   setOpenPopover: (open: boolean) => void;
 }) {
-  const { setShowAddWorkspaceModal } = useContext(ModalContext);
+  const { setShowAddWorkspaceModal } = useContext(WorskpaceModalProvider.ModalContext);
   const { domain, key } = useParams() as { domain?: string; key?: string };
   const pathname = usePathname();
 

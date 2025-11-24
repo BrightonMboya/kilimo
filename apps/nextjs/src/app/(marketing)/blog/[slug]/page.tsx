@@ -6,7 +6,7 @@ import {
   AvatarImage,
 } from "~/components/ui/avatar";
 import { authors } from "~/content/blog/authors";
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import { allPosts } from "content-collections";
 import type { Post } from "content-collections";
 import { format, parseISO } from "date-fns";

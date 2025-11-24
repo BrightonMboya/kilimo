@@ -1,4 +1,4 @@
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 
 export function Frame({
   as: Component = "div",

@@ -1,6 +1,6 @@
 "use client";
 
-import { nFormatter, timeAgo } from "@kilimo/utils";
+import { timeAgo, nFormatter } from "~/utils";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import Linkify from "linkify-react";
 import { HelpCircle } from "lucide-react";

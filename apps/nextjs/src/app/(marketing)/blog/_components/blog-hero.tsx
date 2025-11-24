@@ -4,7 +4,7 @@ import {
   AvatarImage,
 } from "~/components/ui/avatar";
 import type { Author } from "~/content/blog/authors";
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import { format } from "date-fns";
 import { Frame } from "./frame";
 import { ImageWithBlur } from "./ImageWithBlur";

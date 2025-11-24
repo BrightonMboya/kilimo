@@ -2,7 +2,7 @@
 import { Input, Logo, Modal } from "~/components/ui";
 import { Button } from "../../Auth-Button";
 import { useMediaQuery } from "~/utils/hooks";
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import { useParams, useRouter } from "next/navigation";
 import {
   Dispatch,

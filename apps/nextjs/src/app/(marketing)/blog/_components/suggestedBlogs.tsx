@@ -1,4 +1,4 @@
-import { cn } from "~/utils";
+import { cn } from "@kilimo/utils";
 import { type Post, allPosts } from "content-collections";
 import { format } from "date-fns";
 import Link from "next/link";

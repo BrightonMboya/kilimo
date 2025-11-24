@@ -1,7 +1,6 @@
 import LoadingSkeleton from "~/components/ui/LoadingSkeleton";
 import { api, HydrateClient } from "~/trpc/server";
 import Button from "~/components/ui/Button";
-import Link from "next/link";
 import Header from "~/components/Layout/header/header";
 import { EmptyState } from "~/components/shared/empty/empty-state";
 import SuperLink from "~/components/shared/SuperLink";
