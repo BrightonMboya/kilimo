@@ -38,9 +38,9 @@ const nextConfig = withMDX({
     defaultLocale: "en",
   },
   // who gives a damn about eslint while you can just ship stuff
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

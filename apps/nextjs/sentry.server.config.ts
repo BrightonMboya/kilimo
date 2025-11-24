@@ -3,7 +3,6 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import { db } from "~/server/db";
 
 const SENTRY_DSN = process.env.SENTRY_DSN;
 
