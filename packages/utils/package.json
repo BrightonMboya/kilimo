@@ -1,0 +1,21 @@
+{
+  "name": "@kilimo/utils",
+  "version": "0.1.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "exports": {
+    ".": "./index.ts",
+    "./functions": "./src/functions.ts"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.1",
+    "nanoid": "^5.0.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6",
+    "eslint": "^8.54.0",
+    "prettier": "^3.1.0"
+  }
+}
