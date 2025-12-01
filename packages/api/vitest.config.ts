@@ -11,6 +11,18 @@ export default defineConfig({
     globals: true,
     environment: "node",
     setupFiles: ["./src/tests/setup.ts"],
+    // Run tests serially to avoid database conflicts
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
+    env: {
+      DATABASE_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
+      DIRECT_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
+      NODE_ENV: "test",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
