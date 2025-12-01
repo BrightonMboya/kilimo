@@ -26,11 +26,3 @@ export const createMockSession = (userId = "test-user-id"): Session => {
   };
 };
 
-/**
- * Helper to clean up test data after tests
- */
-export const cleanupTestData = async () => {
-  // Add cleanup logic here based on your test data patterns
-  // For example:
-  // await db.farmers.deleteMany({ where: { /* test data criteria */ } });
-};
