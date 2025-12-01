@@ -4,27 +4,44 @@
  */
 
 import { beforeAll, afterAll, afterEach, vi } from "vitest";
-import { cleanupTestData } from "./helpers/test-context";
+import { db } from "@kilimo/db";
+import { clearDatabase } from "./fixtures";
 
 // Mock the env module before any imports
 vi.mock("~/env", () => ({
   env: {
     NODE_ENV: "test",
-    DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://test:test@localhost:5432/test",
+    DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:password@localhost:5433/kilimo_test",
   },
 }));
 
 beforeAll(async () => {
   // Setup before all tests
-  console.log("Setting up tests...");
+  console.log("🗄️  Connecting to test database...");
+  
+  // Verify database connection
+  try {
+    await db.$connect();
+    console.log("✅ Test database connected");
+  } catch (error) {
+    console.error("❌ Failed to connect to test database:", error);
+    console.error("Make sure to run: docker-compose -f docker-compose.test.yml up -d");
+    throw error;
+  }
+  
+  // Clear any existing data
+  await clearDatabase();
+  console.log("🧹 Test database cleared");
 });
 
 afterEach(async () => {
   // Cleanup after each test
-  await cleanupTestData();
+  await clearDatabase();
 });
 
 afterAll(async () => {
   // Cleanup after all tests
-  console.log("Cleaning up tests...");
+  await clearDatabase();
+  await db.$disconnect();
+  console.log("👋 Test database disconnected");
 });
