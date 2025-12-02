@@ -12,11 +12,13 @@ export default function SignUpScreen() {
   const [password, setPassword] = React.useState('')
   const [pendingVerification, setPendingVerification] = React.useState(false)
   const [code, setCode] = React.useState('')
+  const [error, setError] = React.useState('')
 
   // Handle submission of sign-up form
   const onSignUpPress = async () => {
     if (!isLoaded) return
 
+    setError('') // Clear previous errors
     console.log(emailAddress, password)
 
     // Start sign-up process using email and password provided
@@ -32,10 +34,11 @@ export default function SignUpScreen() {
       // Set 'pendingVerification' to true to display second form
       // and capture OTP code
       setPendingVerification(true)
-    } catch (err) {
+    } catch (err: any) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
+      setError(err.errors?.[0]?.message || 'An error occurred during sign up')
     }
   }
 
@@ -43,6 +46,7 @@ export default function SignUpScreen() {
   const onVerifyPress = async () => {
     if (!isLoaded) return
 
+    setError('') // Clear previous errors
     try {
       // Use the code the user provided to attempt verification
       const signUpAttempt = await signUp.attemptEmailAddressVerification({
@@ -58,11 +62,13 @@ export default function SignUpScreen() {
         // If the status is not complete, check why. User may need to
         // complete further steps.
         console.error(JSON.stringify(signUpAttempt, null, 2))
+        setError('Verification incomplete. Please try again.')
       }
-    } catch (err) {
+    } catch (err: any) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
+      setError(err.errors?.[0]?.message || 'Invalid verification code')
     }
   }
 
@@ -92,6 +98,13 @@ export default function SignUpScreen() {
                 keyboardType="number-pad"
               />
             </View>
+
+            {/* Error Message */}
+            {error ? (
+              <View className="bg-red-50 border border-red-200 rounded-xl p-3 mt-4">
+                <Text className="text-red-600 text-sm">{error}</Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               onPress={onVerifyPress}
@@ -144,6 +157,13 @@ export default function SignUpScreen() {
                 onChangeText={(password) => setPassword(password)}
               />
             </View>
+
+            {/* Error Message */}
+            {error ? (
+              <View className="bg-red-50 border border-red-200 rounded-xl p-3 mt-4">
+                <Text className="text-red-600 text-sm">{error}</Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               onPress={onSignUpPress}
