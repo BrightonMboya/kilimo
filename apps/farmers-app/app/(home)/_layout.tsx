@@ -1,15 +1,8 @@
-import { Tabs, Redirect } from 'expo-router'
-import { useAuth } from '@clerk/clerk-expo'
-import { Home, BookOpenText, BrainCircuit, Warehouse, ScanLine, User } from 'lucide-react-native'
-import { View, TouchableOpacity } from 'react-native'
+import { Tabs } from 'expo-router'
+import { Home, Map, BookOpen, User, Sprout } from 'lucide-react-native'
+import { View } from 'react-native'
 
 export default function HomeLayout() {
-  const { isSignedIn } = useAuth()
-
-  if (!isSignedIn) {
-    return <Redirect href="/(auth)/sign-up" />
-  }
-
   return (
     <Tabs
       screenOptions={{
@@ -17,16 +10,17 @@ export default function HomeLayout() {
         tabBarStyle: {
           backgroundColor: 'white',
           borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
-          height: 64,
-          paddingBottom: 8,
-          paddingTop: 8,
+          borderTopColor: '#E5E7EB',
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 10,
         },
-        tabBarActiveTintColor: '#059669', // jani-dark-green
-        tabBarInactiveTintColor: '#6b7280', // gray-500
+        tabBarActiveTintColor: '#16A34A',
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: '500',
+          marginTop: 4,
         },
       }}
     >
@@ -34,28 +28,47 @@ export default function HomeLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Home size={24} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <Home size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="journal"
+        name="fields"
         options={{
-          title: 'Journal',
-          tabBarIcon: ({ color }) => <BookOpenText size={24} color={color} />,
+          title: 'Fields',
+          tabBarIcon: ({ color, size, focused }) => (
+            <Map size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
         }}
       />
       <Tabs.Screen
         name="ai"
         options={{
-          title: 'AI Assist',
-          tabBarIcon: ({ color }) => <BrainCircuit size={24} color={color} />,
+          title: '',
+          tabBarIcon: ({ focused }) => (
+            <View className={`bg-green-700 w-14 h-14 rounded-full items-center justify-center shadow-lg transform -translate-y-4 border-4 border-gray-50 ${focused ? 'bg-green-800' : ''}`}>
+              <Sprout size={28} color="white" />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
-        name="inventory"
+        name="books"
         options={{
-          title: 'Inventory',
-          tabBarIcon: ({ color }) => <Warehouse size={24} color={color} />,
+          title: 'Books',
+          tabBarIcon: ({ color, size, focused }) => (
+            <BookOpen size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, size, focused }) => (
+            <User size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
         }}
       />
     </Tabs>

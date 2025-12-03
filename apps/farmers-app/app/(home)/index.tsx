@@ -1,132 +1,125 @@
-import { SignedIn, useUser } from '@clerk/clerk-expo'
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
+import { useUser } from '@clerk/clerk-expo'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ScanLine, User, Tractor, ClipboardPen, BrainCircuit, CloudSun, ListChecks, Map as MapIcon, ChevronRight, Wallet } from 'lucide-react-native'
-import { SignOutButton } from '../components/SignOutButton'
+import { Leaf, Menu, CloudRain, Droplets, Search, Plus } from 'lucide-react-native'
 import { Link } from 'expo-router'
+import { MOCK_USER, MOCK_WEATHER, MOCK_TASKS, MOCK_FIELDS } from './mockData'
 
 export default function Page() {
   const { user } = useUser()
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100" edges={['top']}>
-      {/* Header Bar */}
-      <View className="flex-row justify-between items-center px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
-        <View className="flex-row items-center space-x-2">
-          <Text className="text-2xl font-extrabold text-emerald-600">JANI</Text>
-        </View>
-        <View className="flex-row items-center gap-3">
-          {/* Farmer ID / QR Code Button */}
-          <TouchableOpacity className="p-2 rounded-full bg-gray-100">
-            <ScanLine size={20} color="#4b5563" />
-          </TouchableOpacity>
-          {/* Profile/Settings Icon */}
-          <TouchableOpacity className="p-2 rounded-full bg-emerald-600">
-            <User size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView className="flex-1 px-4 pt-4 pb-20" showsVerticalScrollIndicator={false}>
-        {/* 1. Home Dashboard */}
-        <View className="gap-6 mb-6">
-          {/* Farm Overview Card */}
-          <View className="bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500">
-            <View className="flex-row items-center mb-2">
-              <Tractor size={20} color="#059669" className="mr-2" />
-              <Text className="text-lg font-bold text-gray-800 ml-2">Active Farm Overview</Text>
-            </View>
-            <View className="space-y-1">
-              <Text className="text-sm text-gray-700"><Text className="font-medium">Farm Name:</Text> Green Acres (Field C)</Text>
-              <Text className="text-sm text-gray-700"><Text className="font-medium">Crop:</Text> Maize (Pioneer P3812)</Text>
-              <Text className="text-sm text-gray-700"><Text className="font-medium">Planted:</Text> 45 Days Ago (DAP)</Text>
-              <Text className="text-sm text-gray-700"><Text className="font-medium">Area:</Text> 1.5 Hectares</Text>
-            </View>
+    <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
+      <ScrollView className="flex-1 pb-20" showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View className="bg-green-700 p-6 rounded-b-3xl shadow-lg relative overflow-hidden pb-8">
+          <View className="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
+            <Leaf size={120} color="white" />
           </View>
-
-          {/* 2. Critical Tracking Events (Quick Actions) */}
-          <View className="flex-row gap-4">
-            <Link href="/(home)/journal" asChild>
-              <TouchableOpacity className="flex-1 bg-emerald-600 p-4 rounded-xl shadow-sm items-center">
-                <ClipboardPen size={32} color="white" className="mb-1" />
-                <Text className="font-semibold text-sm text-white mt-1">Record Event</Text>
-                <Text className="text-xs text-emerald-100 opacity-80 text-center mt-1">(Planting, Spraying, Harvest)</Text>
-              </TouchableOpacity>
-            </Link>
-            <Link href="/(home)/ai" asChild>
-              <TouchableOpacity className="flex-1 bg-blue-600 p-4 rounded-xl shadow-sm items-center">
-                <BrainCircuit size={32} color="white" className="mb-1" />
-                <Text className="font-semibold text-sm text-white mt-1">AI Assistant</Text>
-                <Text className="text-xs text-blue-100 opacity-80 text-center mt-1">(Pest Diagnosis & Advice)</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-
-          {/* 8. Farm Monitoring & 10. Add-Ons Snapshot */}
-          <View>
-            <Text className="text-xl font-bold text-gray-800 mb-4">Today's Focus</Text>
-
-            {/* Monitoring Cards Grid */}
-            <View className="flex-row gap-4">
-              {/* Weather Card */}
-              <View className="flex-1 bg-yellow-50 p-3 rounded-xl shadow-sm">
-                <View className="flex-row items-center mb-1">
-                  <CloudSun size={20} color="#ca8a04" className="mr-2" />
-                  <Text className="font-semibold text-sm text-yellow-600 ml-1">Weather</Text>
-                </View>
-                <Text className="text-2xl font-bold text-gray-800">28°C</Text>
-                <Text className="text-xs text-gray-500">Sunny, 10% Rain Chance</Text>
-              </View>
-
-              {/* Next Task Card */}
-              <View className="flex-1 bg-red-50 p-3 rounded-xl shadow-sm">
-                <View className="flex-row items-center mb-1">
-                  <ListChecks size={20} color="#dc2626" className="mr-2" />
-                  <Text className="font-semibold text-sm text-red-600 ml-1">Next Task</Text>
-                </View>
-                <Text className="text-lg font-bold text-gray-800">Weeding Plot C</Text>
-                <Text className="text-xs text-gray-500">Due: Tomorrow (1:00 PM)</Text>
-              </View>
-            </View>
-          </View>
-
-          {/* 6. Farm Mapping Link */}
-          <TouchableOpacity className="bg-blue-50 p-4 rounded-xl shadow-sm flex-row justify-between items-center border-l-4 border-blue-400">
+          <View className="flex-row justify-between items-start relative z-10">
             <View>
-              <View className="flex-row items-center">
-                <MapIcon size={20} color="#3b82f6" className="mr-2" />
-                <Text className="font-semibold text-gray-800 ml-2">Farm Mapping & Zones</Text>
+              <Text className="text-green-100 text-sm">Hujambo, (Hello)</Text>
+              <Text className="text-2xl font-bold text-white mt-1">{user?.firstName || MOCK_USER.name}</Text>
+              <View className="flex-row items-center mt-2 bg-green-800/50 self-start px-3 py-1 rounded-full">
+                <View className="w-2 h-2 bg-green-400 rounded-full mr-2" />
+                <Text className="text-xs text-white">Online & Synced</Text>
               </View>
-              <Text className="text-sm text-gray-500 mt-1">View field boundaries and soil data.</Text>
             </View>
-            <ChevronRight size={24} color="#3b82f6" />
-          </TouchableOpacity>
+            <View className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
+              <Menu size={24} color="white" />
+            </View>
+          </View>
 
-          {/* 9. Sales & Expenses Snapshot */}
-          <View className="bg-white p-4 rounded-xl shadow-sm">
-            <View className="flex-row items-center mb-3">
-              <Wallet size={20} color="#9333ea" className="mr-2" />
-              <Text className="text-lg font-bold text-gray-800 ml-2">Financial Snapshot (Season)</Text>
+          {/* Weather Widget */}
+          <View className="mt-6 flex-row items-center bg-white/10 p-4 rounded-xl backdrop-blur-md border border-white/10">
+            <View className="mr-4">
+              <CloudRain size={32} className="text-blue-200" color="#BFDBFE" />
             </View>
-            <View className="flex-row justify-around">
-              <View className="items-center">
-                <Text className="text-sm text-gray-500">Total Sales</Text>
-                <Text className="text-xl font-bold text-green-600">₹ 85,000</Text>
+            <View className="flex-1">
+              <View className="flex-row items-end">
+                <Text className="text-3xl font-bold text-white">{MOCK_WEATHER.temp}°</Text>
+                <Text className="text-sm mb-1 ml-1 text-white">Nairobi</Text>
               </View>
-              <View className="items-center">
-                <Text className="text-sm text-gray-500">Total Expenses</Text>
-                <Text className="text-xl font-bold text-red-600">₹ 32,500</Text>
-              </View>
+              <Text className="text-xs text-green-100 mt-1">{MOCK_WEATHER.advice}</Text>
             </View>
-            <TouchableOpacity className="mt-3">
-              <Text className="text-center text-sm text-purple-600 font-medium">View Detailed Ledger</Text>
+            <View className="items-end">
+              <Text className="text-xs font-bold text-white">{MOCK_WEATHER.precip} Rain</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Quick Actions */}
+        <View className="px-4 mt-6">
+          <Text className="font-bold text-gray-800 mb-3 text-lg">Quick Actions</Text>
+          <View className="flex-row justify-between gap-2">
+            {[
+              { icon: Leaf, label: "Log Harvest", bg: "bg-orange-100", text: "text-orange-600", color: "#EA580C" },
+              { icon: Droplets, label: "Spray/Input", bg: "bg-blue-100", text: "text-blue-600", color: "#2563EB" },
+              { icon: Search, label: "Scouting", bg: "bg-purple-100", text: "text-purple-600", color: "#9333EA" },
+              { icon: Plus, label: "Add Task", bg: "bg-gray-200", text: "text-gray-600", color: "#4B5563" },
+            ].map((action, idx) => (
+              <TouchableOpacity key={idx} className="flex-1 items-center space-y-2">
+                <View className={`${action.bg} p-4 rounded-2xl shadow-sm w-full items-center aspect-square justify-center`}>
+                  <action.icon size={24} color={action.color} />
+                </View>
+                <Text className="text-xs text-center font-medium text-gray-600">{action.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Tasks */}
+        <View className="px-4 mt-6">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="font-bold text-gray-800 text-lg">Today's Tasks</Text>
+            <TouchableOpacity>
+              <Text className="text-green-600 text-sm font-medium">See All</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Temporary Sign Out for testing */}
-          <View className="mt-4 mb-8">
-            <SignOutButton />
+          <View className="gap-3">
+            {MOCK_TASKS.map((task) => (
+              <View key={task.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-row items-center">
+                <View className={`w-5 h-5 rounded-full border-2 mr-3 items-center justify-center ${task.urgent ? 'border-red-400' : 'border-gray-300'}`} />
+                <View className="flex-1">
+                  <Text className="font-semibold text-gray-800 text-sm">{task.title}</Text>
+                  <Text className="text-xs text-gray-500 mt-1">Due: {task.due}</Text>
+                </View>
+                {task.urgent && (
+                  <View className="bg-red-100 px-2 py-1 rounded-full">
+                    <Text className="text-red-600 text-[10px] font-bold">URGENT</Text>
+                  </View>
+                )}
+              </View>
+            ))}
           </View>
+        </View>
+
+        {/* Field Overview */}
+        <View className="px-4 mt-6 mb-8">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="font-bold text-gray-800 text-lg">My Fields</Text>
+            <Link href="/(home)/fields" asChild>
+              <TouchableOpacity>
+                <Text className="text-green-600 text-sm font-medium">Manage</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-4 pb-2">
+            {MOCK_FIELDS.map((field) => (
+              <View key={field.id} className="w-[200px] bg-white p-3 rounded-xl shadow-sm border border-gray-100 mr-4">
+                <View className="h-24 bg-gray-200 rounded-lg mb-3 overflow-hidden relative items-center justify-center">
+                  <View className="absolute inset-0 items-center justify-center bg-green-50">
+                     <Leaf className="text-green-200" size={40} color="#BBF7D0" />
+                  </View>
+                  <View className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded shadow-sm">
+                    <Text className="text-[10px] font-bold text-gray-800">{field.status}</Text>
+                  </View>
+                </View>
+                <Text className="font-bold text-gray-800 text-sm">{field.name}</Text>
+                <Text className="text-xs text-gray-500 mt-1">{field.crop} • {field.size}</Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
