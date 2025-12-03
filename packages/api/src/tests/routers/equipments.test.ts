@@ -92,43 +92,7 @@ describe("Equipments Router", () => {
     });
   });
 
-  describe("fetchByOrganization", () => {
-    it.skip("should fetch all equipment for an organization", async () => {
-      // Skipped: Requires real organization in database
-      const session = createMockSession();
-      const ctx = createTestContext({ session });
-      const caller = createCaller(ctx);
-
-      const result = await caller.equipments.fetchByOrganization({
-        organizationEmail: "test@org.com",
-      });
-
-      expect(Array.isArray(result)).toBe(true);
-    });
-
-    it("should require authentication", async () => {
-      const ctx = createTestContext();
-      const caller = createCaller(ctx);
-
-      await expect(
-        caller.equipments.fetchByOrganization({
-          organizationEmail: "test@org.com",
-        })
-      ).rejects.toThrow("UNAUTHORIZED");
-    });
-
-    it("should validate email format", async () => {
-      const session = createMockSession();
-      const ctx = createTestContext({ session });
-      const caller = createCaller(ctx);
-
-      await expect(
-        caller.equipments.fetchByOrganization({
-          organizationEmail: "invalid-email",
-        })
-      ).rejects.toThrow();
-    });
-  });
+  // Removed organization-specific tests: organization not used anymore
 
   describe("fetchById", () => {
     it.skip("should fetch equipment by ID", async () => {
