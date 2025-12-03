@@ -70,43 +70,7 @@ describe("Warehouses Router", () => {
     });
   });
 
-  describe("fetchByOrganization", () => {
-    it.skip("should fetch all warehouses for an organization", async () => {
-      // Skipped: Requires real organization in database
-      const session = createMockSession();
-      const ctx = createTestContext({ session });
-      const caller = createCaller(ctx);
-
-      const result = await caller.warehouses.fetchByOrganization({
-        organizationId: "org-123",
-      });
-
-      expect(Array.isArray(result)).toBe(true);
-    });
-
-    it("should require authentication", async () => {
-      const ctx = createTestContext();
-      const caller = createCaller(ctx);
-
-      await expect(
-        caller.warehouses.fetchByOrganization({
-          organizationId: "org-123",
-        })
-      ).rejects.toThrow("UNAUTHORIZED");
-    });
-
-    it("should validate organizationId is provided", async () => {
-      const session = createMockSession();
-      const ctx = createTestContext({ session });
-      const caller = createCaller(ctx);
-
-      await expect(
-        caller.warehouses.fetchByOrganization({
-          organizationId: "",
-        })
-      ).rejects.toThrow();
-    });
-  });
+  // Removed organization-specific tests: organization not used anymore
 
   describe("fetchById", () => {
     it.skip("should fetch a warehouse by ID", async () => {
