@@ -1,12 +1,33 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { createCaller } from "../../root";
 import { createTestContext, createMockSession } from "../helpers/test-context";
+import {
+  createTestUser,
+  createTestProject,
+  addUserToProject,
+  createTestWarehouse,
+} from "../fixtures";
 
 describe("Inventory Router", () => {
+  let testUser: Awaited<ReturnType<typeof createTestUser>>;
+  let testProject: Awaited<ReturnType<typeof createTestProject>>;
+  let testWarehouse: Awaited<ReturnType<typeof createTestWarehouse>>;
+
+  beforeEach(async () => {
+    testUser = await createTestUser({
+      id: "inventory-test-user",
+      email: "inventory-test@example.com",
+    });
+    testProject = await createTestProject({
+      slug: "inventory-workspace",
+    });
+    await addUserToProject(testUser.id, testProject.id, "owner");
+    testWarehouse = await createTestWarehouse(testProject.id);
+  });
+
   describe("create", () => {
-    it.skip("should create new inventory item successfully", async () => {
-      // Skipped: Requires real database setup
-      const session = createMockSession();
+    it("should create new inventory item successfully", async () => {
+      const session = createMockSession(testUser.id);
       const ctx = createTestContext({ session });
       const caller = createCaller(ctx);
 
@@ -16,7 +37,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "kg",
         description: "High-quality nitrogen-phosphorus-potassium fertilizer",
         estimatedValuePerUnit: "25.50",
-        warehouseId: "warehouse-123",
+        warehousesId: testWarehouse.id, // Changed from warehouseId to match Prisma schema
       };
 
       const result = await caller.inventory.create(input);
@@ -24,6 +45,7 @@ describe("Inventory Router", () => {
       expect(result).toBeDefined();
       expect(result.name).toBe(input.name);
       expect(result.inventoryType).toBe(input.inventoryType);
+      expect(result.warehousesId).toBe(testWarehouse.id);
     });
 
     it("should require authentication", async () => {
@@ -36,7 +58,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "kg",
         description: "High-quality fertilizer",
         estimatedValuePerUnit: "25.50",
-        warehouseId: "warehouse-123",
+        warehousesId: "warehouse-123", // Changed from warehouseId to match Prisma schema
       };
 
       await expect(caller.inventory.create(input)).rejects.toThrow("UNAUTHORIZED");
@@ -53,7 +75,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "",
         description: "",
         estimatedValuePerUnit: "",
-        warehouseId: "",
+        warehousesId: "", // Changed from warehouseId to match Prisma schema
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
@@ -71,7 +93,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "kg",
         description: "Test description",
         estimatedValuePerUnit: "25.50",
-        warehouseId: "warehouse-123",
+        warehousesId: "warehouse-123", // Changed from warehouseId to match Prisma schema
       };
 
       await expect(caller.inventory.create(input)).rejects.toThrow();
@@ -88,7 +110,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "kg",
         description: "Test description",
         estimatedValuePerUnit: "", // Invalid: empty
-        warehouseId: "warehouse-123",
+        warehousesId: "warehouse-123", // Changed from warehouseId to match Prisma schema
       };
 
       await expect(caller.inventory.create(input)).rejects.toThrow();
