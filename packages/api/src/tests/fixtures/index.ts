@@ -7,11 +7,20 @@
 
 import { db } from "@kilimo/db";
 
+// Extra safety guard for destructive cleanup
+function ensureSafeDatabase() {
+  const url = process.env.DATABASE_URL ?? "";
+  if (!url.includes("localhost") && !url.includes("kilimo_test")) {
+    throw new Error(`clearDatabase aborted: DATABASE_URL=${url} does not look like a test database`);
+  }
+}
+
 /**
  * Clear all test data from the database
  * Use this in afterEach or afterAll to clean up
  */
 export async function clearDatabase() {
+  ensureSafeDatabase();
   // Delete in order to respect foreign key constraints
   await db.reportTrackingEvents.deleteMany({});
   await db.reports.deleteMany({});
