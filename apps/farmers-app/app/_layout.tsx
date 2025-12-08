@@ -1,7 +1,9 @@
 import { ClerkProvider, ClerkLoaded } from '@clerk/clerk-expo';
 import { Slot } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import '../global.css'
+import '../global.css';
+import React from 'react';
+import { TRPCProvider } from '../utils/api';
 
 const tokenCache = {
   async getToken(key: string) {
@@ -29,11 +31,12 @@ if (!publishableKey) {
 }
 
 export default function RootLayout() {
-  
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
-        <Slot />
+        <TRPCProvider>
+          <Slot />
+        </TRPCProvider>
       </ClerkLoaded>
     </ClerkProvider>
   );

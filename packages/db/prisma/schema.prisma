@@ -176,9 +176,8 @@ model Farmers {
   country           String
   crops             String
   quantityCanSupply Int
-  // nationalId      FarmersNationalId?
-  // profilePicture  FarmersProfilePictures?
   harvests          Harvests[]
+  fields            Fields[]
   Project           Project    @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   project_id        String
 
@@ -190,17 +189,38 @@ model Farmers {
   @@index(project_id)
 }
 
-// model FarmersNationalId {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
+model Fields {
+  id               String          @id @default(cuid())
+  name             String
+  size             Int
+  crop             String
+  status           String
+  image            String?
+  Farmers          Farmers         @relation(fields: [farmersId], references: [id])
+  farmersId        String
+}
 
-// model FarmersProfilePictures {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
+enum TaskStatus {
+  pending
+  inProgress
+  completed
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+model FarmersTasks {
+  id             String         @id @default(cuid())
+  name           String
+  description    String
+  status         TaskStatus
+  priority       TaskPriority
+  dueAt          DateTime
+  userId         String // this comes from clerk
+}
 
 model Harvests {
   id         String    @id @default(cuid())

@@ -1,12 +1,29 @@
-import { useSignIn } from '@clerk/clerk-expo'
+import { useSignIn, useOAuth } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as WebBrowser from 'expo-web-browser'
+
+// Handle any pending authentication sessions
+WebBrowser.maybeCompleteAuthSession()
+
+export const useWarmUpBrowser = () => {
+  React.useEffect(() => {
+    // Warm up the android browser to improve UX
+    // https://docs.expo.dev/guides/authentication/#improving-user-experience
+    void WebBrowser.warmUpAsync()
+    return () => {
+      void WebBrowser.coolDownAsync()
+    }
+  }, [])
+}
 
 export default function Page() {
+  useWarmUpBrowser()
   const { signIn, setActive, isLoaded } = useSignIn()
   const router = useRouter()
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -38,6 +55,21 @@ export default function Page() {
       console.error(JSON.stringify(err, null, 2))
     }
   }
+
+  const onGoogleSignInPress = React.useCallback(async () => {
+    try {
+      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
+
+      if (createdSessionId) {
+        setActive && setActive({ session: createdSessionId })
+        router.replace('/')
+      } else {
+        // Use signIn or signUp for next steps such as MFA
+      }
+    } catch (err) {
+      console.error('OAuth error', err)
+    }
+  }, [])
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -84,6 +116,23 @@ export default function Page() {
               className="w-full bg-blue-600 rounded-xl py-4 active:bg-blue-700 mt-6 shadow-sm"
             >
               <Text className="text-white text-center font-semibold text-lg">Sign In</Text>
+            </TouchableOpacity>
+
+            <View className="flex-row items-center my-4">
+              <View className="flex-1 h-[1px] bg-gray-200" />
+              <Text className="mx-4 text-gray-400">OR</Text>
+              <View className="flex-1 h-[1px] bg-gray-200" />
+            </View>
+
+            <TouchableOpacity
+              onPress={onGoogleSignInPress}
+              className="w-full bg-white border border-gray-200 rounded-xl py-4 active:bg-gray-50 shadow-sm flex-row justify-center items-center gap-3"
+            >
+              {/* Google Icon SVG */}
+              <View className="w-6 h-6 justify-center items-center">
+                 <Text className="font-bold text-lg">G</Text>
+              </View>
+              <Text className="text-gray-700 text-center font-semibold text-lg">Sign in with Google</Text>
             </TouchableOpacity>
 
             <View className="flex-row justify-center items-center mt-6 gap-2">

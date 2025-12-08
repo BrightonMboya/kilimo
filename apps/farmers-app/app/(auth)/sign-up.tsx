@@ -1,13 +1,31 @@
 import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-import { useSignUp } from '@clerk/clerk-expo'
+import { useSignUp, useOAuth } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as WebBrowser from 'expo-web-browser'
+
+// Handle any pending authentication sessions
+WebBrowser.maybeCompleteAuthSession()
+
+export const useWarmUpBrowser = () => {
+  React.useEffect(() => {
+    // Warm up the android browser to improve UX
+    // https://docs.expo.dev/guides/authentication/#improving-user-experience
+    void WebBrowser.warmUpAsync()
+    return () => {
+      void WebBrowser.coolDownAsync()
+    }
+  }, [])
+}
 
 export default function SignUpScreen() {
+  useWarmUpBrowser()
   const { isLoaded, signUp, setActive } = useSignUp()
   const router = useRouter()
+  const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
 
+  const [fullName, setFullName] = React.useState('')
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [pendingVerification, setPendingVerification] = React.useState(false)
@@ -19,14 +37,21 @@ export default function SignUpScreen() {
     if (!isLoaded) return
 
     setError('') // Clear previous errors
-    console.log(emailAddress, password)
+    
+    // Split full name into first and last name
+    const nameParts = fullName.trim().split(' ')
+    const firstName = nameParts[0]
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
 
     // Start sign-up process using email and password provided
     try {
       await signUp.create({
         emailAddress,
         password,
+        firstName,
+        lastName,
       })
+      
 
       // Send user an email with verification code
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
@@ -71,6 +96,21 @@ export default function SignUpScreen() {
       setError(err.errors?.[0]?.message || 'Invalid verification code')
     }
   }
+
+  const onGoogleSignUpPress = React.useCallback(async () => {
+    try {
+      const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
+
+      if (createdSessionId) {
+        setActive && setActive({ session: createdSessionId })
+        router.replace('/')
+      } else {
+        // Use signIn or signUp for next steps such as MFA
+      }
+    } catch (err) {
+      console.error('OAuth error', err)
+    }
+  }, [])
 
   if (pendingVerification) {
     return (
@@ -134,6 +174,17 @@ export default function SignUpScreen() {
 
           <View className="space-y-5">
             <View>
+              <Text className="text-gray-700 font-medium mb-2">Full Name</Text>
+              <TextInput
+                value={fullName}
+                placeholder="John Doe"
+                placeholderTextColor="#9CA3AF"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+                onChangeText={(text) => setFullName(text)}
+              />
+            </View>
+
+            <View>
               <Text className="text-gray-700 font-medium mb-2">Email Address</Text>
               <TextInput
                 autoCapitalize="none"
@@ -170,6 +221,23 @@ export default function SignUpScreen() {
               className="w-full bg-blue-600 rounded-xl py-4 active:bg-blue-700 mt-6 shadow-sm"
             >
               <Text className="text-white text-center font-semibold text-lg">Create Account</Text>
+            </TouchableOpacity>
+
+            <View className="flex-row items-center my-4">
+              <View className="flex-1 h-[1px] bg-gray-200" />
+              <Text className="mx-4 text-gray-400">OR</Text>
+              <View className="flex-1 h-[1px] bg-gray-200" />
+            </View>
+
+            <TouchableOpacity
+              onPress={onGoogleSignUpPress}
+              className="w-full bg-white border border-gray-200 rounded-xl py-4 active:bg-gray-50 shadow-sm flex-row justify-center items-center gap-3"
+            >
+              {/* Google Icon SVG */}
+              <View className="w-6 h-6 justify-center items-center">
+                 <Text className="font-bold text-lg">G</Text>
+              </View>
+              <Text className="text-gray-700 text-center font-semibold text-lg">Sign up with Google</Text>
             </TouchableOpacity>
 
             <View className="flex-row justify-center items-center mt-6 gap-2">

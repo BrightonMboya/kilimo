@@ -7,38 +7,7 @@ export const MOCK_USER = {
   complianceScore: 94
 };
 
-export const MOCK_FIELDS = [
-  { 
-    id: 1, 
-    name: "North Hill Coffee", 
-    crop: "Coffee (Arabica)", 
-    size: "1.2 Ha", 
-    status: "Flowering", 
-    compliance: "EUDR Compliant",
-    lastActivity: "Fertilizer Application",
-    image: "coffee"
-  },
-  { 
-    id: 2, 
-    name: "River Valley Tea", 
-    crop: "Tea", 
-    size: "0.8 Ha", 
-    status: "Harvest Ready", 
-    compliance: "Pending Review",
-    lastActivity: "Weeding",
-    image: "tea"
-  },
-  { 
-    id: 3, 
-    name: "Garden Plot", 
-    crop: "Avocado", 
-    size: "0.5 Ha", 
-    status: "Vegetative", 
-    compliance: "EUDR Compliant",
-    lastActivity: "Pruning",
-    image: "avocado"
-  }
-];
+
 
 export const MOCK_TASKS = [
   { id: 1, title: "Apply Fertilizer to North Hill", due: "Today", urgent: true },

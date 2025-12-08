@@ -1,12 +1,58 @@
-import { useUser } from '@clerk/clerk-expo'
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { useUser, useAuth } from '@clerk/clerk-expo'
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Leaf, Menu, CloudRain, Droplets, Search, Plus } from 'lucide-react-native'
+import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X } from 'lucide-react-native'
 import { Link } from 'expo-router'
-import { MOCK_USER, MOCK_WEATHER, MOCK_TASKS, MOCK_FIELDS } from './mockData'
+import { MOCK_WEATHER } from './mockData'
+import { trpc } from '../../utils/api'
+import React, { useState } from 'react'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { TasksList } from '../../components/TasksList'
 
 export default function Page() {
   const { user } = useUser()
+  const { signOut } = useAuth()
+  
+  // Fetch tasks for the current user
+  const { data: tasks, refetch: refetchTasks, isLoading: isLoadingTasks } = trpc.tasks.myTasks.useQuery(
+    undefined,
+    { enabled: !!user?.id }
+  )
+
+  const createTaskMutation = trpc.tasks.create.useMutation({
+    onSuccess: () => {
+      refetchTasks()
+      setModalVisible(false)
+      setNewTaskName('')
+      setNewTaskDescription('')
+      setNewTaskPriority('medium')
+      setNewTaskDate(new Date())
+    },
+    onError: (error) => {
+      Alert.alert("Error", error.message || "Failed to create task")
+    }
+  })
+
+  const [modalVisible, setModalVisible] = useState(false)
+  const [newTaskName, setNewTaskName] = useState('')
+  const [newTaskDescription, setNewTaskDescription] = useState('')
+  const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high'>('medium')
+  const [newTaskDate, setNewTaskDate] = useState(new Date())
+  const [showDatePicker, setShowDatePicker] = useState(false)
+
+  const handleAddTask = () => {
+    if (!newTaskName.trim()) {
+      Alert.alert("Error", "Please enter a task name")
+      return
+    }
+    
+    createTaskMutation.mutate({
+      name: newTaskName,
+      description: newTaskDescription,
+      priority: newTaskPriority,
+      dueAt: newTaskDate,
+    })
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
@@ -19,14 +65,22 @@ export default function Page() {
           <View className="flex-row justify-between items-start relative z-10">
             <View>
               <Text className="text-green-100 text-sm">Hujambo, (Hello)</Text>
-              <Text className="text-2xl font-bold text-white mt-1">{user?.firstName || MOCK_USER.name}</Text>
+              <Text className="text-2xl font-bold text-white mt-1">{user?.fullName}</Text>
               <View className="flex-row items-center mt-2 bg-green-800/50 self-start px-3 py-1 rounded-full">
                 <View className="w-2 h-2 bg-green-400 rounded-full mr-2" />
                 <Text className="text-xs text-white">Online & Synced</Text>
               </View>
             </View>
-            <View className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-              <Menu size={24} color="white" />
+            <View className="flex-row gap-3">
+              <TouchableOpacity 
+                onPress={() => signOut()}
+                className="bg-white/20 p-2 rounded-full backdrop-blur-sm"
+              >
+                <LogOut size={24} color="white" />
+              </TouchableOpacity>
+              <View className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
+                <Menu size={24} color="white" />
+              </View>
             </View>
           </View>
 
@@ -56,9 +110,9 @@ export default function Page() {
               { icon: Leaf, label: "Log Harvest", bg: "bg-orange-100", text: "text-orange-600", color: "#EA580C" },
               { icon: Droplets, label: "Spray/Input", bg: "bg-blue-100", text: "text-blue-600", color: "#2563EB" },
               { icon: Search, label: "Scouting", bg: "bg-purple-100", text: "text-purple-600", color: "#9333EA" },
-              { icon: Plus, label: "Add Task", bg: "bg-gray-200", text: "text-gray-600", color: "#4B5563" },
+              { icon: Plus, label: "Add Task", bg: "bg-gray-200", text: "text-gray-600", color: "#4B5563", onPress: () => setModalVisible(true) },
             ].map((action, idx) => (
-              <TouchableOpacity key={idx} className="flex-1 items-center space-y-2">
+              <TouchableOpacity key={idx} onPress={action.onPress} className="flex-1 items-center space-y-2">
                 <View className={`${action.bg} p-4 rounded-2xl shadow-sm w-full items-center aspect-square justify-center`}>
                   <action.icon size={24} color={action.color} />
                 </View>
@@ -69,30 +123,11 @@ export default function Page() {
         </View>
 
         {/* Tasks */}
-        <View className="px-4 mt-6">
-          <View className="flex-row justify-between items-center mb-3">
-            <Text className="font-bold text-gray-800 text-lg">Today's Tasks</Text>
-            <TouchableOpacity>
-              <Text className="text-green-600 text-sm font-medium">See All</Text>
-            </TouchableOpacity>
-          </View>
-          <View className="gap-3">
-            {MOCK_TASKS.map((task) => (
-              <View key={task.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-row items-center">
-                <View className={`w-5 h-5 rounded-full border-2 mr-3 items-center justify-center ${task.urgent ? 'border-red-400' : 'border-gray-300'}`} />
-                <View className="flex-1">
-                  <Text className="font-semibold text-gray-800 text-sm">{task.title}</Text>
-                  <Text className="text-xs text-gray-500 mt-1">Due: {task.due}</Text>
-                </View>
-                {task.urgent && (
-                  <View className="bg-red-100 px-2 py-1 rounded-full">
-                    <Text className="text-red-600 text-[10px] font-bold">URGENT</Text>
-                  </View>
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
+        <TasksList 
+          tasks={tasks} 
+          isLoading={isLoadingTasks} 
+          onAddTask={() => setModalVisible(true)} 
+        />
 
         {/* Field Overview */}
         <View className="px-4 mt-6 mb-8">
@@ -104,24 +139,121 @@ export default function Page() {
               </TouchableOpacity>
             </Link>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-4 pb-2">
-            {MOCK_FIELDS.map((field) => (
-              <View key={field.id} className="w-[200px] bg-white p-3 rounded-xl shadow-sm border border-gray-100 mr-4">
-                <View className="h-24 bg-gray-200 rounded-lg mb-3 overflow-hidden relative items-center justify-center">
-                  <View className="absolute inset-0 items-center justify-center bg-green-50">
-                     <Leaf className="text-green-200" size={40} color="#BBF7D0" />
-                  </View>
-                  <View className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded shadow-sm">
-                    <Text className="text-[10px] font-bold text-gray-800">{field.status}</Text>
-                  </View>
-                </View>
-                <Text className="font-bold text-gray-800 text-sm">{field.name}</Text>
-                <Text className="text-xs text-gray-500 mt-1">{field.crop} • {field.size}</Text>
-              </View>
-            ))}
-          </ScrollView>
+          {/* Fields section temporarily disabled until schema is updated */}
+          <View className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 items-center justify-center">
+            <Text className="text-gray-500 text-sm">No fields added yet</Text>
+            <Link href="/(home)/fields" asChild>
+              <TouchableOpacity className="mt-2">
+                 <Text className="text-green-600 font-medium">Add a field</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
       </ScrollView>
+
+      {/* Add Task Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-3xl p-6 h-[70%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-bold text-gray-900">Add New Task</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)} className="bg-gray-100 p-2 rounded-full">
+                <X size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              <View className="space-y-4">
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Task Name</Text>
+                  <TextInput
+                    value={newTaskName}
+                    onChangeText={setNewTaskName}
+                    placeholder="e.g., Water the maize field"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Description</Text>
+                  <TextInput
+                    value={newTaskDescription}
+                    onChangeText={setNewTaskDescription}
+                    placeholder="Add details..."
+                    multiline
+                    numberOfLines={3}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900"
+                    style={{ textAlignVertical: 'top' }}
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Priority</Text>
+                  <View className="flex-row gap-3">
+                    {(['low', 'medium', 'high'] as const).map((p) => (
+                      <TouchableOpacity
+                        key={p}
+                        onPress={() => setNewTaskPriority(p)}
+                        className={`flex-1 py-3 rounded-xl border ${
+                          newTaskPriority === p 
+                            ? 'bg-green-50 border-green-500' 
+                            : 'bg-white border-gray-200'
+                        }`}
+                      >
+                        <Text className={`text-center capitalize font-medium ${
+                          newTaskPriority === p ? 'text-green-700' : 'text-gray-600'
+                        }`}>
+                          {p}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Due Date</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5"
+                  >
+                    <Text className="text-gray-900">{newTaskDate.toLocaleDateString()}</Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <DateTimePicker
+                      value={newTaskDate}
+                      mode="date"
+                      display="default"
+                      onChange={(event, selectedDate) => {
+                        setShowDatePicker(false)
+                        if (selectedDate) setNewTaskDate(selectedDate)
+                      }}
+                    />
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleAddTask}
+                  disabled={createTaskMutation.isPending || !newTaskName.trim()}
+                  className={`w-full bg-green-600 rounded-xl py-4 mt-6 shadow-sm ${
+                    (createTaskMutation.isPending || !newTaskName.trim()) ? 'opacity-50' : ''
+                  }`}
+                >
+                  {createTaskMutation.isPending ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-lg">Create Task</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }

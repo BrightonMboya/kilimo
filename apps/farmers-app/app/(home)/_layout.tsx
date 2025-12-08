@@ -1,8 +1,23 @@
-import { Tabs } from 'expo-router'
+import { Tabs, Redirect } from 'expo-router'
 import { Home, Map, BookOpen, User, Sprout } from 'lucide-react-native'
-import { View } from 'react-native'
+import { View, ActivityIndicator } from 'react-native'
+import { useAuth } from '@clerk/clerk-expo'
 
 export default function HomeLayout() {
+  const { isSignedIn, isLoaded } = useAuth()
+
+  if (!isLoaded) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#16A34A" />
+      </View>
+    )
+  }
+
+  if (!isSignedIn) {
+    return <Redirect href="/sign-in" />
+  }
+
   return (
     <Tabs
       screenOptions={{
