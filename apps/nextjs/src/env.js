@@ -7,9 +7,13 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
+    // Allow a sensible default for test/local CI runs so tests can run without
+    // requiring the caller to always set DATABASE_URL. In production this
+    // should be provided explicitly via environment variables.
     DATABASE_URL: z
       .string()
       .url()
+      .default(process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/kilimo_test")
       .refine(
         (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
         "You forgot to change the default URL",
