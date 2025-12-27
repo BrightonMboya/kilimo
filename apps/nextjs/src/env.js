@@ -18,11 +18,12 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
 
-    SUPABASE_SERVICE_KEY: z.string(),
-    GITHUB_CLIENT_ID: z.string(),
-    GITHUB_CLIENT_SECRET: z.string(),
-    GOOGLE_CLIENT_ID: z.string(),
-    GOOGLE_CLIENT_SECRET: z.string(),
+  // Allow these to be optional for local CI/testing runs where tokens may not be present.
+  SUPABASE_SERVICE_KEY: z.string().optional(),
+  GITHUB_CLIENT_ID: z.string().optional(),
+  GITHUB_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
   },
 
   /**
