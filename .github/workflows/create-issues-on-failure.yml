@@ -1,0 +1,161 @@
+name: Create Issues on CI Failure
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]  # This should match your main CI workflow name
+    types:
+      - completed
+
+permissions:
+  actions: read
+  issues: write
+  contents: read
+
+jobs:
+  create-issue-on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch != github.event.repository.default_branch }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Ensure .github/scripts exists
+        run: |
+          # If the scripts directory or a key script is missing, fetch and checkout it from the
+          # repository default branch (useful when the triggering run comes from a fork/branch
+          # that doesn't contain the helper scripts).
+          if [ ! -f .github/scripts/get-workflow-details.js ]; then
+            echo ".github/scripts missing — fetching from default branch '${{ github.event.repository.default_branch }}'"
+            git fetch origin ${{ github.event.repository.default_branch }} --depth=1 || true
+            git checkout origin/${{ github.event.repository.default_branch }} -- .github/scripts || true
+          else
+            echo ".github/scripts present"
+          fi
+
+      - name: Download workflow artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/download-artifacts.js`);
+            await script({ github, context, runId: ${{ github.event.workflow_run.id }} });
+
+      - name: Get workflow run details
+        id: workflow-details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Inlined get-workflow-details.js to avoid MODULE_NOT_FOUND when scripts are absent
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }},
+            });
+
+            core.setOutput('run_url', run.data.html_url);
+            core.setOutput('run_number', run.data.run_number);
+            core.setOutput('head_branch', run.data.head_branch);
+            core.setOutput('head_sha', run.data.head_sha.substring(0, 7));
+            core.setOutput('triggering_actor', run.data.triggering_actor.login);
+
+            return run.data;
+
+      - name: Get jobs details
+        id: jobs-details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/get-jobs-details.js`);
+            await script({ github, context, core, runId: ${{ github.event.workflow_run.id }} });
+
+      - name: Check for existing issue
+        id: check-issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/check-existing-issue.js`);
+            await script({
+              github,
+              context,
+              core,
+              branch: '${{ steps.workflow-details.outputs.head_branch }}'
+            });
+
+      - name: Create or update issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/create-or-update-issue.js`);
+            const failedSteps = JSON.parse('${{ steps.jobs-details.outputs.failed_steps }}');
+
+            await script({
+              github,
+              context,
+              params: {
+                branch: '${{ steps.workflow-details.outputs.head_branch }}',
+                sha: '${{ steps.workflow-details.outputs.head_sha }}',
+                runUrl: '${{ steps.workflow-details.outputs.run_url }}',
+                runNumber: '${{ steps.workflow-details.outputs.run_number }}',
+                actor: '${{ steps.workflow-details.outputs.triggering_actor }}',
+                failedSteps: failedSteps,
+                issueExists: '${{ steps.check-issue.outputs.issue_exists }}' === 'true',
+                issueNumber: '${{ steps.check-issue.outputs.issue_number }}'
+              }
+            });
+
+  close-issue-on-success:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch != github.event.repository.default_branch }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure .github/scripts exists
+        run: |
+          # If the scripts directory or a key script is missing, fetch and checkout it from the
+          # repository default branch (useful when the triggering run comes from a fork/branch
+          # that doesn't contain the helper scripts).
+          if [ ! -f .github/scripts/close-ci-issues.js ]; then
+            echo ".github/scripts missing — fetching from default branch '${{ github.event.repository.default_branch }}'"
+            git fetch origin ${{ github.event.repository.default_branch }} --depth=1 || true
+            git checkout origin/${{ github.event.repository.default_branch }} -- .github/scripts || true
+          else
+            echo ".github/scripts present"
+          fi
+
+      - name: Get workflow details
+        id: workflow-details
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Inlined get-workflow-details.js to avoid MODULE_NOT_FOUND when scripts are absent
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: ${{ github.event.workflow_run.id }},
+            });
+
+            core.setOutput('run_url', run.data.html_url);
+            core.setOutput('run_number', run.data.run_number);
+            core.setOutput('head_branch', run.data.head_branch);
+            core.setOutput('head_sha', run.data.head_sha.substring(0, 7));
+            core.setOutput('triggering_actor', run.data.triggering_actor.login);
+
+            return run.data;
+
+      - name: Close related issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require(`${process.env.GITHUB_WORKSPACE}/.github/scripts/close-ci-issues.js`);
+            await script({
+              github,
+              context,
+              branch: '${{ steps.workflow-details.outputs.head_branch }}'
+            });
