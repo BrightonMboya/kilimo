@@ -7,7 +7,6 @@ author: brighton
 tags: ["food-traceability"]
 ---
 
-
 Agriculture as we know it, is backbone of many economies and especially in the Sub-Saharan Africa. But quite a handful of people actually understand the food supply chain and what goes into it. From seed factories, to farmers with a half an acre producing tomatoes, to the tomato pastes we buy at our groceries stores and even the ones exported to international markets. The food supply chain is huge and has a lot of inputs going into it. We will try to look at this from a wider perspective, the gaps and cracks in the supply chain, and opportunities in the eco system. We will also look into how data and traceability can help unlock huge economic wins for agribusiness and tech startups alike.
 
 The first component is what I love to call the Lower Level producers. These are your small scale farmers who produce food primarily to be sold in the local markets and somehow the regional markets in the country. They produce your Spinach, avocados, carrots, and day to day groceries we all use everyday. The people in this category do agriculture as a means to survive and make a small living that satisfies their normal needs.

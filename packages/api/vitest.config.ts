@@ -18,20 +18,13 @@ export default defineConfig({
         singleFork: true,
       },
     },
-    env: {
-      DATABASE_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
-      DIRECT_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
-      NODE_ENV: "test",
-    },
+    // env: {
+    //   // Use environment variables from .env.test
+    // },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        "src/tests/",
-        "**/*.config.*",
-        "**/index.ts",
-      ],
+      exclude: ["node_modules/", "src/tests/", "**/*.config.*", "**/index.ts"],
     },
   },
 });

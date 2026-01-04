@@ -9,7 +9,10 @@ import {
   FieldErrors,
   useFieldArray,
 } from "react-hook-form";
-import { defaultReportEventsObjects, type IReportSchema } from "@kilimo/api/schemas/reports";
+import {
+  defaultReportEventsObjects,
+  type IReportSchema,
+} from "@kilimo/api/schemas/reports";
 import { DatePicker } from "~/components/ui/DatePicker";
 import TrackingEventsForm from "./TrackingEventsForm";
 import Button from "~/components/ui/Button";

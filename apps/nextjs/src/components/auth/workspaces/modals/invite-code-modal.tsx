@@ -13,7 +13,6 @@ import { api } from "~/trpc/react";
 import { useParams } from "next/navigation";
 import { useToast } from "~/utils/hooks";
 
-
 function InviteCodeModal({
   showInviteCodeModal,
   setShowInviteCodeModal,
@@ -25,37 +24,35 @@ function InviteCodeModal({
   id: string;
   inviteCode: string;
 }) {
-
-
   const inviteLink = useMemo(() => {
     return `${APP_DOMAIN}/invites/${inviteCode}`;
   }, [inviteCode]);
 
   const params = useParams();
-  const {toast} = useToast()
-  const utils = api.useUtils()
+  const { toast } = useToast();
+  const utils = api.useUtils();
 
-  const {isLoading, mutateAsync} = api.workspace.resetInviteLink.useMutation({
+  const { isLoading, mutateAsync } = api.workspace.resetInviteLink.useMutation({
     onError: (error) => {
       toast({
         description: "Failed to reset the invite link",
-        variant: "destructive"
-      })
+        variant: "destructive",
+      });
     },
     onSettled: () => {
       toast({
-        description: "Invite code reset succesfully"
-      })
-      utils.workspace.getSpecificWorkspace.invalidate()
+        description: "Invite code reset succesfully",
+      });
+      utils.workspace.getSpecificWorkspace.invalidate();
     },
     onSuccess: () => {
-      alert("This is the on Success")
+      alert("This is the on Success");
       toast({
-        description: "Invite code reset succesfully"
-      })
-      utils.workspace.getSpecificWorkspace.invalidate()
-    }
-  })
+        description: "Invite code reset succesfully",
+      });
+      utils.workspace.getSpecificWorkspace.invalidate();
+    },
+  });
 
   return (
     <Modal
@@ -82,7 +79,9 @@ function InviteCodeModal({
           variant="secondary"
           loading={isLoading}
           onClick={() => {
-            mutateAsync({workspaceSlug: params.accountSlug as unknown as string})
+            mutateAsync({
+              workspaceSlug: params.accountSlug as unknown as string,
+            });
           }}
         />
       </div>

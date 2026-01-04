@@ -74,7 +74,7 @@ export function BlogHero({
             {tags?.map((tag) => (
               <p
                 key={tag}
-                className="py-.5 z-100 flex w-fit items-center rounded-md bg-primary/90 px-[9px] text-sm capitalize leading-6 "
+                className="py-.5 z-100 bg-primary/90 flex w-fit items-center rounded-md px-[9px] text-sm capitalize leading-6 "
               >
                 {tag.charAt(0).toUpperCase() + tag.slice(1)}
               </p>

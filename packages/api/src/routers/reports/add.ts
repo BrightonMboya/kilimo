@@ -5,9 +5,13 @@ import { reportSchema } from "../../schemas/reports";
 
 export const add = createTRPCRouter({
   add: protectedProcedure
-    .input(reportSchema.merge(z.object({
-      workspaceSlug: z.string(),
-    })))
+    .input(
+      reportSchema.merge(
+        z.object({
+          workspaceSlug: z.string(),
+        }),
+      ),
+    )
     .mutation(async ({ ctx, input }) => {
       const workspace = await ctx.db.project.findUnique({
         where: {

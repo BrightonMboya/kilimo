@@ -18,7 +18,5 @@ Sentry.init({
   // spotlight: process.env.NODE_ENV === 'development',
 
   // integrating sentry with the prisma adapter
-  integrations: [
-    Sentry.prismaIntegration(),
-  ],
+  integrations: [Sentry.prismaIntegration()],
 });

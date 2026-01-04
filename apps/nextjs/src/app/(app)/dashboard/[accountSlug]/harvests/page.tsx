@@ -14,7 +14,6 @@ export default async function Index(props: {
     workspaceSlug: props.params.accountSlug,
   });
 
-
   return (
     <HydrateClient>
       <main className="">

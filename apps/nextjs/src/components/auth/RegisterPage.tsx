@@ -8,8 +8,6 @@ export const metadata = constructMetadata({
   title: `Create your ${process.env.NEXT_PUBLIC_APP_NAME} account`,
 });
 
-
-
 export default function RegisterPage() {
   return (
     <div className="grid w-full grid-cols-1 md:grid-cols-3">
@@ -38,7 +36,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-     
     </div>
   );
 }

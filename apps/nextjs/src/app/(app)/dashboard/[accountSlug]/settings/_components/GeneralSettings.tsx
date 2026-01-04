@@ -81,7 +81,6 @@ export default function GeneralSettings({ data }: any) {
 
           console.log(res);
         }}
-       
       />
     </>
   );

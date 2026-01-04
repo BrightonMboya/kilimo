@@ -13,7 +13,7 @@ import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import styles from "~/components/landingPage/gradient.module.css"
+import styles from "~/components/landingPage/gradient.module.css";
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({
@@ -32,7 +32,6 @@ export function generateMetadata({
   return {
     title: `${post.title} | Jani AI`,
     description: post.description,
-  
 
     openGraph: {
       title: `${post.title} | Jani AI`,
@@ -76,12 +75,12 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
       <div className="container mx-auto scroll-smooth pt-48 sm:overflow-hidden md:overflow-visible ">
         <div className="flex w-full flex-row">
           <div className="flex w-full flex-col lg:w-3/4">
-            <div className={`prose sm:prose-sm md:prose-md sm:mx-6 ${styles["gradient"]}`}>
+            <div
+              className={`prose sm:prose-sm md:prose-md sm:mx-6 ${styles["gradient"]}`}
+            >
               <div className="m-0 mb-8 flex items-center gap-5 p-0 text-xl font-medium leading-8">
                 <Link href="/blog">
-                  <span className="bg-clip-text  ">
-                    Blog
-                  </span>
+                  <span className="bg-clip-text  ">Blog</span>
                 </Link>
                 <span className="text-black/40">/</span>
                 <Link href={`/blog?tag=${post.tags?.at(0)}`}>
@@ -90,7 +89,9 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
                   </span>
                 </Link>
               </div>
-              <h1 className="text-balance text-3xl font-bold tracking-tight md:text-4xl lg:text-6xl blog-heading-gradient">{post.title}</h1>
+              <h1 className="blog-heading-gradient text-balance text-3xl font-bold tracking-tight md:text-4xl lg:text-6xl">
+                {post.title}
+              </h1>
               {/* <p className="not-prose mt-8 text-lg font-medium leading-8 text-black/60 lg:text-xl">
                 {post.description}
               </p> */}
@@ -162,9 +163,7 @@ const BlogArticleWrapper = async ({ params }: { params: { slug: string } }) => {
             </div>
             {post.tableOfContents?.length !== 0 ? (
               <div className="not-prose flex flex-col gap-4 lg:gap-2">
-                <p className="prose text-nowrap text-sm text-black">
-                  Contents
-                </p>
+                <p className="prose text-nowrap text-sm text-black">Contents</p>
                 <ul className="relative flex flex-col gap-1 overflow-hidden">
                   {post.tableOfContents.map((heading) => {
                     return (

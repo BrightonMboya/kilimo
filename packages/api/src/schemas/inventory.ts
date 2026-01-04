@@ -1,4 +1,4 @@
-import z from "zod"
+import z from "zod";
 
 export const inventorySchema = z.object({
   name: z.string().min(1),
@@ -6,5 +6,5 @@ export const inventorySchema = z.object({
   inventoryUnit: z.string().min(1),
   description: z.string(),
   estimatedValuePerUnit: z.string().min(1),
-  warehouseId: z.string().min(1),
+  warehousesId: z.string().min(1),
 });

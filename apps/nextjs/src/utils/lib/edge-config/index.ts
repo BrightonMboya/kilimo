@@ -1,1 +1,1 @@
-export * from "./is-reserved-key"
+export * from "./is-reserved-key";

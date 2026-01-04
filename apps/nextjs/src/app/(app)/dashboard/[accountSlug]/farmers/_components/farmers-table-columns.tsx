@@ -18,8 +18,6 @@ import { api } from "~/trpc/react";
 import DeleteFarmerButton from "./delete-farmer-button";
 import { useParams } from "next/navigation";
 
-
-
 export const columns: ColumnDef<Farmers>[] = [
   {
     id: "select",
@@ -99,7 +97,7 @@ export const columns: ColumnDef<Farmers>[] = [
     cell: ({ row }) => {
       const farmer = row.original;
       const { mutateAsync } = api.farmers.delete.useMutation({});
-      const params = useParams()
+      const params = useParams();
 
       return (
         <DropdownMenu>

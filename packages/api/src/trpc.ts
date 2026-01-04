@@ -43,7 +43,10 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = async (opts: { headers: Headers; session: Session | null }) => {
+export const createTRPCContext = async (opts: {
+  headers: Headers;
+  session: Session | null;
+}) => {
   return createInnerTRPCContext({
     session: opts.session,
     headers: opts.headers,
@@ -67,9 +70,8 @@ const t = initTRPC.context<TRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError: error.cause instanceof ZodError
-          ? error.cause.flatten()
-          : null,
+        zodError:
+          error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },
@@ -130,7 +132,7 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
   });
 });
 
-const withSentryMiddleware  = sentryMiddleware.unstable_pipe(enforceUserIsAuthed)
+const withSentryMiddleware =
+  sentryMiddleware.unstable_pipe(enforceUserIsAuthed);
 
 export const protectedProcedure = t.procedure.use(withSentryMiddleware);
-

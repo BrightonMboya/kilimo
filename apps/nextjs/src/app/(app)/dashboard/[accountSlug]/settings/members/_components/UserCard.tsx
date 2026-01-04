@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useRemoveTeammateModal } from "~/components/auth/workspaces/modals/use-remove-team-modal";
 import { CheckCircleFill, ThreeDots } from "~/components/ui/icons";
 import {
@@ -10,14 +10,13 @@ import {
   PopoverTrigger,
 } from "~/components/ui";
 import { cn } from "@kilimo/utils";
-import {timeAgo} from "~/utils/functions";
+import { timeAgo } from "~/utils/functions";
 import { UserMinus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useToast } from "~/utils/hooks";
 import { useState } from "react";
 import { Button } from "~/components/auth/Auth-Button";
 import { useEditRoleModal } from "~/components/auth/workspaces/modals/edit-role-modal";
-
 
 const UserCard = ({
   user,

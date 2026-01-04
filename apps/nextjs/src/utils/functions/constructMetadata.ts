@@ -2,10 +2,8 @@ import { Metadata } from "next";
 import { HOME_DOMAIN } from "@kilimo/utils";
 
 export function constructMetadata({
-  title =
-    `${process.env.NEXT_PUBLIC_APP_NAME} - Helping Aggregators tracking resources across the supply chain`,
-  description =
-    `${process.env.NEXT_PUBLIC_APP_NAME} helps aggregators track resources across the supply chain, from the farm all the way to the fork`,
+  title = `${process.env.NEXT_PUBLIC_APP_NAME} - Helping Aggregators tracking resources across the supply chain`,
+  description = `${process.env.NEXT_PUBLIC_APP_NAME} helps aggregators track resources across the supply chain, from the farm all the way to the fork`,
   image = "https://assets.dub.co/thumbnail.jpg",
   icons = [
     {

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { cn } from "@kilimo/utils";
 import { VariantProps, cva } from "class-variance-authority";

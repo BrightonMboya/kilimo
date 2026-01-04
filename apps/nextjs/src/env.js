@@ -7,27 +7,14 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    // Allow a sensible default for test/local CI runs so tests can run without
-    // requiring the caller to always set DATABASE_URL. In production this
-    // should be provided explicitly via environment variables.
-    DATABASE_URL: z
-      .string()
-      .url()
-      .default(process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/kilimo_test")
-      .refine(
-        (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
-        "You forgot to change the default URL",
-      ),
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
+    DATABASE_URL: z.string().url().optional(),
+    NODE_ENV: z.string(),
 
-  // Allow these to be optional for local CI/testing runs where tokens may not be present.
-  SUPABASE_SERVICE_KEY: z.string().optional(),
-  GITHUB_CLIENT_ID: z.string().optional(),
-  GITHUB_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
+    SUPABASE_SERVICE_KEY: z.string().optional(),
+    GITHUB_CLIENT_ID: z.string().optional(),
+    GITHUB_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
   },
 
   /**
@@ -38,8 +25,8 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
 
-    NEXT_PUBLIC_SUPABASE_URL: z.string(),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+    NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
   },
 
   /**

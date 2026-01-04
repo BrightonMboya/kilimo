@@ -1,6 +1,5 @@
 import { CalendarIcon } from "@radix-ui/react-icons";
 
-
 import {
   ArchiveIcon,
   CoinsIcon,
@@ -84,7 +83,6 @@ type IconsMap = {
   [key in IconType]: JSX.Element;
 };
 
-
 export const iconsMap: IconsMap = {
   plus: <PlusIcon />,
   trash: <TrashIcon />,
@@ -124,8 +122,6 @@ export const iconsMap: IconsMap = {
   "give-custody": <GiveCustodyIcon />,
   "take-custody": <TakeCustodyIcon />,
 };
-
-
 
 export default iconsMap;
 function Spinner({ className }: { className?: string }) {

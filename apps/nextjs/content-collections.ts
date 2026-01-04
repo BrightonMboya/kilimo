@@ -25,16 +25,17 @@ const posts = defineCollection({
     });
     const slugger = new GithubSlugger();
     const regXHeader = /\n(?<flag>#+)\s+(?<content>.+)/g;
-    const tableOfContents = Array.from(document.content.matchAll(regXHeader))
-      .map(({ groups }) => {
-        const flag = groups?.flag;
-        const content = groups?.content;
-        return {
-          level: flag?.length,
-          text: content,
-          slug: content ? slugger.slug(content) : undefined,
-        };
-      });
+    const tableOfContents = Array.from(
+      document.content.matchAll(regXHeader),
+    ).map(({ groups }) => {
+      const flag = groups?.flag;
+      const content = groups?.content;
+      return {
+        level: flag?.length,
+        text: content,
+        slug: content ? slugger.slug(content) : undefined,
+      };
+    });
     return {
       ...document,
       mdx,
@@ -44,8 +45,6 @@ const posts = defineCollection({
     };
   },
 });
-
-
 
 export default defineConfig({
   collections: [posts],

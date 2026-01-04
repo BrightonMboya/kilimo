@@ -41,13 +41,13 @@ export const MdxComponents = {
   h1: (props: any) => (
     <h2
       {...props}
-      className=" scroll-mt-20 pt-5 text-2xl lg:text-4xl font-extrabold leading-8 text-primary"
+      className=" text-primary scroll-mt-20 pt-5 text-2xl font-extrabold leading-8 lg:text-4xl"
     />
   ),
   h2: (props: any) => (
     <h2
       {...props}
-      className=" scroll-mt-20 pt-5 text-2xl lg:text-3xl font-bold leading-8 text-primary "
+      className=" text-primary scroll-mt-20 pt-5 text-2xl font-bold leading-8 lg:text-3xl "
     />
   ),
   h3: (props: any) => (
@@ -57,15 +57,12 @@ export const MdxComponents = {
     />
   ),
   h4: (props: any) => (
-    <h4
-      {...props}
-      className=" text-lg font-medium leading-8 text-black/60"
-    />
+    <h4 {...props} className=" text-lg font-medium leading-8 text-black/60" />
   ),
   p: (props: any) => (
     <p
       {...props}
-      className="text-left text-lg font-normal leading-8 text-black/90 pt-5"
+      className="pt-5 text-left text-lg font-normal leading-8 text-black/90"
     />
   ),
   code: (props: any) => (
@@ -74,7 +71,6 @@ export const MdxComponents = {
       {...props}
     />
   ),
-  
 };
 
 interface MDXProps {

@@ -7,7 +7,6 @@ import {
   Pricing,
 } from "~/components/landingPage";
 
-
 function Page() {
   return (
     <>

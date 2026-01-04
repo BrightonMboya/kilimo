@@ -14,7 +14,7 @@ export default function WelcomePage() {
     <>
       {/* <Background /> */}
       {/* <Suspense> */}
-        <WelcomePageClient />
+      <WelcomePageClient />
       {/* </Suspense> */}
     </>
   );

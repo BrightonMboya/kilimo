@@ -14,7 +14,7 @@ import {
   PopoverTrigger,
 } from "~/components/ui";
 
-import {  FADE_IN_ANIMATION_SETTINGS } from "@kilimo/utils";
+import { FADE_IN_ANIMATION_SETTINGS } from "@kilimo/utils";
 import { motion } from "framer-motion";
 import { Check, ChevronRight, Link2 } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -71,9 +71,7 @@ export function QRCodePicker({
 
   const [showLogo, setShowLogo] = useState(true);
   const [fgColor, setFgColor] = useState("#000000");
-   const params = useParams();
-
-
+  const params = useParams();
 
   const qrData = useMemo(
     () => ({
@@ -91,8 +89,7 @@ export function QRCodePicker({
       level: "Q", // QR Code error correction level: https://blog.qrstuff.com/general/qr-code-error-correction
       ...(showLogo && {
         imageSettings: {
-          src:
-            "/static/images/brand/jani-icon-black.png",
+          src: "/static/images/brand/jani-icon-black.png",
           height: 256,
           width: 256,
           excavate: true,
@@ -295,7 +292,6 @@ function AdvancedSettings({
   // setShowLogo,
   // setShowReportQRModal,
 }: any) {
-
   const [expanded, setExpanded] = useState(false);
 
   const debouncedSetFgColor = useDebouncedCallback((color) => {
@@ -380,7 +376,7 @@ function QrDropdown({
         <button
           type="button"
           onClick={() => setOpenPopover(!openPopover)}
-          className="flex w-full items-center justify-center gap-2 rounded-md border bg-primary px-5 py-1.5 text-sm text-white transition-all hover:bg-white hover:text-black"
+          className="bg-primary flex w-full items-center justify-center gap-2 rounded-md border px-5 py-1.5 text-sm text-white transition-all hover:bg-white hover:text-black"
         >
           {button}
         </button>

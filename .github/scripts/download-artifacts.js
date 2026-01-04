@@ -11,10 +11,13 @@ module.exports = async ({ github, context, runId }) => {
       repo: context.repo.repo,
       run_id: runId,
     });
-    console.log('Artifacts:', artifacts.data);
+    console.log("Artifacts:", artifacts.data);
     return artifacts.data;
   } catch (err) {
-    console.error('download-artifacts failed:', err && err.message ? err.message : err);
+    console.error(
+      "download-artifacts failed:",
+      err && err.message ? err.message : err,
+    );
     throw err;
   }
 };

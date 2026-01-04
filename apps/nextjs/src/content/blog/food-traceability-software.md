@@ -7,8 +7,6 @@ author: brighton
 tags: ["food-traceability"]
 ---
 
-
-
 In today's complex global food supply chains, traceability software has become an indispensable tool for food businesses and a critical factor in ensuring consumer safety. But what exactly is traceability software, and why should both businesses and consumers care about it? Let's dive in.
 
 ## What is Traceability Software?

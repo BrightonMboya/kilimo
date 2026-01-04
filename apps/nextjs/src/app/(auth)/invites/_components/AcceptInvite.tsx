@@ -8,15 +8,15 @@ export default function AcceptInvite() {
   const workspaceSlug = searchParams.get("workspaceSlug");
   const email = searchParams.get("email");
   return (
-    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+    <div className="bg-background flex min-h-[100dvh] flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md text-center">
-        <div className="inline-flex items-center justify-center rounded-full bg-primary p-4 text-primary-foreground">
+        <div className="bg-primary text-primary-foreground inline-flex items-center justify-center rounded-full p-4">
           <MailOpenIcon className="h-8 w-8" />
         </div>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+        <h1 className="text-foreground mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
           {` You've been invited to ${process.env.NEXT_PUBLIC_APP_NAME}`}
         </h1>
-        <p className="mt-4 text-muted-foreground">
+        <p className="text-muted-foreground mt-4">
           {`
           You've been invited to join the workspace ${workspaceSlug}. To accept the
           invitation, please log in with the email address
@@ -26,7 +26,7 @@ export default function AcceptInvite() {
         <div className="mt-6">
           <Link
             href={`/register?invite=true&email=${email}&workspaceSlug=${workspaceSlug}`}
-            className="inline-flex w-[200px] items-center justify-center rounded-md bg-primary px-4 py-2 text-center text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-[200px] items-center justify-center rounded-md px-4 py-2 text-center text-base font-medium shadow-sm transition-colors"
             prefetch={false}
           >
             Log in

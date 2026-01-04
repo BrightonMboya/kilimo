@@ -13,29 +13,39 @@
  * @param {number} params.issueNumber - Existing issue number (if exists)
  */
 module.exports = async ({ github, context, params }) => {
-  const { branch, sha, runUrl, runNumber, actor, failedSteps, issueExists, issueNumber } = params;
+  const {
+    branch,
+    sha,
+    runUrl,
+    runNumber,
+    actor,
+    failedSteps,
+    issueExists,
+    issueNumber,
+  } = params;
 
   // Categorize failures by job type
   const jobCategories = {
     critical: [],
     quality: [],
-    other: []
+    other: [],
   };
 
-  const uniqueJobs = [...new Set(failedSteps.map(s => s.job))];
-  uniqueJobs.forEach(job => {
+  const uniqueJobs = [...new Set(failedSteps.map((s) => s.job))];
+  uniqueJobs.forEach((job) => {
     const jobLower = job.toLowerCase();
-    if (jobLower.includes('test') || jobLower.includes('security')) {
+    if (jobLower.includes("test") || jobLower.includes("security")) {
       jobCategories.critical.push(job);
-    } else if (jobLower.includes('lint') || jobLower.includes('format')) {
+    } else if (jobLower.includes("lint") || jobLower.includes("format")) {
       jobCategories.quality.push(job);
     } else {
       jobCategories.other.push(job);
     }
   });
 
-  const priorityEmoji = jobCategories.critical.length > 0 ? '🔴' : '🟡';
-  const priorityLabel = jobCategories.critical.length > 0 ? 'HIGH PRIORITY' : 'MEDIUM PRIORITY';
+  const priorityEmoji = jobCategories.critical.length > 0 ? "🔴" : "🟡";
+  const priorityLabel =
+    jobCategories.critical.length > 0 ? "HIGH PRIORITY" : "MEDIUM PRIORITY";
 
   // Build metadata section
   const metadata = `
@@ -58,7 +68,7 @@ module.exports = async ({ github, context, params }) => {
 
   // Group failed steps by job
   const stepsByJob = {};
-  failedSteps.forEach(step => {
+  failedSteps.forEach((step) => {
     if (!stepsByJob[step.job]) {
       stepsByJob[step.job] = [];
     }
@@ -66,27 +76,31 @@ module.exports = async ({ github, context, params }) => {
   });
 
   // Format failed steps table with grouping
-  let stepsTable = '';
+  let stepsTable = "";
   Object.entries(stepsByJob).forEach(([job, steps]) => {
-    const jobEmoji = jobCategories.critical.includes(job) ? '🔴' :
-                     jobCategories.quality.includes(job) ? '🟡' : '🔵';
+    const jobEmoji = jobCategories.critical.includes(job)
+      ? "🔴"
+      : jobCategories.quality.includes(job)
+        ? "🟡"
+        : "🔵";
     stepsTable += `\n#### ${jobEmoji} ${job}\n\n`;
-    stepsTable += '| Step Name | Status | Logs |\n|-----------|--------|------|\n';
-    steps.forEach(step => {
+    stepsTable +=
+      "| Step Name | Status | Logs |\n|-----------|--------|------|\n";
+    steps.forEach((step) => {
       stepsTable += `| ${step.step} | ❌ Failed | [View](${step.url}) |\n`;
     });
   });
 
   // Build detailed error analysis
-  let errorAnalysis = '\n### 🔍 Detailed Analysis\n';
+  let errorAnalysis = "\n### 🔍 Detailed Analysis\n";
 
   if (jobCategories.critical.length > 0) {
     errorAnalysis += `\n#### 🔴 Critical Failures (${jobCategories.critical.length} jobs)\n\n`;
-    errorAnalysis += '**These must be fixed before merging:**\n\n';
-    jobCategories.critical.forEach(job => {
+    errorAnalysis += "**These must be fixed before merging:**\n\n";
+    jobCategories.critical.forEach((job) => {
       const steps = stepsByJob[job];
       errorAnalysis += `- **${job}**: ${steps.length} step(s) failed\n`;
-      steps.forEach(step => {
+      steps.forEach((step) => {
         errorAnalysis += `  - ❌ ${step.step}\n`;
       });
     });
@@ -94,10 +108,10 @@ module.exports = async ({ github, context, params }) => {
 
   if (jobCategories.quality.length > 0) {
     errorAnalysis += `\n#### 🟡 Code Quality Issues (${jobCategories.quality.length} jobs)\n\n`;
-    jobCategories.quality.forEach(job => {
+    jobCategories.quality.forEach((job) => {
       const steps = stepsByJob[job];
       errorAnalysis += `- **${job}**: ${steps.length} step(s) failed\n`;
-      steps.forEach(step => {
+      steps.forEach((step) => {
         errorAnalysis += `  - ⚠️ ${step.step}\n`;
       });
     });
@@ -105,7 +119,7 @@ module.exports = async ({ github, context, params }) => {
 
   if (jobCategories.other.length > 0) {
     errorAnalysis += `\n#### 🔵 Other Issues (${jobCategories.other.length} jobs)\n\n`;
-    jobCategories.other.forEach(job => {
+    jobCategories.other.forEach((job) => {
       const steps = stepsByJob[job];
       errorAnalysis += `- **${job}**: ${steps.length} step(s) failed\n`;
     });
@@ -129,10 +143,10 @@ git pull origin ${branch}
 make ci-test
 
 # Or run specific checks:
-${jobCategories.critical.some(j => j.toLowerCase().includes('test')) ? 'make test        # Run tests\n' : ''}${jobCategories.critical.some(j => j.toLowerCase().includes('security')) ? 'bandit -r src/  # Security scan\n' : ''}${jobCategories.quality.some(j => j.toLowerCase().includes('lint')) ? 'make lint       # Linting checks\n' : ''}\`\`\`
+${jobCategories.critical.some((j) => j.toLowerCase().includes("test")) ? "make test        # Run tests\n" : ""}${jobCategories.critical.some((j) => j.toLowerCase().includes("security")) ? "bandit -r src/  # Security scan\n" : ""}${jobCategories.quality.some((j) => j.toLowerCase().includes("lint")) ? "make lint       # Linting checks\n" : ""}\`\`\`
 
 **3. Fix Issues:**
-${jobCategories.critical.length > 0 ? '- [ ] Fix all critical failures (tests, security)\n' : ''}${jobCategories.quality.length > 0 ? '- [ ] Resolve code quality issues (linting, formatting)\n' : ''}${jobCategories.other.length > 0 ? '- [ ] Address other failures\n' : ''}- [ ] Verify all checks pass locally
+${jobCategories.critical.length > 0 ? "- [ ] Fix all critical failures (tests, security)\n" : ""}${jobCategories.quality.length > 0 ? "- [ ] Resolve code quality issues (linting, formatting)\n" : ""}${jobCategories.other.length > 0 ? "- [ ] Address other failures\n" : ""}- [ ] Verify all checks pass locally
 
 **4. Validation:**
 - [ ] Commit fixes with descriptive message
@@ -202,7 +216,7 @@ ${commands}
       issue_number: issueNumber,
       body: `## 🔄 CI Still Failing (Attempt #${runNumber})
 
-${issueBody}`
+${issueBody}`,
     });
 
     console.log(`✅ Updated existing issue #${issueNumber}`);
@@ -210,29 +224,33 @@ ${issueBody}`
     console.log(`   Priority: ${priorityLabel}`);
   } else {
     // Determine labels
-    const labels = ['ci-failure', 'automated'];
+    const labels = ["ci-failure", "automated"];
     if (jobCategories.critical.length > 0) {
-      labels.push('priority: high', 'bug');
+      labels.push("priority: high", "bug");
     } else {
-      labels.push('priority: medium', 'code-quality');
+      labels.push("priority: medium", "code-quality");
     }
 
-  // Add specific labels
-  if (uniqueJobs.some(j => j.toLowerCase().includes('test'))) labels.push('tests');
-  if (uniqueJobs.some(j => j.toLowerCase().includes('security'))) labels.push('security');
-  if (uniqueJobs.some(j => j.toLowerCase().includes('lint'))) labels.push('linting');
+    // Add specific labels
+    if (uniqueJobs.some((j) => j.toLowerCase().includes("test")))
+      labels.push("tests");
+    if (uniqueJobs.some((j) => j.toLowerCase().includes("security")))
+      labels.push("security");
+    if (uniqueJobs.some((j) => j.toLowerCase().includes("lint")))
+      labels.push("linting");
 
-  // Deduplicate labels and trim
-  const labelSet = new Set(labels.map(l => String(l).trim()));
-  const finalLabels = Array.from(labelSet);
+    // Deduplicate labels and trim
+    const labelSet = new Set(labels.map((l) => String(l).trim()));
+    const finalLabels = Array.from(labelSet);
 
     // Create new issue with enhanced title
-    const failedJobsList = uniqueJobs.slice(0, 2).join(', ') +
-                          (uniqueJobs.length > 2 ? ` +${uniqueJobs.length - 2} more` : '');
+    const failedJobsList =
+      uniqueJobs.slice(0, 2).join(", ") +
+      (uniqueJobs.length > 2 ? ` +${uniqueJobs.length - 2} more` : "");
 
     try {
       // Avoid assigning bot accounts
-      const isBot = typeof actor === 'string' && /bot(]|$)/i.test(actor);
+      const isBot = typeof actor === "string" && /bot(]|$)/i.test(actor);
       const assignees = isBot ? [] : [actor];
 
       const issue = await github.rest.issues.create({
@@ -241,15 +259,18 @@ ${issueBody}`
         title: `${priorityEmoji} CI Failure: ${failedJobsList} on ${branch} (${sha})`,
         body: issueBody,
         labels: finalLabels,
-        assignees: assignees
+        assignees: assignees,
       });
 
       console.log(`✅ Created new issue #${issue.data.number}`);
       console.log(`   Title: ${issue.data.title}`);
       console.log(`   Priority: ${priorityLabel}`);
-      console.log(`   Labels: ${finalLabels.join(', ')}`);
+      console.log(`   Labels: ${finalLabels.join(", ")}`);
     } catch (err) {
-      console.error('❌ Failed to create issue:', err && err.message ? err.message : err);
+      console.error(
+        "❌ Failed to create issue:",
+        err && err.message ? err.message : err,
+      );
       // Re-throw so calling workflow step can fail if desired
       throw err;
     }

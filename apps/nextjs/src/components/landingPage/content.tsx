@@ -1,4 +1,3 @@
-
 export const FEATURES_LIST = [
   {
     title: "Farmer Management",
@@ -30,7 +29,6 @@ export const FEATURES_LIST = [
     // icon: Users,
     href: "#",
   },
-  
 ];
 
 export const CUSTOMER_STORIES = [
@@ -42,11 +40,7 @@ export const CUSTOMER_STORIES = [
       "How Nestle tracks their resources from remote farmers in Ivory Coast",
     href: "/customers/raycast",
   },
-  
 ];
-
-
-
 
 export const RESOURCES = [
   {

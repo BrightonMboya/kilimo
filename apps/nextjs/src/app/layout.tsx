@@ -8,8 +8,7 @@ import { TooltipProvider } from "~/components/ui";
 import { Toaster } from "sonner";
 import { Toaster as ShadToaster } from "~/components/ui";
 import ModalProvider from "~/components/auth/workspaces/WorskpaceModalProvider";
-import { Analytics } from "@vercel/analytics/react"
-
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -48,13 +47,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.className}`}>
-    <head>
-      <link rel="manifest" href="/manifest.json" />
-    </head>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={`${GeistSans.className} font-sans`}>
         {/* <Toaster closeButton className="pointer-events-auto" />  */}
         <Toaster />
-        <Analytics/>
+        <Analytics />
         {/* <ShadToaster /> */}
         <TRPCReactProvider headers={headers()}>
           <ModalProvider>{children}</ModalProvider>

@@ -139,7 +139,7 @@ const Input = forwardRef(function Input(
 
       {/* Error */}
       {!hideErrorText && error && (
-        <div className="text-red-500 text-sm">{error}</div>
+        <div className="text-sm text-red-500">{error}</div>
       )}
     </label>
   );

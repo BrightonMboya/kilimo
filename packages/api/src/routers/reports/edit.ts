@@ -5,17 +5,19 @@ import { reportSchema } from "../../schemas/reports";
 
 export const edit = createTRPCRouter({
   edit: protectedProcedure
-    .input(reportSchema.merge(
-      z.object({
-        id: z.string(),
-        workspaceSlug: z.string(),
-      }),
-    ))
+    .input(
+      reportSchema.merge(
+        z.object({
+          id: z.string(),
+          workspaceSlug: z.string(),
+        }),
+      ),
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         const newEvents = input.trackingEvents.filter((event) => event.isItNew);
-        const oldEvents = input.trackingEvents.filter((event) =>
-          !event.isItNew
+        const oldEvents = input.trackingEvents.filter(
+          (event) => !event.isItNew,
         );
         const workspace = await ctx.db.project.findUnique({
           where: {
@@ -38,26 +40,24 @@ export const edit = createTRPCRouter({
             harvestsId: input.harvestId,
             project_id: workspace?.id,
             ReportTrackingEvents: {
-              update: oldEvents
-                .map((event) => ({
-                  where: {
-                    id: event.id,
-                    project_id: workspace?.id,
-                  },
-                  data: {
-                    eventName: event.eventName,
-                    dateCreated: event.dateCreated,
-                    description: event.description,
-                  },
-                })),
+              update: oldEvents.map((event) => ({
+                where: {
+                  id: event.id,
+                  project_id: workspace?.id,
+                },
+                data: {
+                  eventName: event.eventName,
+                  dateCreated: event.dateCreated,
+                  description: event.description,
+                },
+              })),
               createMany: {
-                data: newEvents
-                  .map((event) => ({
-                    eventName: event.eventName,
-                    dateCreated: event.dateCreated,
-                    description: event.description,
-                    project_id: workspace?.id!,
-                  })),
+                data: newEvents.map((event) => ({
+                  eventName: event.eventName,
+                  dateCreated: event.dateCreated,
+                  description: event.description,
+                  project_id: workspace?.id!,
+                })),
               },
             },
           },

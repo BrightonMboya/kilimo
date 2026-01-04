@@ -9,13 +9,7 @@ import { equipmentSchema } from "../schemas/equipments";
 
 const equipments = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      equipmentSchema.merge(
-        z.object({
-          organizationId: z.string(),
-        }),
-      ),
-    )
+    .input(equipmentSchema)
     .mutation(async ({ ctx, input }) => {
       try {
         return await ctx.db.equipments.create({

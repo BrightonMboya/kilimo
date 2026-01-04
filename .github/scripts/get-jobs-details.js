@@ -14,24 +14,31 @@ module.exports = async ({ github, context, core, runId }) => {
     });
 
     const jobs = (jobsResp.data && jobsResp.data.jobs) || [];
-    const failedJobs = jobs.filter(job => job.conclusion === 'failure');
-    const failedSteps = failedJobs.flatMap(job =>
-      (job.steps || []).filter(step => step.conclusion === 'failure')
-        .map(step => ({
+    const failedJobs = jobs.filter((job) => job.conclusion === "failure");
+    const failedSteps = failedJobs.flatMap((job) =>
+      (job.steps || [])
+        .filter((step) => step.conclusion === "failure")
+        .map((step) => ({
           job: job.name,
           step: step.name,
-          url: job.html_url
-        }))
+          url: job.html_url,
+        })),
     );
 
-    if (core && typeof core.setOutput === 'function') {
-      core.setOutput('failed_jobs', JSON.stringify(failedJobs.map(j => j.name)));
-      core.setOutput('failed_steps', JSON.stringify(failedSteps));
+    if (core && typeof core.setOutput === "function") {
+      core.setOutput(
+        "failed_jobs",
+        JSON.stringify(failedJobs.map((j) => j.name)),
+      );
+      core.setOutput("failed_steps", JSON.stringify(failedSteps));
     }
 
     return failedSteps;
   } catch (err) {
-    console.error('get-jobs-details failed:', err && err.message ? err.message : err);
+    console.error(
+      "get-jobs-details failed:",
+      err && err.message ? err.message : err,
+    );
     throw err;
   }
 };

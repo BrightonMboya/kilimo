@@ -7,7 +7,6 @@ author: brighton
 tags: ["eu food traceability law"]
 ---
 
-
 Are you exporting food products to the European Union? If so, you need to be aware of the EU's General Food Law Regulation (EC) No 178/2002. This regulation has significant implications for food importers and could affect your business. Let's dive into what this means for you and how you can stay compliant.
 
 ## What is the EU General Food Law Regulation?
@@ -54,7 +53,7 @@ By implementing JANI AI's solution, you can ensure compliance with EU regulation
 
 For more detailed information about the EU's General Food Law Regulation, visit the [official EU Food Safety website](https://food.ec.europa.eu/horizontal-topics/general-food-law/food-law-general-requirements_en).
 
-Don't let these regulations catch you off guard. Stay ahead of the curve and ensure your business continues to thrive in the EU market. 
+Don't let these regulations catch you off guard. Stay ahead of the curve and ensure your business continues to thrive in the EU market.
 
 **Ready to see how JANI AI can transform your food traceability process?** [Book a demo today](https://cal.com/brightonmboya/15min) to learn more about our features tailored for EU compliance.
 

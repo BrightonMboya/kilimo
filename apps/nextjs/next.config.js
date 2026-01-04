@@ -5,11 +5,11 @@
 // await import("./src/env.js");
 // Injected content via Sentry wizard below
 const { withSentryConfig } = require("@sentry/nextjs");
-const NextMDX = require("@next/mdx")
+const NextMDX = require("@next/mdx");
 const { withContentCollections } = require("@content-collections/next");
-const withPWA = require('next-pwa')({
-  dest: 'public'
-})
+const withPWA = require("next-pwa")({
+  dest: "public",
+});
 
 const withMDX = NextMDX();
 

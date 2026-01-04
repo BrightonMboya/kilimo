@@ -4,11 +4,10 @@ import {
   publicProcedure,
 } from "../../trpc";
 import { z } from "zod";
-import {nanoid} from "@kilimo/utils/functions"
+import { nanoid } from "@kilimo/utils/functions";
 import { waitUntil } from "@vercel/functions";
 import { TRPCClientError } from "@trpc/client";
 import { WorkspaceSchema } from "./schema";
-
 
 export const addWorkSpace = createTRPCRouter({
   addWorkSpace: protectedProcedure
@@ -31,7 +30,7 @@ export const addWorkSpace = createTRPCRouter({
         },
       });
       if (project) {
-        throw new TRPCClientError("Project already in use")
+        throw new TRPCClientError("Project already in use");
       } else {
         // // lets check if the person can create more than one workspaces
         // const freeWorkspaces = await ctx.db.project.count({
@@ -46,14 +45,11 @@ export const addWorkSpace = createTRPCRouter({
         //   },
         // });
 
-
         // if (freeWorkspaces >= 1) {
         //   throw new TRPCClientError(
         //     "You can only create up to 1 free workspace. Additional workspaces require a paid plan",
         //   );
         // }
-
-
 
         const workspaceResponse = await ctx.db.project.create({
           data: {

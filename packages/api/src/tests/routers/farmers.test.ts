@@ -84,7 +84,9 @@ describe("Farmers Router", () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await expect(caller.farmers.addFarmer(invalidInput as any)).rejects.toThrow();
+      await expect(
+        caller.farmers.addFarmer(invalidInput as any),
+      ).rejects.toThrow();
     });
 
     it("should validate farmSize is positive", async () => {
@@ -154,16 +156,24 @@ describe("Farmers Router", () => {
         workspaceSlug: "test-workspace",
       };
 
-      await expect(caller.farmers.editFarmer(input)).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.farmers.editFarmer(input)).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
   });
 
   describe("fetchByOrganization", () => {
     it("should fetch all farmers for a workspace", async () => {
       // Create multiple farmers
-      await createTestFarmer(testProject.id, testUser.id, { fullName: "Farmer 1" });
-      await createTestFarmer(testProject.id, testUser.id, { fullName: "Farmer 2" });
-      await createTestFarmer(testProject.id, testUser.id, { fullName: "Farmer 3" });
+      await createTestFarmer(testProject.id, testUser.id, {
+        fullName: "Farmer 1",
+      });
+      await createTestFarmer(testProject.id, testUser.id, {
+        fullName: "Farmer 2",
+      });
+      await createTestFarmer(testProject.id, testUser.id, {
+        fullName: "Farmer 3",
+      });
 
       const session = createMockSession(testUser.id);
       const ctx = createTestContext({ session });
@@ -185,7 +195,7 @@ describe("Farmers Router", () => {
       await expect(
         caller.farmers.fetchByOrganization({
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
   });
@@ -211,7 +221,7 @@ describe("Farmers Router", () => {
       await expect(
         caller.farmers.farmersNamesAndIds({
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
   });
@@ -244,7 +254,7 @@ describe("Farmers Router", () => {
         caller.farmers.fetchFarmerById({
           id: "farmer-123",
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
   });
@@ -282,7 +292,7 @@ describe("Farmers Router", () => {
         caller.farmers.delete({
           id: "farmer-123",
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
 
@@ -295,7 +305,7 @@ describe("Farmers Router", () => {
         caller.farmers.delete({
           id: "",
           workspaceSlug: "",
-        })
+        }),
       ).rejects.toThrow();
     });
   });

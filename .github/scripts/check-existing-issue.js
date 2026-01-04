@@ -12,29 +12,32 @@ module.exports = async ({ github, context, core, branch }) => {
     const issues = await github.rest.issues.listForRepo({
       owner: context.repo.owner,
       repo: context.repo.repo,
-      state: 'open',
-      labels: 'ci-failure,automated',
-      per_page: 100
+      state: "open",
+      labels: "ci-failure,automated",
+      per_page: 100,
     });
 
-    const existingIssue = issues.data.find(issue =>
-      (issue.title && issue.title.includes(issueTitle)) ||
-      (issue.body && issue.body.includes(`Branch: \`${branch}\``))
+    const existingIssue = issues.data.find(
+      (issue) =>
+        (issue.title && issue.title.includes(issueTitle)) ||
+        (issue.body && issue.body.includes(`Branch: \`${branch}\``)),
     );
 
-    if (core && typeof core.setOutput === 'function') {
+    if (core && typeof core.setOutput === "function") {
       if (existingIssue) {
-        core.setOutput('issue_exists', 'true');
-        core.setOutput('issue_number', existingIssue.number);
+        core.setOutput("issue_exists", "true");
+        core.setOutput("issue_number", existingIssue.number);
       } else {
-        core.setOutput('issue_exists', 'false');
+        core.setOutput("issue_exists", "false");
       }
     }
 
     return existingIssue;
   } catch (err) {
-    console.error('check-existing-issue failed:', err && err.message ? err.message : err);
+    console.error(
+      "check-existing-issue failed:",
+      err && err.message ? err.message : err,
+    );
     throw err;
   }
 };
-

@@ -7,7 +7,7 @@ import { api } from "~/trpc/react";
 
 export default function Index() {
   const { isLoading, data } = api.equipments.fetchByOrganization.useQuery({
-    organizationEmail: ""
+    organizationEmail: "",
   });
   return (
     <main className="pl-5">

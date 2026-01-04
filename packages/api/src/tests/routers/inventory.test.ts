@@ -61,7 +61,9 @@ describe("Inventory Router", () => {
         warehousesId: "warehouse-123", // Changed from warehouseId to match Prisma schema
       };
 
-      await expect(caller.inventory.create(input)).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.inventory.create(input)).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
 
     it("should validate required fields", async () => {
@@ -79,7 +81,9 @@ describe("Inventory Router", () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await expect(caller.inventory.create(invalidInput as any)).rejects.toThrow();
+      await expect(
+        caller.inventory.create(invalidInput as any),
+      ).rejects.toThrow();
     });
 
     it("should validate name is not empty", async () => {

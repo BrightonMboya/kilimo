@@ -57,7 +57,9 @@ describe("Warehouses Router", () => {
         project_id: "dummy-project-id",
       };
 
-      await expect(caller.warehouses.create(input)).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.warehouses.create(input)).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
 
     it("should validate required fields", async () => {
@@ -74,7 +76,9 @@ describe("Warehouses Router", () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await expect(caller.warehouses.create(invalidInput as any)).rejects.toThrow();
+      await expect(
+        caller.warehouses.create(invalidInput as any),
+      ).rejects.toThrow();
     });
 
     it("should validate maxCapacity is positive", async () => {
@@ -122,7 +126,7 @@ describe("Warehouses Router", () => {
       await expect(
         caller.warehouses.fetchById({
           warehouseId: "warehouse-123",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
 
@@ -134,7 +138,7 @@ describe("Warehouses Router", () => {
       const result = await caller.warehouses.fetchById({
         warehouseId: "",
       });
-      
+
       // Empty ID returns null, not an error
       expect(result).toBeNull();
     });

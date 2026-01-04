@@ -10,7 +10,7 @@ describe("Auth Router", () => {
       const caller = createCaller(ctx);
 
       const result = await caller.auth.getProfileData();
-      
+
       expect(result).toBeDefined();
       expect(result.id).toBe("user-123");
       expect(result.email).toBe("test@example.com");
@@ -21,7 +21,9 @@ describe("Auth Router", () => {
       const ctx = createTestContext(); // No session
       const caller = createCaller(ctx);
 
-      await expect(caller.auth.getProfileData()).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.auth.getProfileData()).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
 
     it("should return correct user data for different users", async () => {
@@ -31,7 +33,7 @@ describe("Auth Router", () => {
       const caller = createCaller(ctx);
 
       const result = await caller.auth.getProfileData();
-      
+
       expect(result.id).toBe(userId);
     });
   });

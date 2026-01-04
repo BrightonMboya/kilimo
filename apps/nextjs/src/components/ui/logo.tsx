@@ -17,8 +17,6 @@ export function Logo({ className }: { className?: string }) {
     //     fill="currentColor"
     //   />
     // </svg>
-    <img
-    src="/static/images/jani.svg"
-    />
+    <img src="/static/images/jani.svg" />
   );
 }

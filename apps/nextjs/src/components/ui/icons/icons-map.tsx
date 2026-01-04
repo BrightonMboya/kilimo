@@ -11,7 +11,6 @@ export function Spinner({ className }: { className?: string }) {
   );
 }
 
-
 import {
   ArchiveIcon,
   CoinsIcon,
@@ -93,11 +92,10 @@ export type IconType =
   | "give-custody"
   | "take-custody"
   | "shoppingCart"
-  | "harvest" 
+  | "harvest"
   | "currencyDollar"
   | "farmers"
   | "reports";
-
 
 type IconsMap = {
   [key in IconType]: JSX.Element;
@@ -145,7 +143,7 @@ export const iconsMap: IconsMap = {
   currencyDollar: <CurrencyDollar />,
   "give-custody": <GiveCustodyIcon />,
   "take-custody": <TakeCustodyIcon />,
-  "reports": <Clipboard />,
+  reports: <Clipboard />,
 };
 
 export default iconsMap;

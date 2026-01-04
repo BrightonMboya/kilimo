@@ -1,10 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createCaller } from "../../root";
 import { createTestContext, createMockSession } from "../helpers/test-context";
-import {
-  createTestUser,
-  createTestEquipment,
-} from "../fixtures";
+import { createTestUser, createTestEquipment } from "../fixtures";
 
 describe("Equipments Router", () => {
   let testUser: Awaited<ReturnType<typeof createTestUser>>;
@@ -31,7 +28,6 @@ describe("Equipments Router", () => {
         estimatedValue: "45000",
         brand: "John Deere",
         status: "Available",
-        organizationId: "dummy-org-id", // Router requires this but schema doesn't use it
       };
 
       const result = await caller.equipments.create(input);
@@ -54,10 +50,11 @@ describe("Equipments Router", () => {
         estimatedValue: "45000",
         brand: "John Deere",
         status: "Available",
-        organizationId: "org-123",
       };
 
-      await expect(caller.equipments.create(input)).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.equipments.create(input)).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
 
     it("should validate required fields", async () => {
@@ -74,11 +71,12 @@ describe("Equipments Router", () => {
         estimatedValue: "",
         brand: "",
         status: "",
-        organizationId: "",
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await expect(caller.equipments.create(invalidInput as any)).rejects.toThrow();
+      await expect(
+        caller.equipments.create(invalidInput as any),
+      ).rejects.toThrow();
     });
 
     it("should validate leased is boolean", async () => {
@@ -96,7 +94,6 @@ describe("Equipments Router", () => {
         estimatedValue: "45000",
         brand: "John Deere",
         status: "Available",
-        organizationId: "org-123",
       };
 
       // @ts-expect-error - Testing invalid input type
@@ -132,7 +129,7 @@ describe("Equipments Router", () => {
       await expect(
         caller.equipments.fetchById({
           equipmentId: "equipment-123",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
 
@@ -144,7 +141,7 @@ describe("Equipments Router", () => {
       const result = await caller.equipments.fetchById({
         equipmentId: "",
       });
-      
+
       // Empty ID returns null, not an error
       expect(result).toBeNull();
     });

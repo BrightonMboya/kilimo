@@ -11,24 +11,28 @@ import { clearDatabase } from "./fixtures";
 vi.mock("~/env", () => ({
   env: {
     NODE_ENV: "test",
-    DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:password@localhost:5433/kilimo_test",
+    DATABASE_URL:
+      process.env.DATABASE_URL ??
+      "postgresql://postgres:password@localhost:5432/kilimo_test",
   },
 }));
 
 beforeAll(async () => {
   // Setup before all tests
   console.log("🗄️  Connecting to test database...");
-  
+
   // Verify database connection
   try {
     await db.$connect();
     console.log("✅ Test database connected");
   } catch (error) {
     console.error("❌ Failed to connect to test database:", error);
-    console.error("Make sure to run: docker-compose -f docker-compose.test.yml up -d");
+    console.error(
+      "Make sure to run: docker-compose -f docker-compose.test.yml up -d",
+    );
     throw error;
   }
-  
+
   // Clear any existing data
   await clearDatabase();
   console.log("🧹 Test database cleared");

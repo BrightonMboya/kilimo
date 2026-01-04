@@ -1,11 +1,11 @@
 export default function Faq() {
   return (
-    <section className="relative z-20 overflow-hidden bg-white pb-8 pt-20 lg:pb-[50px] lg:pt-[120px] pl-5 lg:pl-0">
+    <section className="relative z-20 overflow-hidden bg-white pb-8 pl-5 pt-20 lg:pb-[50px] lg:pl-0 lg:pt-[120px]">
       <div className="container mx-auto">
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4">
             <div className="mx-auto mb-[60px] max-w-[520px] text-center">
-              <span className="mb-2 block text-lg font-semibold text-primary">
+              <span className="text-primary mb-2 block text-lg font-semibold">
                 FAQ
               </span>
               <h2 className="mb-3 text-3xl font-bold leading-[1.2] text-black sm:text-4xl md:text-[40px]">
@@ -17,7 +17,7 @@ export default function Faq() {
         <div className="-mx-4 flex flex-wrap">
           <div className="w-full px-4 lg:w-1/2">
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -41,7 +41,7 @@ export default function Faq() {
               </div>
             </div>
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -59,16 +59,16 @@ export default function Faq() {
                 </h3>
                 <p className=" text-base lg:text-lg">
                   We believe that data and custom workflows are crucial to the
-                  the success of any business. JANI allows businesses to fork the
-                  repo so that they can build their custom workflow and features
-                  on top of our existing features.
+                  the success of any business. JANI allows businesses to fork
+                  the repo so that they can build their custom workflow and
+                  features on top of our existing features.
                 </p>
               </div>
             </div>
           </div>
           <div className="w-full px-4 lg:w-1/2">
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -86,13 +86,13 @@ export default function Faq() {
                 </h3>
                 <p className=" text-base lg:text-lg">
                   We are what we eat. Giving transparency to your clients on
-                  what processes and input go into the food they buy will increase loyalty, trust, and your brand
-                  value.
+                  what processes and input go into the food they buy will
+                  increase loyalty, trust, and your brand value.
                 </p>
               </div>
             </div>
             <div className="mb-12 flex lg:mb-[70px]">
-              <div className="mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl bg-primary text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
+              <div className="bg-primary mr-4 flex h-[50px] w-full max-w-[50px] items-center justify-center rounded-xl text-white sm:mr-6 sm:h-[60px] sm:max-w-[60px]">
                 <svg
                   width="32"
                   height="32"
@@ -109,9 +109,9 @@ export default function Faq() {
                   How can I self-host?
                 </h3>
                 <p className=" text-base lg:text-lg">
-                  Each software created comes with a dedicated manual on
-                  how you can self-host. JANI AI guarantees 99% uptime for all
-                  the software shipped so that you can keep on focusing on your
+                  Each software created comes with a dedicated manual on how you
+                  can self-host. JANI AI guarantees 99% uptime for all the
+                  software shipped so that you can keep on focusing on your
                   business operations.
                 </p>
               </div>

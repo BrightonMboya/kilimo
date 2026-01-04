@@ -68,7 +68,9 @@ describe("Harvests Router", () => {
         workspaceSlug: "test-workspace",
       };
 
-      await expect(caller.harvests.create(input)).rejects.toThrow("UNAUTHORIZED");
+      await expect(caller.harvests.create(input)).rejects.toThrow(
+        "UNAUTHORIZED",
+      );
     });
 
     it("should validate required fields", async () => {
@@ -88,7 +90,9 @@ describe("Harvests Router", () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-      await expect(caller.harvests.create(invalidInput as any)).rejects.toThrow();
+      await expect(
+        caller.harvests.create(invalidInput as any),
+      ).rejects.toThrow();
     });
 
     it("should validate size is a positive number", async () => {
@@ -140,7 +144,7 @@ describe("Harvests Router", () => {
       await expect(
         caller.harvests.fetchByOrganization({
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
 
@@ -152,16 +156,21 @@ describe("Harvests Router", () => {
       await expect(
         caller.harvests.fetchByOrganization({
           workspaceSlug: "",
-        })
+        }),
       ).rejects.toThrow();
     });
   });
 
   describe("fetchById", () => {
     it("should fetch a single harvest by ID", async () => {
-      const harvest = await createTestHarvest(testProject.id, testFarmer.id, testUser.id, {
-        name: "Specific Harvest",
-      });
+      const harvest = await createTestHarvest(
+        testProject.id,
+        testFarmer.id,
+        testUser.id,
+        {
+          name: "Specific Harvest",
+        },
+      );
 
       const session = createMockSession(testUser.id);
       const ctx = createTestContext({ session });
@@ -185,7 +194,7 @@ describe("Harvests Router", () => {
         caller.harvests.fetchById({
           harvestId: "harvest-123",
           workspaceSlug: "test-workspace",
-        })
+        }),
       ).rejects.toThrow("UNAUTHORIZED");
     });
 
@@ -198,7 +207,7 @@ describe("Harvests Router", () => {
         harvestId: "",
         workspaceSlug: "",
       });
-      
+
       // Empty IDs return null, not an error
       expect(result).toBeNull();
     });

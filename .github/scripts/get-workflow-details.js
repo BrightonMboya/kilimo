@@ -15,17 +15,26 @@ module.exports = async ({ github, context, core, runId }) => {
 
     const run = runResp && runResp.data ? runResp.data : {};
 
-    if (core && typeof core.setOutput === 'function') {
-      core.setOutput('run_url', run.html_url || '');
-      core.setOutput('run_number', run.run_number || '');
-      core.setOutput('head_branch', run.head_branch || '');
-      core.setOutput('head_sha', run.head_sha ? String(run.head_sha).substring(0, 7) : '');
-      core.setOutput('triggering_actor', run.triggering_actor ? run.triggering_actor.login : '');
+    if (core && typeof core.setOutput === "function") {
+      core.setOutput("run_url", run.html_url || "");
+      core.setOutput("run_number", run.run_number || "");
+      core.setOutput("head_branch", run.head_branch || "");
+      core.setOutput(
+        "head_sha",
+        run.head_sha ? String(run.head_sha).substring(0, 7) : "",
+      );
+      core.setOutput(
+        "triggering_actor",
+        run.triggering_actor ? run.triggering_actor.login : "",
+      );
     }
 
     return run;
   } catch (err) {
-    console.error('get-workflow-details failed:', err && err.message ? err.message : err);
+    console.error(
+      "get-workflow-details failed:",
+      err && err.message ? err.message : err,
+    );
     throw err;
   }
 };

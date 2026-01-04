@@ -68,7 +68,7 @@ export default function WorkspaceSwitcher() {
   return (
     <div>
       <Popover open={openPopover}>
-        <PopoverTrigger className="bg-gray-300 rounded-md w-[200px]">
+        <PopoverTrigger className="w-[200px] rounded-md bg-gray-300">
           <button
             onClick={() => setOpenPopover(!openPopover)}
             className="flex items-center justify-between rounded-lg  p-1.5 text-left text-sm transition-all duration-75 hover:bg-gray-100 focus:outline-none active:bg-gray-200"
@@ -127,7 +127,9 @@ function WorkspaceList({
   workspaces: WorkspaceProps[];
   setOpenPopover: (open: boolean) => void;
 }) {
-  const { setShowAddWorkspaceModal } = useContext(WorskpaceModalProvider.ModalContext);
+  const { setShowAddWorkspaceModal } = useContext(
+    WorskpaceModalProvider.ModalContext,
+  );
   const { domain, key } = useParams() as { domain?: string; key?: string };
   const pathname = usePathname();
 

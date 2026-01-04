@@ -3,7 +3,11 @@ import { cn } from "@kilimo/utils";
 import { format } from "date-fns";
 import { Frame } from "./frame";
 import { ImageWithBlur } from "./ImageWithBlur";
-import { ShadCnAvatar as Avatar, AvatarFallback, AvatarImage } from "~/components/ui";
+import {
+  ShadCnAvatar as Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "~/components/ui";
 
 type BlogCardProps = {
   tags?: string[];
@@ -27,9 +31,8 @@ export function BlogCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-3xl border border-transparent p-3 duration-150 ease-out max-sm:h-full hover:bg-gray-100 border-gray-100",
+        "flex flex-col rounded-3xl border border-gray-100 border-transparent p-3 duration-150 ease-out hover:bg-gray-100 max-sm:h-full",
         className,
-         
       )}
     >
       <div className="w-full rounded-2xl bg-clip-border">
@@ -50,7 +53,7 @@ export function BlogCard({
         <div className="flex h-80 flex-col pb-2 pt-3">
           <div className="flex-inline flex h-6 flex-wrap gap-2">
             {tags?.map((tag) => (
-              <div className="content-center rounded-md px-[9px] text-sm bg-primary/90 text-white/80">
+              <div className="bg-primary/90 content-center rounded-md px-[9px] text-sm text-white/80">
                 {tag.charAt(0).toUpperCase() + tag.slice(1)}
               </div>
             ))}
@@ -74,9 +77,7 @@ export function BlogCard({
                 />
                 <AvatarFallback />
               </Avatar>
-              <p className="ml-4 pt-3 text-sm font-medium">
-                {author.name}
-              </p>
+              <p className="ml-4 pt-3 text-sm font-medium">{author.name}</p>
               <p className="ml-6 pt-3 text-sm font-normal">
                 {format(new Date(publishDate!), "MMM dd, yyyy")}
               </p>

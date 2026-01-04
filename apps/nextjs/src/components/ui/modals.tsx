@@ -7,7 +7,6 @@ import { Dispatch, SetStateAction } from "react";
 import { Drawer } from "vaul";
 import { useMediaQuery } from "~/utils/hooks/useMediaQuery";
 
-
 export function Modal({
   children,
   className,

@@ -25,4 +25,3 @@ export const createMockSession = (userId = "test-user-id"): Session => {
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 hours from now
   };
 };
-

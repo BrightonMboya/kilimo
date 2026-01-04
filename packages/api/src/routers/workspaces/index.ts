@@ -20,6 +20,6 @@ const workspace = mergeRouters(
   deleteTeamInvite,
   resetInviteLink,
   acceptInvite,
-  changeTeamMemberRole
+  changeTeamMemberRole,
 );
 export default workspace;

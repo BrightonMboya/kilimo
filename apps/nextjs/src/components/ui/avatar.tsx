@@ -1,7 +1,6 @@
 import { cn } from "@kilimo/utils";
-import * as React from "react"
+import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
-
 
 export function Avatar({
   user = {},
@@ -58,7 +57,7 @@ export const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "bg-muted flex h-full w-full items-center justify-center rounded-full",
       className,
     )}
     {...props}
