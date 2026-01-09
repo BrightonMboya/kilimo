@@ -7,7 +7,15 @@
     "lint": "turbo lint",
     "clean": "turbo clean",
     "type-check": "turbo type-check",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "supabase:start": "cd supabase && supabase start",
+    "supabase:stop": "cd supabase && supabase stop",
+    "supabase:status": "cd supabase && supabase status",
+    "supabase:logs": "cd supabase && supabase functions serve",
+    "db:push:local": "cd packages/db && DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma db push",
+    "db:seed:local": "PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f supabase/test-seed.sql",
+    "db:studio:local": "cd packages/db && DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma studio",
+    "db:reset:local": "pnpm supabase:stop && pnpm supabase:start && sleep 8 && pnpm db:push:local && pnpm db:seed:local"
   },
   "devDependencies": {
     "turbo": "^1.12.4",
