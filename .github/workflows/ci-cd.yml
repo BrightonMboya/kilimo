@@ -96,28 +96,13 @@ jobs:
           echo "- Node version: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
 
   test:
-    name: API Tests with Postgres
+    name: API Tests with Supabase
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: lint
     strategy:
       matrix:
         node-version: [18, 20]
-    env:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: kilimo_test
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout code
@@ -151,23 +136,36 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Set test DB env
-        run: |
-          echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
-          echo "DIRECT_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
-      - name: Push Prisma schema to test DB
-        working-directory: packages/db
-        run: pnpm exec prisma db push --skip-generate
+      - name: Start Supabase local instance
+        run: |
+          pnpm supabase:start
+          echo "Waiting for Supabase to be ready..."
+          sleep 10
+
+      - name: Push Prisma schema to Supabase
+        run: pnpm db:push:local
+
+      - name: Seed test database
+        run: pnpm db:seed:local
 
       - name: Run API tests with coverage
-        working-directory: packages/api
         env:
           NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: |
           echo "Running tests with coverage..."
-          pnpm test -- --coverage --coverage.threshold.lines=80 --coverage.threshold.functions=80 --coverage.threshold.branches=70 --coverage.threshold.statements=80
+          pnpm test:api -- --coverage --coverage.threshold.lines=80 --coverage.threshold.functions=80 --coverage.threshold.branches=70 --coverage.threshold.statements=80
           echo "✅ Tests passed with coverage requirements met"
+
+      - name: Stop Supabase
+        if: always()
+        run: pnpm supabase:stop
 
       - name: Upload test coverage
         if: always()
@@ -182,7 +180,7 @@ jobs:
         run: |
           echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
           echo "- Node version: ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Database: PostgreSQL 15" >> $GITHUB_STEP_SUMMARY
+          echo "- Database: Supabase (PostgreSQL 15)" >> $GITHUB_STEP_SUMMARY
           if [ "${{ job.status }}" == "success" ]; then
             echo "- Status: ✅ All tests passed" >> $GITHUB_STEP_SUMMARY
           else
