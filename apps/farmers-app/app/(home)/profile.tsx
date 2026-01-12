@@ -1,16 +1,19 @@
 import { useUser } from '@clerk/clerk-expo'
 import { View, Text, ScrollView, Image } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { User, QrCode, CheckCircle, Leaf } from 'lucide-react-native'
-import { MOCK_USER } from './mockData'
 
 export default function ProfileScreen() {
   const { user } = useUser()
 
+  // Generate a farmer ID from the Clerk user ID
+  const farmerId = user?.id ? `JANI-${user.id.slice(-8).toUpperCase()}` : 'JANI-XXXXXXXX'
+
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
       <ScrollView className="flex-1 pb-24" showsVerticalScrollIndicator={false}>
         {/* Top Section */}
-        <View className="bg-green-700 p-6 pb-12 items-center rounded-b-[3rem] shadow-lg pt-12">
+        <View className="bg-green-700 p-6 pb-12 items-center rounded-b-[3rem] shadow-lg">
           <View className="w-24 h-24 bg-white rounded-full mb-3 p-1">
             <View className="w-full h-full bg-gray-200 rounded-full overflow-hidden items-center justify-center">
               {user?.imageUrl ? (
@@ -20,8 +23,8 @@ export default function ProfileScreen() {
               )}
             </View>
           </View>
-          <Text className="text-xl font-bold text-white">{user?.fullName || MOCK_USER.name}</Text>
-          <Text className="text-green-200 text-sm mt-1">{MOCK_USER.location}</Text>
+          <Text className="text-xl font-bold text-white">{user?.fullName || 'Farmer'}</Text>
+          <Text className="text-green-200 text-sm mt-1">{user?.primaryEmailAddress?.emailAddress}</Text>
         </View>
 
         {/* ID Card Section */}
@@ -31,11 +34,13 @@ export default function ProfileScreen() {
             <View className="bg-white p-2 border-2 border-gray-900 rounded-lg mb-4">
               <QrCode size={120} color="#111827" />
             </View>
-            <Text className="font-mono text-lg font-bold text-gray-800 tracking-wider">{MOCK_USER.id}</Text>
+            <Text className="font-mono text-lg font-bold text-gray-800 tracking-wider">{farmerId}</Text>
             <View className="w-full h-px bg-gray-100 my-4" />
             <View className="flex-row justify-between w-full">
-              <Text className="text-sm text-gray-500">Cooperative</Text>
-              <Text className="font-medium text-right max-w-[60%] text-gray-800">{MOCK_USER.coop}</Text>
+              <Text className="text-sm text-gray-500">Member since</Text>
+              <Text className="font-medium text-right max-w-[60%] text-gray-800">
+                {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'N/A'}
+              </Text>
             </View>
           </View>
         </View>
@@ -63,6 +68,6 @@ export default function ProfileScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

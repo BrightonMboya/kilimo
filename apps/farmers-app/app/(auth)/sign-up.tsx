@@ -98,6 +98,7 @@ export default function SignUpScreen() {
   }
 
   const onGoogleSignUpPress = React.useCallback(async () => {
+    setError('') // Clear previous errors
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
 
@@ -107,8 +108,9 @@ export default function SignUpScreen() {
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('OAuth error', err)
+      setError(err.errors?.[0]?.message || 'Google sign up failed. Please try again.')
     }
   }, [])
 
@@ -126,7 +128,7 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          <View className="space-y-4">
+          <View className="gap-4">
             <View>
               <Text className="text-gray-700 font-medium mb-2">Verification Code</Text>
               <TextInput
@@ -172,7 +174,7 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          <View className="space-y-5">
+          <View className="gap-5">
             <View>
               <Text className="text-gray-700 font-medium mb-2">Full Name</Text>
               <TextInput

@@ -6,31 +6,38 @@ import superjson from "superjson";
 import Constants from "expo-constants";
 import { useAuth } from '@clerk/clerk-expo';
 import { httpBatchLink } from "@trpc/client";
+import { Platform } from "react-native";
 
 export const trpc = createTRPCReact<AppRouter>();
- 
+
 /**
  * Extend this function when going to production by
  * setting the baseUrl to your production API URL.
  */
 const getBaseUrl = () => {
-  /**
-   * Gets the IP address of your host-machine. If it cannot automatically find it,
-   * you'll have to manually set it. NOTE: Port 3000 should work for most but confirm
-   * you don't have anything else running on it, or you'd have to change it.
-   *
-   * **NOTE**: This is only for development. In production, you'll want to set the
-   * baseUrl to your production API URL.
-   */
+  // For production, set your API URL here
+  // return "https://your-production-api.com";
+
+  // Try to get the debugger host from Expo
   const debuggerHost =
+    Constants.expoConfig?.hostUri ??
     Constants.manifest?.debuggerHost ??
     Constants.manifest2?.extra?.expoGo?.debuggerHost;
+
   const localhost = debuggerHost?.split(":")[0];
-  if (!localhost) {
-    // Fallback to localhost for iOS simulator or Android emulator
-    return "http://localhost:3000";
+
+  if (localhost) {
+    return `http://${localhost}:3000`;
   }
-  return `http://${localhost}:3000`;
+
+  // Fallbacks for different environments
+  if (Platform.OS === "android") {
+    // Android emulator uses 10.0.2.2 to access host machine
+    return "http://10.0.2.2:3000";
+  }
+
+  // iOS simulator can use localhost
+  return "http://localhost:3000";
 };
 
 const url = `${getBaseUrl()}/api/trpc`;

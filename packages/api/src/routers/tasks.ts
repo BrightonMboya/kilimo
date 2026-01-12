@@ -53,6 +53,16 @@ const tasks = createTRPCRouter({
         },
       });
     }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.farmersTasks.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    }),
 });
 
 export default tasks

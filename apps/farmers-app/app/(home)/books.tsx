@@ -200,7 +200,7 @@ export default function BooksScreen() {
           {isLoadingRecords ? (
             <ActivityIndicator size="small" color="#16A34A" />
           ) : records && records.length > 0 ? (
-            <View className="space-y-3">
+            <View className="gap-3">
               {records.map((record) => (
                 <View key={record.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                   <View className="flex-row justify-between items-start">
@@ -270,7 +270,7 @@ export default function BooksScreen() {
             </View>
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              <View className="space-y-4">
+              <View className="gap-4">
                 {/* Type Selector */}
                 <View>
                   <Text className="text-gray-700 font-medium mb-2">Type</Text>

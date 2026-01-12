@@ -27,10 +27,13 @@ export default function Page() {
 
   const [emailAddress, setEmailAddress] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [error, setError] = React.useState('')
 
   // Handle the submission of the sign-in form
   const onSignInPress = async () => {
     if (!isLoaded) return
+
+    setError('') // Clear previous errors
 
     // Start the sign-in process using the email and password provided
     try {
@@ -48,15 +51,18 @@ export default function Page() {
         // If the status isn't complete, check why. User might need to
         // complete further steps.
         console.error(JSON.stringify(signInAttempt, null, 2))
+        setError('Sign in incomplete. Please try again.')
       }
-    } catch (err) {
+    } catch (err: any) {
       // See https://clerk.com/docs/guides/development/custom-flows/error-handling
-      // for more info on error handling, probably over sentry or sth
+      // for more info on error handling
       console.error(JSON.stringify(err, null, 2))
+      setError(err.errors?.[0]?.message || 'Invalid email or password')
     }
   }
 
   const onGoogleSignInPress = React.useCallback(async () => {
+    setError('') // Clear previous errors
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
 
@@ -66,8 +72,9 @@ export default function Page() {
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('OAuth error', err)
+      setError(err.errors?.[0]?.message || 'Google sign in failed. Please try again.')
     }
   }, [])
 
@@ -85,7 +92,7 @@ export default function Page() {
             </Text>
           </View>
 
-          <View className="space-y-5">
+          <View className="gap-5">
             <View>
               <Text className="text-gray-700 font-medium mb-2">Email Address</Text>
               <TextInput
@@ -110,6 +117,13 @@ export default function Page() {
                 onChangeText={(password) => setPassword(password)}
               />
             </View>
+
+            {/* Error Message */}
+            {error ? (
+              <View className="bg-red-50 border border-red-200 rounded-xl p-3">
+                <Text className="text-red-600 text-sm">{error}</Text>
+              </View>
+            ) : null}
 
             <TouchableOpacity
               onPress={onSignInPress}
