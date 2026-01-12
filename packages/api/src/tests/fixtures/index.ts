@@ -10,7 +10,7 @@ import { db } from "@kilimo/db";
 // Extra safety guard for destructive cleanup
 function ensureSafeDatabase() {
   const url = process.env.DATABASE_URL ?? "";
-  if (!url.includes("localhost") && !url.includes("kilimo_test")) {
+  if (!url.includes("localhost") && !url.includes("127.0.0.1")) {
     throw new Error(`clearDatabase aborted: DATABASE_URL=${url} does not look like a test database`);
   }
 }

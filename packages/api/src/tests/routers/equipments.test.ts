@@ -31,7 +31,6 @@ describe("Equipments Router", () => {
         estimatedValue: "45000",
         brand: "John Deere",
         status: "Available",
-        organizationId: "dummy-org-id", // Router requires this but schema doesn't use it
       };
 
       const result = await caller.equipments.create(input);
