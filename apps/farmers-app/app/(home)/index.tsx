@@ -16,13 +16,20 @@ function Toast({ message, visible, onHide }: { message: string; visible: boolean
 
   useEffect(() => {
     if (visible) {
-      Animated.sequence([
+      const animation = Animated.sequence([
         Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
         Animated.delay(2000),
         Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
-      ]).start(() => onHide())
+      ])
+      animation.start(() => onHide())
+
+      // Cleanup: stop animation if component unmounts
+      return () => {
+        animation.stop()
+        opacity.setValue(0)
+      }
     }
-  }, [visible])
+  }, [visible, opacity, onHide])
 
   if (!visible) return null
 

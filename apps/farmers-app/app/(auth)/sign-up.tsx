@@ -98,6 +98,7 @@ export default function SignUpScreen() {
   }
 
   const onGoogleSignUpPress = React.useCallback(async () => {
+    setError('') // Clear previous errors
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
 
@@ -107,8 +108,9 @@ export default function SignUpScreen() {
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('OAuth error', err)
+      setError(err.errors?.[0]?.message || 'Google sign up failed. Please try again.')
     }
   }, [])
 

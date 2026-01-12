@@ -2,8 +2,13 @@ import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, Alert, Acti
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState } from 'react'
 import { ArrowLeft, Map, BookOpen, Plus, Camera, CheckCircle, AlertTriangle, ChevronRight, X, Trash2, Edit3, Droplets, Leaf, Search, Bug } from 'lucide-react-native'
-import { trpc } from '../../utils/api'
+import { trpc, type RouterOutputs } from '../../utils/api'
 import DateTimePicker from '@react-native-community/datetimepicker'
+
+// Type definitions derived from API
+type Field = RouterOutputs['farmerFields']['myFields'][number]
+type FieldWithActivities = RouterOutputs['farmerFields']['getById']
+type Activity = FieldWithActivities['activities'][number]
 
 // Activity type labels and colors
 const ACTIVITY_TYPES = [
@@ -39,7 +44,7 @@ export default function FieldsScreen() {
   // Modal states
   const [showFieldModal, setShowFieldModal] = useState(false)
   const [showActivityModal, setShowActivityModal] = useState(false)
-  const [editingField, setEditingField] = useState<any>(null)
+  const [editingField, setEditingField] = useState<Field | null>(null)
 
   // Field form state
   const [fieldName, setFieldName] = useState('')
@@ -128,7 +133,7 @@ export default function FieldsScreen() {
     setActivityDate(new Date())
   }
 
-  const openEditField = (field: any) => {
+  const openEditField = (field: Field | FieldWithActivities) => {
     setEditingField(field)
     setFieldName(field.name)
     setFieldCrop(field.crop)
@@ -143,8 +148,34 @@ export default function FieldsScreen() {
   }
 
   const handleSaveField = () => {
+    // Validate required fields
     if (!fieldName.trim() || !fieldCrop.trim() || !fieldSize) {
       Alert.alert("Error", "Please fill in required fields (name, crop, size)")
+      return
+    }
+
+    // Validate field name length (max 100 characters)
+    if (fieldName.trim().length > 100) {
+      Alert.alert("Error", "Field name must be 100 characters or less")
+      return
+    }
+
+    // Validate crop name length (max 50 characters)
+    if (fieldCrop.trim().length > 50) {
+      Alert.alert("Error", "Crop name must be 50 characters or less")
+      return
+    }
+
+    // Validate size is a positive number
+    const sizeValue = parseFloat(fieldSize)
+    if (isNaN(sizeValue) || sizeValue <= 0) {
+      Alert.alert("Error", "Size must be a positive number greater than 0")
+      return
+    }
+
+    // Validate size range (reasonable upper limit of 10000 hectares)
+    if (sizeValue > 10000) {
+      Alert.alert("Error", "Size cannot exceed 10,000 hectares")
       return
     }
 
@@ -152,7 +183,7 @@ export default function FieldsScreen() {
       name: fieldName.trim(),
       crop: fieldCrop.trim(),
       variety: fieldVariety.trim() || undefined,
-      size: parseFloat(fieldSize),
+      size: sizeValue,
       status: fieldStatus,
       soilType: fieldSoilType || undefined,
       irrigationType: fieldIrrigation || undefined,
@@ -180,6 +211,25 @@ export default function FieldsScreen() {
 
   const handleLogActivity = () => {
     if (!activeFieldId) return
+
+    // Validate quantity if provided
+    if (activityQuantity) {
+      const quantityValue = parseFloat(activityQuantity)
+      if (isNaN(quantityValue) || quantityValue <= 0) {
+        Alert.alert("Error", "Quantity must be a positive number")
+        return
+      }
+      if (quantityValue > 1000000) {
+        Alert.alert("Error", "Quantity value is too large")
+        return
+      }
+    }
+
+    // Validate description length
+    if (activityDescription.trim().length > 500) {
+      Alert.alert("Error", "Description must be 500 characters or less")
+      return
+    }
 
     logActivityMutation.mutate({
       fieldId: activeFieldId,
@@ -322,7 +372,7 @@ export default function FieldsScreen() {
             <Text className="font-bold text-gray-800 mb-3">Activity Log</Text>
             {activeField.activities && activeField.activities.length > 0 ? (
               <View className="border-l-2 border-gray-200 ml-2 pl-4 py-2 gap-4">
-                {activeField.activities.map((activity: any) => {
+                {activeField.activities.map((activity: Activity) => {
                   const info = getActivityInfo(activity.activityType)
                   const IconComponent = info.icon
                   return (
