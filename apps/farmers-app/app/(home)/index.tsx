@@ -1,20 +1,63 @@
 import { useUser, useAuth } from '@clerk/clerk-expo'
-import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X } from 'lucide-react-native'
+import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle } from 'lucide-react-native'
 import { Link } from 'expo-router'
 import { MOCK_WEATHER } from './mockData'
 import { trpc } from '../../utils/api'
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { TasksList } from '../../components/TasksList'
+import { useQueryClient } from '@tanstack/react-query'
+
+// Simple Toast Component
+function Toast({ message, visible, onHide }: { message: string; visible: boolean; onHide: () => void }) {
+  const opacity = useRef(new Animated.Value(0)).current
+
+  useEffect(() => {
+    if (visible) {
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 200, useNativeDriver: true }),
+        Animated.delay(2000),
+        Animated.timing(opacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+      ]).start(() => onHide())
+    }
+  }, [visible])
+
+  if (!visible) return null
+
+  return (
+    <Animated.View
+      style={{ opacity }}
+      className="absolute bottom-24 left-4 right-4 bg-gray-800 px-4 py-3 rounded-xl shadow-lg z-50"
+    >
+      <Text className="text-white text-center font-medium">{message}</Text>
+    </Animated.View>
+  )
+}
 
 export default function Page() {
   const { user } = useUser()
   const { signOut } = useAuth()
-  
+  const queryClient = useQueryClient()
+
+  // Toast state
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastVisible, setToastVisible] = useState(false)
+
+  const showToast = (message: string) => {
+    setToastMessage(message)
+    setToastVisible(true)
+  }
+
   // Fetch tasks for the current user
   const { data: tasks, refetch: refetchTasks, isLoading: isLoadingTasks } = trpc.tasks.myTasks.useQuery(
+    undefined,
+    { enabled: !!user?.id }
+  )
+
+  // Fetch fields for the current user
+  const { data: fields, isLoading: isLoadingFields } = trpc.farmerFields.myFields.useQuery(
     undefined,
     { enabled: !!user?.id }
   )
@@ -27,11 +70,81 @@ export default function Page() {
       setNewTaskDescription('')
       setNewTaskPriority('medium')
       setNewTaskDate(new Date())
+      showToast('Task created successfully')
     },
     onError: (error) => {
       Alert.alert("Error", error.message || "Failed to create task")
     }
   })
+
+  const updateStatusMutation = trpc.tasks.updateStatus.useMutation({
+    // Optimistic update
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: [['tasks', 'myTasks']] })
+      const previousTasks = queryClient.getQueryData([['tasks', 'myTasks']])
+
+      queryClient.setQueryData([['tasks', 'myTasks']], (old: any) => {
+        if (!old) return old
+        return old.map((task: any) =>
+          task.id === id ? { ...task, status } : task
+        )
+      })
+
+      return { previousTasks }
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData([['tasks', 'myTasks']], context.previousTasks)
+      }
+      Alert.alert("Error", error.message || "Failed to update task")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [['tasks', 'myTasks']] })
+    }
+  })
+
+  const deleteTaskMutation = trpc.tasks.delete.useMutation({
+    // Optimistic update
+    onMutate: async ({ id }) => {
+      await queryClient.cancelQueries({ queryKey: [['tasks', 'myTasks']] })
+      const previousTasks = queryClient.getQueryData([['tasks', 'myTasks']])
+
+      queryClient.setQueryData([['tasks', 'myTasks']], (old: any) => {
+        if (!old) return old
+        return old.filter((task: any) => task.id !== id)
+      })
+
+      return { previousTasks }
+    },
+    onSuccess: () => {
+      showToast('Task deleted')
+    },
+    onError: (error, variables, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData([['tasks', 'myTasks']], context.previousTasks)
+      }
+      Alert.alert("Error", error.message || "Failed to delete task")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [['tasks', 'myTasks']] })
+    }
+  })
+
+  const handleToggleComplete = (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'completed' ? 'pending' : 'completed'
+    updateStatusMutation.mutate({ id, status: newStatus as 'pending' | 'inProgress' | 'completed' })
+  }
+
+  const handleDeleteTask = (id: string) => {
+    Alert.alert(
+      "Delete Task",
+      "Are you sure you want to delete this task?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deleteTaskMutation.mutate({ id }) }
+      ]
+    )
+  }
 
   const [modalVisible, setModalVisible] = useState(false)
   const [newTaskName, setNewTaskName] = useState('')
@@ -45,7 +158,7 @@ export default function Page() {
       Alert.alert("Error", "Please enter a task name")
       return
     }
-    
+
     createTaskMutation.mutate({
       name: newTaskName,
       description: newTaskDescription,
@@ -53,6 +166,9 @@ export default function Page() {
       dueAt: newTaskDate,
     })
   }
+
+  // Get display fields (max 2 for homepage)
+  const displayFields = fields?.slice(0, 2) || []
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
@@ -72,7 +188,7 @@ export default function Page() {
               </View>
             </View>
             <View className="flex-row gap-3">
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => signOut()}
                 className="bg-white/20 p-2 rounded-full backdrop-blur-sm"
               >
@@ -128,6 +244,8 @@ export default function Page() {
           isLoading={isLoadingTasks}
           onAddTask={() => setModalVisible(true)}
           onSeeAll={() => Alert.alert("All Tasks", `You have ${tasks?.length || 0} tasks total.`)}
+          onToggleComplete={handleToggleComplete}
+          onDelete={handleDeleteTask}
         />
 
         {/* Field Overview */}
@@ -136,19 +254,58 @@ export default function Page() {
             <Text className="font-bold text-gray-800 text-lg">My Fields</Text>
             <Link href="/(home)/fields" asChild>
               <TouchableOpacity>
-                <Text className="text-green-600 text-sm font-medium">Manage</Text>
+                <Text className="text-green-600 text-sm font-medium">
+                  {fields && fields.length > 0 ? 'See All' : 'Manage'}
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>
-          {/* Fields section temporarily disabled until schema is updated */}
-          <View className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 items-center justify-center">
-            <Text className="text-gray-500 text-sm">No fields added yet</Text>
-            <Link href="/(home)/fields" asChild>
-              <TouchableOpacity className="mt-2">
-                 <Text className="text-green-600 font-medium">Add a field</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
+
+          {isLoadingFields ? (
+            <ActivityIndicator size="small" color="#16A34A" />
+          ) : displayFields.length > 0 ? (
+            <View className="gap-3">
+              {displayFields.map((field) => (
+                <Link key={field.id} href="/(home)/fields" asChild>
+                  <TouchableOpacity className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-row items-center">
+                    <View className="bg-green-100 p-3 rounded-xl mr-3">
+                      <Map size={20} color="#16A34A" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="font-semibold text-gray-800">{field.name}</Text>
+                      <Text className="text-xs text-gray-500 mt-0.5">
+                        {field.crop}{field.variety ? ` (${field.variety})` : ''} • {field.size} {field.sizeUnit}
+                      </Text>
+                    </View>
+                    {field.complianceStatus === 'compliant' ? (
+                      <CheckCircle size={18} color="#16A34A" />
+                    ) : (
+                      <ChevronRight size={18} color="#9CA3AF" />
+                    )}
+                  </TouchableOpacity>
+                </Link>
+              ))}
+              {fields && fields.length > 2 && (
+                <Link href="/(home)/fields" asChild>
+                  <TouchableOpacity className="py-2">
+                    <Text className="text-green-600 text-sm font-medium text-center">
+                      +{fields.length - 2} more fields
+                    </Text>
+                  </TouchableOpacity>
+                </Link>
+              )}
+            </View>
+          ) : (
+            <View className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 items-center justify-center">
+              <Map size={32} color="#D1D5DB" />
+              <Text className="text-gray-500 text-sm mt-2">No fields added yet</Text>
+              <Link href="/(home)/fields" asChild>
+                <TouchableOpacity className="mt-2">
+                  <Text className="text-green-600 font-medium">Add a field</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -201,8 +358,8 @@ export default function Page() {
                         key={p}
                         onPress={() => setNewTaskPriority(p)}
                         className={`flex-1 py-3 rounded-xl border ${
-                          newTaskPriority === p 
-                            ? 'bg-green-50 border-green-500' 
+                          newTaskPriority === p
+                            ? 'bg-green-50 border-green-500'
                             : 'bg-white border-gray-200'
                         }`}
                       >
@@ -255,6 +412,13 @@ export default function Page() {
           </View>
         </View>
       </Modal>
+
+      {/* Toast */}
+      <Toast
+        message={toastMessage}
+        visible={toastVisible}
+        onHide={() => setToastVisible(false)}
+      />
     </SafeAreaView>
   )
 }

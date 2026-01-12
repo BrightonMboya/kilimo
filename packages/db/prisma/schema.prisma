@@ -262,6 +262,116 @@ model FinancialRecords {
   @@index([type])
 }
 
+// ============================================
+// FARMER MOBILE APP - FIELDS & ACTIVITIES
+// ============================================
+
+enum FieldStatus {
+  active      // Currently being cultivated
+  fallow      // Resting/not in use
+  harvested   // Recently harvested
+  preparing   // Being prepared for planting
+}
+
+enum ComplianceStatus {
+  compliant       // Meets all requirements
+  pending_review  // Awaiting verification
+  non_compliant   // Does not meet requirements
+  not_verified    // Not yet checked
+}
+
+enum ActivityType {
+  planting
+  fertilization
+  spraying
+  irrigation
+  weeding
+  pruning
+  inspection
+  harvest
+  soil_testing
+  other
+}
+
+model FarmerFields {
+  id                  String           @id @default(cuid())
+  userId              String           // Clerk user ID
+  name                String
+  crop                String
+  variety             String?          // e.g., "SL-28" for coffee
+  size                Float            // in hectares
+  sizeUnit            String           @default("ha") // ha, acres
+  status              FieldStatus      @default(active)
+
+  // Location data for geo-verification
+  latitude            Float?
+  longitude           Float?
+  altitude            Float?           // meters above sea level
+  polygon             String?          // GeoJSON polygon for field boundaries
+
+  // Agronomic details
+  soilType            String?          // e.g., "Red Volcanic", "Loamy"
+  irrigationType      String?          // e.g., "Rain-fed", "Drip", "Sprinkler"
+  plantingDate        DateTime?
+  expectedHarvestDate DateTime?
+
+  // Compliance & Certification
+  complianceStatus    ComplianceStatus @default(not_verified)
+  eudrVerified        Boolean          @default(false)
+  certifications      String?          // JSON array of certifications
+
+  // Metadata
+  notes               String?
+  imageUrl            String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  // Relations
+  activities          FieldActivity[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([complianceStatus])
+}
+
+model FieldActivity {
+  id            String       @id @default(cuid())
+  fieldId       String
+  userId        String       // Clerk user ID (who logged this)
+
+  activityType  ActivityType
+  description   String?
+
+  // Quantity tracking (for inputs)
+  quantity      Float?
+  unit          String?      // kg, liters, bags, etc.
+  inputName     String?      // e.g., "NPK 17:17:17"
+  inputBatch    String?      // Batch number for traceability
+
+  // Cost tracking
+  cost          Float?
+  currency      String?      @default("KES")
+
+  // Weather conditions at time of activity
+  weather       String?      // e.g., "Sunny", "Cloudy", "After rain"
+  temperature   Float?       // Celsius
+
+  // Evidence
+  imageUrl      String?
+
+  // Timestamps
+  date          DateTime     @default(now()) // When the activity happened
+  createdAt     DateTime     @default(now()) // When it was logged
+
+  // Relations
+  field         FarmerFields @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId])
+  @@index([userId])
+  @@index([activityType])
+  @@index([date])
+}
+
 model Harvests {
   id         String    @id @default(cuid())
   date       DateTime
