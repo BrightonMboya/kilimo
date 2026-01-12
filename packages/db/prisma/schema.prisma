@@ -190,14 +190,14 @@ model Farmers {
 }
 
 model Fields {
-  id               String          @id @default(cuid())
-  name             String
-  size             Int
-  crop             String
-  status           String
-  image            String?
-  Farmers          Farmers         @relation(fields: [farmersId], references: [id])
-  farmersId        String
+  id        String  @id @default(cuid())
+  name      String
+  size      Int
+  crop      String
+  status    String
+  image     String?
+  Farmers   Farmers @relation(fields: [farmersId], references: [id])
+  farmersId String
 }
 
 enum TaskStatus {
@@ -213,13 +213,53 @@ enum TaskPriority {
 }
 
 model FarmersTasks {
-  id             String         @id @default(cuid())
-  name           String
-  description    String
-  status         TaskStatus
-  priority       TaskPriority
-  dueAt          DateTime
-  userId         String // this comes from clerk
+  id          String       @id @default(cuid())
+  name        String
+  description String
+  status      TaskStatus
+  priority    TaskPriority
+  dueAt       DateTime
+  userId      String // this comes from clerk
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum TransactionCategory {
+  // Income categories
+  crop_sales
+  livestock_sales
+  government_subsidy
+  other_income
+
+  // Expense categories
+  seeds
+  fertilizer
+  pesticides
+  labor
+  equipment
+  fuel
+  water
+  rent
+  other_expense
+}
+
+model FinancialRecords {
+  id          String              @id @default(cuid())
+  userId      String // Clerk user ID
+  type        TransactionType
+  category    TransactionCategory
+  amount      Float
+  description String?
+  date        DateTime            @default(now())
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
 }
 
 model Harvests {

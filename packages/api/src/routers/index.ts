@@ -9,3 +9,4 @@ export { default as reports } from "./reports";
 export { default as workspace } from "./workspaces";
 export { default as tasks } from "./tasks";
 export { default as fields } from "./fields";
+export { default as financialRecords } from "./financialRecords";

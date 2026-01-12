@@ -17,7 +17,33 @@ export const MOCK_TASKS = [
 
 export const MOCK_WEATHER = {
   temp: 24,
-  condition: "Cloudy",
   precip: "40%",
-  advice: "Good day for pruning, risk of rain in PM."
+  advice: "Good day for planting",
 };
+
+export const MOCK_FIELDS = [
+  {
+    id: "1",
+    name: "North Field",
+    crop: "Coffee (SL-28)",
+    size: "2.5 Ha",
+    compliance: "EUDR Compliant",
+    lastActivity: "2 days ago",
+  },
+  {
+    id: "2",
+    name: "South Field",
+    crop: "Maize",
+    size: "1.8 Ha",
+    compliance: "EUDR Compliant",
+    lastActivity: "1 week ago",
+  },
+  {
+    id: "3",
+    name: "East Field",
+    crop: "Beans",
+    size: "1.2 Ha",
+    compliance: "Pending Review",
+    lastActivity: "3 days ago",
+  },
+];
