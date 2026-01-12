@@ -1,6 +1,7 @@
 import { streamText } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { db } from '@kilimo/db';
+import { verifyToken } from '@clerk/backend';
 
 // System prompt for the farming assistant
 const SYSTEM_PROMPT = `You are Jani, a helpful AI farming assistant for smallholder farmers in East Africa.
@@ -61,22 +62,25 @@ export async function POST(req: Request) {
       return new Response('Unauthorized - no token', { status: 401 });
     }
 
-    // Decode JWT to get user ID
+    // Verify JWT and get user ID
     let userId: string;
     try {
-      const tokenParts = authHeader.split('.');
-      if (tokenParts.length !== 3) {
-        throw new Error('Invalid token format');
+      const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+      if (!clerkSecretKey) {
+        console.error('Chat API: CLERK_SECRET_KEY is not configured');
+        return new Response('Authentication not configured', { status: 500 });
       }
-      const payload = JSON.parse(
-        Buffer.from(tokenParts[1], 'base64').toString('utf-8')
-      );
-      userId = payload.sub;
-      if (!userId) {
+
+      const payload = await verifyToken(authHeader, {
+        secretKey: clerkSecretKey,
+      });
+
+      if (!payload || !payload.sub) {
         throw new Error('No user ID in token');
       }
+      userId = payload.sub;
     } catch (tokenError) {
-      console.error('Chat API: Token error:', tokenError);
+      console.error('Chat API: Token verification error:', tokenError);
       return new Response('Invalid token', { status: 401 });
     }
 

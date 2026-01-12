@@ -117,7 +117,14 @@ export default function AssistantScreen() {
             setMessages(prev => [...prev, assistantMessage])
           }
         } else {
-          throw new Error(`HTTP error: ${xhr.status}`)
+          // Handle non-200 status codes within the callback
+          console.error(`HTTP error: ${xhr.status}`)
+          const errorMessage: ChatMessage = {
+            id: `error-${Date.now()}`,
+            role: 'assistant',
+            content: 'Sorry, I encountered an error. Please try again.',
+          }
+          setMessages(prev => [...prev, errorMessage])
         }
 
         setIsLoading(false)
