@@ -11,9 +11,7 @@ import { clearDatabase } from "./fixtures";
 vi.mock("~/env", () => ({
   env: {
     NODE_ENV: "test",
-    DATABASE_URL:
-      process.env.DATABASE_URL ??
-      "postgresql://postgres:password@localhost:5432/kilimo_test",
+    DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
   },
 }));
 
@@ -27,9 +25,7 @@ beforeAll(async () => {
     console.log("✅ Test database connected");
   } catch (error) {
     console.error("❌ Failed to connect to test database:", error);
-    console.error(
-      "Make sure to run: docker-compose -f docker-compose.test.yml up -d",
-    );
+    console.error("Make sure to run: pnpm supabase:start");
     throw error;
   }
 

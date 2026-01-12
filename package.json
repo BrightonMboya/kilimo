@@ -11,7 +11,18 @@
     "format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json,js,jsx}\"",
     "deps:check": "npx depcheck --ignores='@types/*,eslint-*,prettier,typescript,turbo,vitest,@vitest/*'",
-    "test:coverage": "turbo test -- --coverage"
+    "test": "turbo test",
+    "test:watch": "turbo test:watch",
+    "test:api": "cd packages/api && pnpm test",
+    "test:coverage": "turbo test -- --coverage",
+    "supabase:start": "cd supabase && supabase start",
+    "supabase:stop": "cd supabase && supabase stop",
+    "supabase:status": "cd supabase && supabase status",
+    "supabase:logs": "cd supabase && supabase functions serve",
+    "db:push:local": "cd packages/db && DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma db push",
+    "db:seed:local": "PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f supabase/test-seed.sql",
+    "db:studio:local": "cd packages/db && DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma studio",
+    "db:reset:local": "pnpm supabase:stop && pnpm supabase:start && sleep 8 && pnpm db:push:local && pnpm db:seed:local"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.11.0",

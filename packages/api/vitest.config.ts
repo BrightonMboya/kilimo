@@ -18,9 +18,11 @@ export default defineConfig({
         singleFork: true,
       },
     },
-    // env: {
-    //   // Use environment variables from .env.test
-    // },
+    env: {
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
+      DIRECT_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
+      NODE_ENV: "test",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

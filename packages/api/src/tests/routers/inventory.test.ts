@@ -37,7 +37,7 @@ describe("Inventory Router", () => {
         inventoryUnit: "kg",
         description: "High-quality nitrogen-phosphorus-potassium fertilizer",
         estimatedValuePerUnit: "25.50",
-        warehousesId: testWarehouse.id, // Changed from warehouseId to match Prisma schema
+        warehouseId: testWarehouse.id, // Schema expects warehouseId
       };
 
       const result = await caller.inventory.create(input);

@@ -1,6 +1,6 @@
 /**
  * Test fixtures for seeding the test database
- *
+ * 
  * This module provides functions to create test data for all entities.
  * Each fixture function returns the created data for use in tests.
  */
@@ -10,10 +10,8 @@ import { db } from "@kilimo/db";
 // Extra safety guard for destructive cleanup
 function ensureSafeDatabase() {
   const url = process.env.DATABASE_URL ?? "";
-  if (!url.includes("localhost") && !url.includes("kilimo_test")) {
-    throw new Error(
-      `clearDatabase aborted: DATABASE_URL=${url} does not look like a test database`,
-    );
+  if (!url.includes("localhost") && !url.includes("127.0.0.1")) {
+    throw new Error(`clearDatabase aborted: DATABASE_URL=${url} does not look like a test database`);
   }
 }
 
@@ -101,7 +99,7 @@ export async function createTestFarmer(
     country?: string;
     crops?: string;
     quantityCanSupply?: number;
-  },
+  }
 ) {
   return await db.farmers.create({
     data: {
@@ -132,7 +130,7 @@ export async function createTestHarvest(
     unit?: string;
     size?: number;
     inputsUsed?: string;
-  },
+  }
 ) {
   return await db.harvests.create({
     data: {
@@ -159,13 +157,12 @@ export async function createTestWarehouse(
     description?: string;
     maxCapacity?: number;
     unit?: string;
-  },
+  }
 ) {
   return await db.warehouses.create({
     data: {
       name: data?.name ?? "Main Storage Facility",
-      description:
-        data?.description ?? "Primary warehouse for agricultural products",
+      description: data?.description ?? "Primary warehouse for agricultural products",
       maxCapacity: data?.maxCapacity ?? 5000,
       unit: data?.unit ?? "tons",
       project_id: projectId,
@@ -211,16 +208,14 @@ export async function createTestInventory(
     inventoryUnit?: string;
     description?: string;
     estimatedValuePerUnit?: string;
-  },
+  }
 ) {
   return await db.inventory.create({
     data: {
       name: data?.name ?? "Fertilizer NPK",
       inventoryType: data?.inventoryType ?? "Agricultural Input",
       inventoryUnit: data?.inventoryUnit ?? "kg",
-      description:
-        data?.description ??
-        "High-quality nitrogen-phosphorus-potassium fertilizer",
+      description: data?.description ?? "High-quality nitrogen-phosphorus-potassium fertilizer",
       estimatedValuePerUnit: data?.estimatedValuePerUnit ?? "25.50",
       warehousesId: warehouseId,
     },
@@ -233,7 +228,7 @@ export async function createTestInventory(
 export async function addUserToProject(
   userId: string,
   projectId: string,
-  role: "owner" | "member" = "member",
+  role: "owner" | "member" = "member"
 ) {
   return await db.projectUsers.create({
     data: {
@@ -276,10 +271,10 @@ export async function createCompleteTestSetup() {
 export async function createMultipleFarmers(
   projectId: string,
   userId: string,
-  count: number = 3,
+  count: number = 3
 ) {
   const farmers = [];
-
+  
   for (let i = 0; i < count; i++) {
     const farmer = await createTestFarmer(projectId, userId, {
       fullName: `Farmer ${i + 1}`,
@@ -291,7 +286,7 @@ export async function createMultipleFarmers(
     });
     farmers.push(farmer);
   }
-
+  
   return farmers;
 }
 
@@ -302,10 +297,10 @@ export async function createMultipleHarvests(
   projectId: string,
   farmerId: string,
   userId: string,
-  count: number = 3,
+  count: number = 3
 ) {
   const harvests = [];
-
+  
   for (let i = 0; i < count; i++) {
     const harvest = await createTestHarvest(projectId, farmerId, userId, {
       name: `Harvest ${i + 1}`,
@@ -315,6 +310,6 @@ export async function createMultipleHarvests(
     });
     harvests.push(harvest);
   }
-
+  
   return harvests;
 }
