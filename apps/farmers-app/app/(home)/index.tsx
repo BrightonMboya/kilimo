@@ -107,12 +107,12 @@ export default function Page() {
           <Text className="font-bold text-gray-800 mb-3 text-lg">Quick Actions</Text>
           <View className="flex-row justify-between gap-2">
             {[
-              { icon: Leaf, label: "Log Harvest", bg: "bg-orange-100", text: "text-orange-600", color: "#EA580C" },
-              { icon: Droplets, label: "Spray/Input", bg: "bg-blue-100", text: "text-blue-600", color: "#2563EB" },
-              { icon: Search, label: "Scouting", bg: "bg-purple-100", text: "text-purple-600", color: "#9333EA" },
+              { icon: Leaf, label: "Log Harvest", bg: "bg-orange-100", text: "text-orange-600", color: "#EA580C", onPress: () => Alert.alert("Log Harvest", "Harvest logging coming soon!") },
+              { icon: Droplets, label: "Spray/Input", bg: "bg-blue-100", text: "text-blue-600", color: "#2563EB", onPress: () => Alert.alert("Spray/Input", "Input tracking coming soon!") },
+              { icon: Search, label: "Scouting", bg: "bg-purple-100", text: "text-purple-600", color: "#9333EA", onPress: () => Alert.alert("Scouting", "Field scouting coming soon!") },
               { icon: Plus, label: "Add Task", bg: "bg-gray-200", text: "text-gray-600", color: "#4B5563", onPress: () => setModalVisible(true) },
             ].map((action, idx) => (
-              <TouchableOpacity key={idx} onPress={action.onPress} className="flex-1 items-center space-y-2">
+              <TouchableOpacity key={idx} onPress={action.onPress} className="flex-1 items-center gap-2">
                 <View className={`${action.bg} p-4 rounded-2xl shadow-sm w-full items-center aspect-square justify-center`}>
                   <action.icon size={24} color={action.color} />
                 </View>
@@ -123,10 +123,11 @@ export default function Page() {
         </View>
 
         {/* Tasks */}
-        <TasksList 
-          tasks={tasks} 
-          isLoading={isLoadingTasks} 
-          onAddTask={() => setModalVisible(true)} 
+        <TasksList
+          tasks={tasks}
+          isLoading={isLoadingTasks}
+          onAddTask={() => setModalVisible(true)}
+          onSeeAll={() => Alert.alert("All Tasks", `You have ${tasks?.length || 0} tasks total.`)}
         />
 
         {/* Field Overview */}
@@ -168,7 +169,7 @@ export default function Page() {
             </View>
 
             <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              <View className="space-y-4">
+              <View className="gap-4">
                 <View>
                   <Text className="text-gray-700 font-medium mb-2">Task Name</Text>
                   <TextInput

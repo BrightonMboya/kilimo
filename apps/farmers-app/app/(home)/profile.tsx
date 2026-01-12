@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/clerk-expo'
 import { View, Text, ScrollView, Image } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { User, QrCode, CheckCircle, Leaf } from 'lucide-react-native'
 import { MOCK_USER } from './mockData'
 
@@ -7,10 +8,10 @@ export default function ProfileScreen() {
   const { user } = useUser()
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
       <ScrollView className="flex-1 pb-24" showsVerticalScrollIndicator={false}>
         {/* Top Section */}
-        <View className="bg-green-700 p-6 pb-12 items-center rounded-b-[3rem] shadow-lg pt-12">
+        <View className="bg-green-700 p-6 pb-12 items-center rounded-b-[3rem] shadow-lg">
           <View className="w-24 h-24 bg-white rounded-full mb-3 p-1">
             <View className="w-full h-full bg-gray-200 rounded-full overflow-hidden items-center justify-center">
               {user?.imageUrl ? (
@@ -63,6 +64,6 @@ export default function ProfileScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

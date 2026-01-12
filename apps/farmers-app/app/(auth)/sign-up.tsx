@@ -126,7 +126,7 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          <View className="space-y-4">
+          <View className="gap-4">
             <View>
               <Text className="text-gray-700 font-medium mb-2">Verification Code</Text>
               <TextInput
@@ -172,7 +172,7 @@ export default function SignUpScreen() {
             </Text>
           </View>
 
-          <View className="space-y-5">
+          <View className="gap-5">
             <View>
               <Text className="text-gray-700 font-medium mb-2">Full Name</Text>
               <TextInput

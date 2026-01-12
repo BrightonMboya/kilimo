@@ -12,16 +12,19 @@ interface TasksListProps {
   tasks: Task[] | undefined | null
   isLoading: boolean
   onAddTask: () => void
+  onSeeAll?: () => void
 }
 
-export function TasksList({ tasks, isLoading, onAddTask }: TasksListProps) {
+export function TasksList({ tasks, isLoading, onAddTask, onSeeAll }: TasksListProps) {
   return (
     <View className="px-4 mt-6">
       <View className="flex-row justify-between items-center mb-3">
         <Text className="font-bold text-gray-800 text-lg">Today's Tasks</Text>
-        <TouchableOpacity>
-          <Text className="text-green-600 text-sm font-medium">See All</Text>
-        </TouchableOpacity>
+        {onSeeAll && (
+          <TouchableOpacity onPress={onSeeAll}>
+            <Text className="text-green-600 text-sm font-medium">See All</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
       {isLoading ? (

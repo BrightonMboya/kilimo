@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState } from 'react'
-import { ArrowDownLeft, Map, BookOpen, Plus, Camera, CheckCircle, AlertTriangle, ChevronRight } from 'lucide-react-native'
+import { ArrowLeft, Map, BookOpen, Plus, Camera, CheckCircle, AlertTriangle, ChevronRight } from 'lucide-react-native'
 import { MOCK_FIELDS } from './mockData'
 
 export default function FieldsScreen() {
@@ -14,7 +14,7 @@ export default function FieldsScreen() {
       <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
         <View className="bg-white p-4 shadow-sm flex-row items-center border-b border-gray-100">
           <TouchableOpacity onPress={() => setActiveField(null)} className="mr-3 bg-gray-100 p-2 rounded-full">
-            <ArrowDownLeft size={20} color="#374151" className="transform rotate-45" />
+            <ArrowLeft size={20} color="#374151" />
           </TouchableOpacity>
           <View>
             <Text className="font-bold text-lg text-gray-800">{activeField.name}</Text>
@@ -64,7 +64,7 @@ export default function FieldsScreen() {
           {/* Activity Log / Traceability Chain */}
           <View className="pb-24">
              <Text className="font-bold text-gray-800 mb-3">Activity Log</Text>
-             <View className="border-l-2 border-gray-200 ml-2 pl-4 py-2 space-y-6">
+             <View className="border-l-2 border-gray-200 ml-2 pl-4 py-2 gap-6">
                 <View>
                    <View className="absolute -left-[23px] bg-green-500 h-3 w-3 rounded-full border-2 border-white shadow-sm" />
                    <Text className="text-xs text-gray-500">Yesterday, 10:00 AM</Text>
@@ -105,7 +105,7 @@ export default function FieldsScreen() {
           <View className="flex-1 justify-end bg-black/50">
             <View className="bg-white rounded-t-3xl p-6">
               <Text className="text-lg font-bold mb-4 text-gray-800">Log Activity</Text>
-              <View className="space-y-4">
+              <View className="gap-4">
                 <View>
                   <Text className="text-xs font-medium text-gray-700 mb-1">Activity Type</Text>
                   <View className="p-3 border border-gray-200 rounded-lg bg-gray-50">
