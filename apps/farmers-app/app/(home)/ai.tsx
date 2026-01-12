@@ -3,10 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator,
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Sprout, ArrowUp, Trash2, Plus } from 'lucide-react-native'
 import { useAuth } from '@clerk/clerk-expo'
-import { trpc, type RouterOutputs } from '../../utils/api'
+import { trpc } from '../../utils/api'
 import Constants from 'expo-constants'
-
-type Message = RouterOutputs['chat']['getConversation']['messages'][number]
 
 // Local message type for UI
 interface ChatMessage {
@@ -32,27 +30,10 @@ export default function AssistantScreen() {
   const [inputText, setInputText] = useState('')
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [isStreaming, setIsStreaming] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [streamingContent, setStreamingContent] = useState('')
   const scrollViewRef = useRef<ScrollView>(null)
-  const abortControllerRef = useRef<AbortController | null>(null)
-
-  // Fetch conversation on mount if we have an ID
-  const { data: conversation, refetch: refetchConversation } = trpc.chat.getConversation.useQuery(
-    { id: conversationId! },
-    { enabled: !!conversationId && !isStreaming }
-  )
-
-  // Sync fetched messages with local state
-  useEffect(() => {
-    if (conversation?.messages && !isStreaming) {
-      setMessages(conversation.messages.map(m => ({
-        id: m.id,
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })))
-    }
-  }, [conversation?.messages, isStreaming])
+  const xhrRef = useRef<XMLHttpRequest | null>(null)
 
   // Delete conversation mutation
   const deleteConversationMutation = trpc.chat.deleteConversation.useMutation({
@@ -73,7 +54,7 @@ export default function AssistantScreen() {
 
   const handleSend = useCallback(async () => {
     const message = inputText.trim()
-    if (!message || isStreaming) return
+    if (!message || isLoading) return
 
     // Clear input immediately
     setInputText('')
@@ -86,8 +67,8 @@ export default function AssistantScreen() {
     }
     setMessages(prev => [...prev, userMessage])
 
-    // Start streaming
-    setIsStreaming(true)
+    // Start loading
+    setIsLoading(true)
     setStreamingContent('')
 
     try {
@@ -96,101 +77,95 @@ export default function AssistantScreen() {
         throw new Error('Not authenticated')
       }
 
-      // Create abort controller for cancellation
-      abortControllerRef.current = new AbortController()
+      // Use XMLHttpRequest for streaming support in React Native
+      const xhr = new XMLHttpRequest()
+      xhrRef.current = xhr
 
-      const response = await fetch(`${getBaseUrl()}/api/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: JSON.stringify({
-          message,
-          conversationId: conversationId || undefined,
-        }),
-        signal: abortControllerRef.current.signal,
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      // Get conversation ID from response header
-      const newConvId = response.headers.get('X-Conversation-Id')
-      if (newConvId && !conversationId) {
-        setConversationId(newConvId)
-      }
-
-      // Read the stream
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('No response body')
-      }
-
-      const decoder = new TextDecoder()
       let fullContent = ''
+      let receivedLength = 0
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+      xhr.open('POST', `${getBaseUrl()}/api/chat`)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.setRequestHeader('Authorization', token)
 
-        const chunk = decoder.decode(value, { stream: true })
+      // Handle streaming via onprogress
+      xhr.onprogress = () => {
+        const newData = xhr.responseText.substring(receivedLength)
+        receivedLength = xhr.responseText.length
 
-        // Parse the Vercel AI SDK stream format
-        // Format: 0:"text"\n or other prefixed data
-        const lines = chunk.split('\n')
-        for (const line of lines) {
-          if (line.startsWith('0:')) {
-            // Text content
-            try {
-              const text = JSON.parse(line.slice(2))
-              fullContent += text
-              setStreamingContent(fullContent)
-            } catch {
-              // Skip malformed lines
-            }
+        if (newData) {
+          fullContent += newData
+          setStreamingContent(fullContent)
+        }
+      }
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          // Get conversation ID from header
+          const newConvId = xhr.getResponseHeader('X-Conversation-Id')
+          if (newConvId && !conversationId) {
+            setConversationId(newConvId)
           }
+
+          // Add complete message
+          if (fullContent) {
+            const assistantMessage: ChatMessage = {
+              id: `assistant-${Date.now()}`,
+              role: 'assistant',
+              content: fullContent,
+            }
+            setMessages(prev => [...prev, assistantMessage])
+          }
+        } else {
+          throw new Error(`HTTP error: ${xhr.status}`)
         }
+
+        setIsLoading(false)
+        setStreamingContent('')
+        xhrRef.current = null
       }
 
-      // Streaming complete - add assistant message
-      if (fullContent) {
-        const assistantMessage: ChatMessage = {
-          id: `assistant-${Date.now()}`,
-          role: 'assistant',
-          content: fullContent,
-        }
-        setMessages(prev => [...prev, assistantMessage])
-      }
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        // User cancelled
-        console.log('Stream aborted')
-      } else {
-        console.error('Streaming error:', error)
-        // Add error message
+      xhr.onerror = () => {
+        console.error('XHR error')
         const errorMessage: ChatMessage = {
           id: `error-${Date.now()}`,
           role: 'assistant',
           content: 'Sorry, I encountered an error. Please try again.',
         }
         setMessages(prev => [...prev, errorMessage])
+        setIsLoading(false)
+        setStreamingContent('')
+        xhrRef.current = null
       }
-    } finally {
-      setIsStreaming(false)
+
+      xhr.send(JSON.stringify({
+        message,
+        conversationId: conversationId || undefined,
+      }))
+
+    } catch (error: any) {
+      console.error('Error:', error)
+      const errorMessage: ChatMessage = {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      }
+      setMessages(prev => [...prev, errorMessage])
+      setIsLoading(false)
       setStreamingContent('')
-      abortControllerRef.current = null
     }
-  }, [inputText, isStreaming, conversationId, getToken])
+  }, [inputText, isLoading, conversationId, getToken])
 
   const handleNewConversation = () => {
-    // Cancel any ongoing stream
-    abortControllerRef.current?.abort()
+    // Cancel any ongoing request
+    if (xhrRef.current) {
+      xhrRef.current.abort()
+      xhrRef.current = null
+    }
     setConversationId(null)
     setMessages([])
     setStreamingContent('')
-    setIsStreaming(false)
+    setIsLoading(false)
   }
 
   const handleDeleteConversation = () => {
@@ -198,9 +173,6 @@ export default function AssistantScreen() {
       deleteConversationMutation.mutate({ id: conversationId })
     }
   }
-
-  // Combine messages with streaming content for display
-  const displayMessages = [...messages]
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
@@ -243,7 +215,7 @@ export default function AssistantScreen() {
           contentContainerStyle={{ gap: 16, paddingBottom: 20 }}
           showsVerticalScrollIndicator={false}
         >
-          {displayMessages.length === 0 && !isStreaming ? (
+          {messages.length === 0 && !isLoading ? (
             // Welcome message
             <View className="items-start">
               <View className="flex-row items-start">
@@ -268,7 +240,7 @@ export default function AssistantScreen() {
             </View>
           ) : (
             // Messages
-            displayMessages.map((message) => (
+            messages.map((message) => (
               <View
                 key={message.id}
                 className={message.role === 'user' ? 'items-end' : 'items-start'}
@@ -291,8 +263,8 @@ export default function AssistantScreen() {
             ))
           )}
 
-          {/* Streaming response */}
-          {isStreaming && (
+          {/* Streaming/Loading response */}
+          {isLoading && (
             <View className="items-start">
               <View className="flex-row items-start max-w-[85%]">
                 <View className="w-8 h-8 bg-green-100 rounded-full items-center justify-center mr-2 mt-1">
@@ -329,9 +301,9 @@ export default function AssistantScreen() {
             />
             <TouchableOpacity
               onPress={handleSend}
-              disabled={!inputText.trim() || isStreaming}
+              disabled={!inputText.trim() || isLoading}
               className={`p-3 rounded-full shadow-md ${
-                inputText.trim() && !isStreaming ? 'bg-green-600' : 'bg-gray-300'
+                inputText.trim() && !isLoading ? 'bg-green-600' : 'bg-gray-300'
               }`}
             >
               <ArrowUp size={20} color="white" />
