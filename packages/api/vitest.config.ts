@@ -19,8 +19,8 @@ export default defineConfig({
       },
     },
     env: {
-      DATABASE_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
-      DIRECT_URL: "postgresql://postgres:password@localhost:5433/kilimo_test",
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
+      DIRECT_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
       NODE_ENV: "test",
     },
     coverage: {
