@@ -101,6 +101,7 @@ jobs:
     timeout-minutes: 20
     needs: lint
     strategy:
+      max-parallel: 1  # Run sequentially to avoid Supabase port conflicts
       matrix:
         node-version: [18, 20]
 
@@ -141,6 +142,12 @@ jobs:
         with:
           version: latest
 
+      - name: Clean up any existing Supabase state
+        run: |
+          cd supabase
+          supabase stop --no-backup || true
+          docker volume ls --filter label=com.supabase.cli.project=kilimo -q | xargs -r docker volume rm || true
+
       - name: Start Supabase local instance
         run: |
           pnpm supabase:start
@@ -149,6 +156,11 @@ jobs:
 
       - name: Push Prisma schema to Supabase
         run: pnpm db:push:local
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
 
       - name: Seed test database
         run: pnpm db:seed:local
