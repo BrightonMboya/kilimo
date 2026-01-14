@@ -1,0 +1,151 @@
+import { describe, it, expect, beforeEach } from "vitest";
+import { createCaller } from "../../root";
+import { createTestContext, createMockSession } from "../helpers/test-context";
+import {
+  createTestUser,
+  createTestEquipment,
+} from "../fixtures";
+
+describe("Equipments Router", () => {
+  let testUser: Awaited<ReturnType<typeof createTestUser>>;
+
+  beforeEach(async () => {
+    testUser = await createTestUser({
+      id: "equipment-test-user",
+      email: "equipment-test@example.com",
+    });
+  });
+
+  describe("create", () => {
+    it("should create new equipment successfully", async () => {
+      const session = createMockSession(testUser.id);
+      const ctx = createTestContext({ session });
+      const caller = createCaller(ctx);
+
+      const input = {
+        name: "Tractor",
+        type: "Heavy Machinery",
+        leased: false,
+        dateAcquired: new Date("2025-01-01"),
+        purchasePrice: "50000",
+        estimatedValue: "45000",
+        brand: "John Deere",
+        status: "Available",
+      };
+
+      const result = await caller.equipments.create(input);
+
+      expect(result).toBeDefined();
+      expect(result.name).toBe(input.name);
+      expect(result.brand).toBe(input.brand);
+    });
+
+    it("should require authentication", async () => {
+      const ctx = createTestContext(); // No session
+      const caller = createCaller(ctx);
+
+      const input = {
+        name: "Tractor",
+        type: "Heavy Machinery",
+        leased: false,
+        dateAcquired: new Date("2025-01-01"),
+        purchasePrice: "50000",
+        estimatedValue: "45000",
+        brand: "John Deere",
+        status: "Available",
+        organizationId: "org-123",
+      };
+
+      await expect(caller.equipments.create(input)).rejects.toThrow("UNAUTHORIZED");
+    });
+
+    it("should validate required fields", async () => {
+      const session = createMockSession();
+      const ctx = createTestContext({ session });
+      const caller = createCaller(ctx);
+
+      const invalidInput = {
+        name: "", // Invalid: empty
+        type: "",
+        leased: false,
+        dateAcquired: new Date(),
+        purchasePrice: "",
+        estimatedValue: "",
+        brand: "",
+        status: "",
+        organizationId: "",
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+      await expect(caller.equipments.create(invalidInput as any)).rejects.toThrow();
+    });
+
+    it("should validate leased is boolean", async () => {
+      const session = createMockSession();
+      const ctx = createTestContext({ session });
+      const caller = createCaller(ctx);
+
+      // Testing with invalid type for leased field
+      const input = {
+        name: "Tractor",
+        type: "Heavy Machinery",
+        leased: "yes", // Invalid: should be boolean
+        dateAcquired: new Date("2025-01-01"),
+        purchasePrice: "50000",
+        estimatedValue: "45000",
+        brand: "John Deere",
+        status: "Available",
+        organizationId: "org-123",
+      };
+
+      // @ts-expect-error - Testing invalid input type
+      await expect(caller.equipments.create(input)).rejects.toThrow();
+    });
+  });
+
+  // Removed organization-specific tests: organization not used anymore
+
+  describe("fetchById", () => {
+    it("should fetch equipment by ID", async () => {
+      const equipment = await createTestEquipment({
+        name: "Specific Equipment",
+      });
+
+      const session = createMockSession(testUser.id);
+      const ctx = createTestContext({ session });
+      const caller = createCaller(ctx);
+
+      const result = await caller.equipments.fetchById({
+        equipmentId: equipment.id,
+      });
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(equipment.id);
+      expect(result?.name).toBe("Specific Equipment");
+    });
+
+    it("should require authentication", async () => {
+      const ctx = createTestContext();
+      const caller = createCaller(ctx);
+
+      await expect(
+        caller.equipments.fetchById({
+          equipmentId: "equipment-123",
+        })
+      ).rejects.toThrow("UNAUTHORIZED");
+    });
+
+    it("should validate equipmentId is provided", async () => {
+      const session = createMockSession(testUser.id);
+      const ctx = createTestContext({ session });
+      const caller = createCaller(ctx);
+
+      const result = await caller.equipments.fetchById({
+        equipmentId: "",
+      });
+      
+      // Empty ID returns null, not an error
+      expect(result).toBeNull();
+    });
+  });
+});

@@ -5,7 +5,13 @@ import { warehouseSchema } from "../schemas/warehouses";
 
 const warehouses = createTRPCRouter({
   create: protectedProcedure
-    .input(warehouseSchema)
+    .input(
+      warehouseSchema.merge(
+        z.object({
+          project_id: z.string(),
+        }),
+      ),
+    )
     .mutation(async ({ ctx, input }) => {
       try {
         return await ctx.db.warehouses.create({
