@@ -9,6 +9,10 @@ import {
   reports,
   warehouses,
   workspace,
+  tasks,
+  fields,
+  financialRecords,
+  farmerFields,
 } from "./routers";
 
 /**
@@ -26,6 +30,10 @@ export const appRouter = createTRPCRouter({
   auth,
   reports,
   workspace,
+  tasks,
+  fields,
+  financialRecords,
+  farmerFields,
 });
 
 // export type definition of API
