@@ -11,8 +11,7 @@
     "supabase:start": "cd supabase && supabase start",
     "supabase:stop": "cd supabase && supabase stop",
     "supabase:status": "cd supabase && supabase status",
-    "supabase:logs": "cd supabase && supabase functions serve",
-    },
+    "supabase:logs": "cd supabase && supabase functions serve"
   },
   "devDependencies": {
     "turbo": "^1.12.4",
