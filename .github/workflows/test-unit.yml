@@ -1,0 +1,189 @@
+name: Unit Tests
+
+on:
+  workflow_run:
+    workflows: ["Code Quality & Linting"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Only run if code quality passed
+  check-quality:
+    name: Verify Code Quality Passed
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Quality check status
+        run: |
+          echo "✅ Code quality checks passed - proceeding with tests"
+
+  test-api:
+    name: API Unit Tests
+    runs-on: ubuntu-latest
+    needs: check-quality
+    timeout-minutes: 20
+    strategy:
+      max-parallel: 1  # Run sequentially to avoid Supabase port conflicts
+      matrix:
+        node-version: [18, 20]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Enable corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.local/share/pnpm
+            .turbo
+            **/node_modules
+          key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          echo "📥 Installing dependencies..."
+          pnpm install --frozen-lockfile
+          echo "✅ Dependencies installed"
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Clean up any existing Supabase state
+        run: |
+          echo "🧹 Cleaning existing Supabase state..."
+          cd supabase
+          supabase stop --no-backup || true
+          docker volume ls --filter label=com.supabase.cli.project=kilimo -q | xargs -r docker volume rm || true
+          echo "✅ Cleanup complete"
+
+      - name: Start Supabase local instance
+        run: |
+          echo "🚀 Starting Supabase..."
+          pnpm supabase:start
+          echo "⏳ Waiting for Supabase to be ready..."
+          sleep 10
+          echo "✅ Supabase ready"
+
+      - name: Push Prisma schema to Supabase
+        run: |
+          echo "📊 Pushing Prisma schema..."
+          pnpm --filter ./packages/db run db:push:local
+          echo "✅ Schema pushed"
+
+      - name: Install PostgreSQL client
+        run: |
+          echo "📦 Installing PostgreSQL client..."
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+          echo "✅ PostgreSQL client installed"
+
+      - name: Seed test database
+        run: |
+          echo "🌱 Seeding database..."
+          pnpm --filter ./packages/db run db:seed:local
+          echo "✅ Database seeded"
+
+      - name: Run API tests with coverage
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+          DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          echo "🧪 Running API tests with coverage..."
+          pnpm --filter ./packages/api run test:coverage -- --coverage.threshold.lines=80 --coverage.threshold.functions=80 --coverage.threshold.branches=70 --coverage.threshold.statements=80
+          echo "✅ All tests passed"
+
+      - name: Stop Supabase
+        if: always()
+        run: |
+          echo "🛑 Stopping Supabase..."
+          pnpm supabase:stop
+          echo "✅ Supabase stopped"
+
+      - name: Upload test coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage-node${{ matrix.node-version }}
+          path: packages/api/coverage
+          retention-days: 7
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## 🧪 Test Results (Node ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Database**: Supabase (PostgreSQL 15)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Type**: API Unit Tests" >> $GITHUB_STEP_SUMMARY
+          echo "- **Coverage**: Uploaded as artifact" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ **Status**: All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status**: Tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  test-gate:
+    name: Test Gate
+    runs-on: ubuntu-latest
+    needs: [test-api]
+    if: always()
+    
+    steps:
+      - name: Check test gate
+        run: |
+          if [ "${{ needs.test-api.result }}" != "success" ]; then
+            echo "❌ Test gate failed"
+            echo "- API Tests: ${{ needs.test-api.result }}"
+            exit 1
+          else
+            echo "✅ Test gate passed - all tests successful"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Test Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| API Unit Tests | ${{ needs.test-api.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY

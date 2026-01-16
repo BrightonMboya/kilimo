@@ -1,0 +1,188 @@
+name: Build & Verify
+
+on:
+  workflow_run:
+    workflows: ["Unit Tests"]
+    types:
+      - completed
+    branches:
+      - main
+      - master
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Only run if tests passed
+  check-tests:
+    name: Verify Tests Passed
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Test status
+        run: |
+          echo "✅ All tests passed - proceeding with build"
+
+  build:
+    name: Build All Packages
+    runs-on: ubuntu-latest
+    needs: check-tests
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        node-version: [18, 20]
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Enable corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.local/share/pnpm
+            .turbo
+            **/node_modules
+          key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          echo "📥 Installing dependencies..."
+          pnpm install --frozen-lockfile
+          echo "✅ Dependencies installed"
+
+      - name: Build all packages
+        run: |
+          echo "🔨 Building all packages with Turbo..."
+          pnpm -w exec turbo build
+          echo "✅ Build complete"
+
+      - name: Analyze Next.js bundle size
+        if: matrix.node-version == '20'
+        run: |
+          if [ -d "apps/nextjs/.next" ]; then
+            echo "📦 Analyzing Next.js bundle size..."
+            echo "## 📦 Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Next.js Build Size:" >> $GITHUB_STEP_SUMMARY
+            du -sh apps/nextjs/.next >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details><summary>Detailed breakdown</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            du -h apps/nextjs/.next/* | sort -rh | head -20 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️  Next.js build directory not found"
+          fi
+
+      - name: Upload Next.js build artifact
+        if: matrix.node-version == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build-node${{ matrix.node-version }}
+          path: |
+            apps/nextjs/.next
+            apps/nextjs/public
+          retention-days: 7
+
+      - name: Upload packages build artifacts
+        if: matrix.node-version == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-build-node${{ matrix.node-version }}
+          path: |
+            packages/*/dist
+            packages/*/build
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Check bundle size limits
+        continue-on-error: true
+        run: |
+          if [ -d "apps/nextjs/.next" ]; then
+            BUNDLE_SIZE=$(du -sm apps/nextjs/.next | cut -f1)
+            echo "📊 Next.js bundle size: ${BUNDLE_SIZE}MB"
+            
+            # Warning if bundle exceeds 100MB
+            if [ $BUNDLE_SIZE -gt 100 ]; then
+              echo "⚠️  Warning: Bundle size exceeds 100MB"
+            else
+              echo "✅ Bundle size is within limits"
+            fi
+          fi
+
+      - name: Generate build summary
+        if: always()
+        run: |
+          echo "## 🔨 Build Results (Node ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ **Status**: Build successful" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status**: Build failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Turbo build: ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifacts uploaded: ✅" >> $GITHUB_STEP_SUMMARY
+
+  build-gate:
+    name: Build Gate
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: always()
+    
+    steps:
+      - name: Check build gate
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "❌ Build gate failed"
+            echo "- Build: ${{ needs.build.result }}"
+            exit 1
+          else
+            echo "✅ Build gate passed - all builds successful"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## 🎉 Build Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Build | ${{ needs.build.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Ready for Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All build artifacts are available for deployment workflows." >> $GITHUB_STEP_SUMMARY

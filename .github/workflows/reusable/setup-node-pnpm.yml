@@ -1,0 +1,94 @@
+name: Setup Node.js & pnpm
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node.js version to use'
+        required: false
+        type: string
+        default: '20'
+      install-deps:
+        description: 'Whether to install dependencies'
+        required: false
+        type: boolean
+        default: true
+      cache-key-suffix:
+        description: 'Additional cache key suffix for custom cache isolation'
+        required: false
+        type: string
+        default: ''
+    outputs:
+      cache-hit:
+        description: 'Whether the cache was restored'
+        value: ${{ jobs.setup.outputs.cache-hit }}
+      pnpm-version:
+        description: 'Installed pnpm version'
+        value: ${{ jobs.setup.outputs.pnpm-version }}
+
+jobs:
+  setup:
+    name: Setup Node & pnpm
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache-restore.outputs.cache-hit }}
+      pnpm-version: ${{ steps.pnpm-version.outputs.version }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Enable corepack and pnpm
+        id: pnpm-setup
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          echo "PNPM installed successfully"
+
+      - name: Get pnpm version
+        id: pnpm-version
+        run: |
+          VERSION=$(pnpm --version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 pnpm version: $VERSION"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        id: cache-restore
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.local/share/pnpm
+            .turbo
+            **/node_modules
+          key: ${{ runner.os }}-node${{ inputs.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}${{ inputs.cache-key-suffix }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ inputs.node-version }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependencies
+        if: inputs.install-deps
+        run: |
+          echo "📥 Installing dependencies..."
+          pnpm install --frozen-lockfile
+          echo "✅ Dependencies installed successfully"
+
+      - name: Cache summary
+        run: |
+          if [ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]; then
+            echo "✅ Cache restored successfully"
+          else
+            echo "⚠️  Cache miss - dependencies installed from scratch"
+          fi
