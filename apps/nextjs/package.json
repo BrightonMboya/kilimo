@@ -18,7 +18,6 @@
   "dependencies": {
     "@ai-sdk/groq": "^3.0.4",
     "@auth/prisma-adapter": "^2.4.1",
-    "@auth/supabase-adapter": "^1.4.1",
     "@clerk/backend": "^2.26.0",
     "@content-collections/mdx": "^0.1.6",
     "@hookform/resolvers": "^3.3.4",
