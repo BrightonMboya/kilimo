@@ -1,35 +1,14 @@
 import { useUser, useAuth } from '@clerk/clerk-expo'
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle, Sun, Cloud, CloudLightning, CloudFog, Snowflake } from 'lucide-react-native'
+import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle } from 'lucide-react-native'
 import { Link } from 'expo-router'
+import { MOCK_WEATHER } from './mockData'
 import { trpc } from '../../utils/api'
-import { useWeather, WeatherCondition } from '../../hooks/useWeather'
 import React, { useState, useRef, useEffect } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { TasksList } from '../../components/TasksList'
 import { useQueryClient } from '@tanstack/react-query'
-
-// Weather icon component based on condition
-function WeatherIcon({ condition, size = 32 }: { condition: WeatherCondition; size?: number }) {
-  const color = "#BFDBFE"
-  switch (condition) {
-    case 'sunny':
-      return <Sun size={size} color={color} />
-    case 'cloudy':
-      return <Cloud size={size} color={color} />
-    case 'rainy':
-      return <CloudRain size={size} color={color} />
-    case 'stormy':
-      return <CloudLightning size={size} color={color} />
-    case 'foggy':
-      return <CloudFog size={size} color={color} />
-    case 'snowy':
-      return <Snowflake size={size} color={color} />
-    default:
-      return <Cloud size={size} color={color} />
-  }
-}
 
 // Simple Toast Component
 function Toast({ message, visible, onHide }: { message: string; visible: boolean; onHide: () => void }) {
@@ -68,9 +47,6 @@ export default function Page() {
   const { user } = useUser()
   const { signOut } = useAuth()
   const queryClient = useQueryClient()
-
-  // Weather data
-  const { data: weather, isLoading: isLoadingWeather } = useWeather()
 
   // Toast state
   const [toastMessage, setToastMessage] = useState('')
@@ -218,46 +194,34 @@ export default function Page() {
                 <Text className="text-xs text-white">Online & Synced</Text>
               </View>
             </View>
-            <View>
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => signOut()}
                 className="bg-white/20 p-2 rounded-full backdrop-blur-sm"
               >
                 <LogOut size={24} color="white" />
               </TouchableOpacity>
+              <View className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
+                <Menu size={24} color="white" />
+              </View>
             </View>
           </View>
 
           {/* Weather Widget */}
           <View className="mt-6 flex-row items-center bg-white/10 p-4 rounded-xl backdrop-blur-md border border-white/10">
-            {isLoadingWeather ? (
-              <View className="flex-1 items-center py-2">
-                <ActivityIndicator color="white" size="small" />
-                <Text className="text-xs text-green-100 mt-2">Loading weather...</Text>
+            <View className="mr-4">
+              <CloudRain size={32} className="text-blue-200" color="#BFDBFE" />
+            </View>
+            <View className="flex-1">
+              <View className="flex-row items-end">
+                <Text className="text-3xl font-bold text-white">{MOCK_WEATHER.temp}°</Text>
+                <Text className="text-sm mb-1 ml-1 text-white">Nairobi</Text>
               </View>
-            ) : weather ? (
-              <>
-                <View className="mr-4">
-                  <WeatherIcon condition={weather.weatherCondition} size={32} />
-                </View>
-                <View className="flex-1">
-                  <View className="flex-row items-end">
-                    <Text className="text-3xl font-bold text-white">{weather.temperature}°</Text>
-                    <Text className="text-sm mb-1 ml-1 text-white">{weather.location}</Text>
-                  </View>
-                  <Text className="text-xs text-green-100 mt-1">{weather.farmingAdvice}</Text>
-                </View>
-                <View className="items-end">
-                  <Text className="text-xs font-bold text-white">{weather.precipitationProbability}% Rain</Text>
-                  <Text className="text-xs text-green-100 mt-1">{weather.weatherDescription}</Text>
-                </View>
-              </>
-            ) : (
-              <View className="flex-1">
-                <Text className="text-sm text-white">Weather unavailable</Text>
-                <Text className="text-xs text-green-100 mt-1">Check your connection</Text>
-              </View>
-            )}
+              <Text className="text-xs text-green-100 mt-1">{MOCK_WEATHER.advice}</Text>
+            </View>
+            <View className="items-end">
+              <Text className="text-xs font-bold text-white">{MOCK_WEATHER.precip} Rain</Text>
+            </View>
           </View>
         </View>
 
