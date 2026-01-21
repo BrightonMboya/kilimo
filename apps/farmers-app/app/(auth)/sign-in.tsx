@@ -1,4 +1,4 @@
-import { useSignIn, useOAuth } from '@clerk/clerk-expo'
+import { useSignIn, useOAuth, useAuth } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import React from 'react'
@@ -22,6 +22,7 @@ export const useWarmUpBrowser = () => {
 export default function Page() {
   useWarmUpBrowser()
   const { signIn, setActive, isLoaded } = useSignIn()
+  const { signOut, isSignedIn } = useAuth()
   const router = useRouter()
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
 
@@ -34,6 +35,11 @@ export default function Page() {
     if (!isLoaded) return
 
     setError('') // Clear previous errors
+
+    // Sign out any existing session first to prevent "Session already exists" error
+    if (isSignedIn) {
+      await signOut()
+    }
 
     // Start the sign-in process using the email and password provided
     try {
@@ -63,6 +69,12 @@ export default function Page() {
 
   const onGoogleSignInPress = React.useCallback(async () => {
     setError('') // Clear previous errors
+
+    // Sign out any existing session first to prevent "Session already exists" error
+    if (isSignedIn) {
+      await signOut()
+    }
+
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
 
@@ -76,7 +88,7 @@ export default function Page() {
       console.error('OAuth error', err)
       setError(err.errors?.[0]?.message || 'Google sign in failed. Please try again.')
     }
-  }, [])
+  }, [isSignedIn, signOut, startOAuthFlow, router])
 
   return (
     <SafeAreaView className="flex-1 bg-white">
