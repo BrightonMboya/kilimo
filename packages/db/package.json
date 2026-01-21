@@ -4,6 +4,9 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "license": "MIT",
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "lint": "eslint .",

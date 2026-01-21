@@ -176,9 +176,8 @@ model Farmers {
   country           String
   crops             String
   quantityCanSupply Int
-  // nationalId      FarmersNationalId?
-  // profilePicture  FarmersProfilePictures?
   harvests          Harvests[]
+  fields            Fields[]
   Project           Project    @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   project_id        String
 
@@ -190,17 +189,188 @@ model Farmers {
   @@index(project_id)
 }
 
-// model FarmersNationalId {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
+model Fields {
+  id        String  @id @default(cuid())
+  name      String
+  size      Int
+  crop      String
+  status    String
+  image     String?
+  Farmers   Farmers @relation(fields: [farmersId], references: [id])
+  farmersId String
+}
 
-// model FarmersProfilePictures {
-//   id        String  @id @default(cuid())
-//   farmer    Farmers @relation(fields: [farmersId], references: [id])
-//   farmersId String  @unique
-// }
+enum TaskStatus {
+  pending
+  inProgress
+  completed
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+model FarmersTasks {
+  id          String       @id @default(cuid())
+  name        String
+  description String
+  status      TaskStatus
+  priority    TaskPriority
+  dueAt       DateTime
+  userId      String // this comes from clerk
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+enum TransactionCategory {
+  // Income categories
+  crop_sales
+  livestock_sales
+  government_subsidy
+  other_income
+
+  // Expense categories
+  seeds
+  fertilizer
+  pesticides
+  labor
+  equipment
+  fuel
+  water
+  rent
+  other_expense
+}
+
+model FinancialRecords {
+  id          String              @id @default(cuid())
+  userId      String // Clerk user ID
+  type        TransactionType
+  category    TransactionCategory
+  amount      Float
+  description String?
+  date        DateTime            @default(now())
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@index([type])
+}
+
+// ============================================
+// FARMER MOBILE APP - FIELDS & ACTIVITIES
+// ============================================
+
+enum FieldStatus {
+  active      // Currently being cultivated
+  fallow      // Resting/not in use
+  harvested   // Recently harvested
+  preparing   // Being prepared for planting
+}
+
+enum ComplianceStatus {
+  compliant       // Meets all requirements
+  pending_review  // Awaiting verification
+  non_compliant   // Does not meet requirements
+  not_verified    // Not yet checked
+}
+
+enum ActivityType {
+  planting
+  fertilization
+  spraying
+  irrigation
+  weeding
+  pruning
+  inspection
+  harvest
+  soil_testing
+  other
+}
+
+model FarmerFields {
+  id                  String           @id @default(cuid())
+  userId              String           // Clerk user ID
+  name                String
+  crop                String
+  variety             String?          // e.g., "SL-28" for coffee
+  size                Float            // in hectares
+  sizeUnit            String           @default("ha") // ha, acres
+  status              FieldStatus      @default(active)
+
+  // Location data for geo-verification
+  latitude            Float?
+  longitude           Float?
+  altitude            Float?           // meters above sea level
+  polygon             String?          // GeoJSON polygon for field boundaries
+
+  // Agronomic details
+  soilType            String?          // e.g., "Red Volcanic", "Loamy"
+  irrigationType      String?          // e.g., "Rain-fed", "Drip", "Sprinkler"
+  plantingDate        DateTime?
+  expectedHarvestDate DateTime?
+
+  // Compliance & Certification
+  complianceStatus    ComplianceStatus @default(not_verified)
+  eudrVerified        Boolean          @default(false)
+  certifications      String?          // JSON array of certifications
+
+  // Metadata
+  notes               String?
+  imageUrl            String?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  // Relations
+  activities          FieldActivity[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([complianceStatus])
+}
+
+model FieldActivity {
+  id            String       @id @default(cuid())
+  fieldId       String
+  userId        String       // Clerk user ID (who logged this)
+
+  activityType  ActivityType
+  description   String?
+
+  // Quantity tracking (for inputs)
+  quantity      Float?
+  unit          String?      // kg, liters, bags, etc.
+  inputName     String?      // e.g., "NPK 17:17:17"
+  inputBatch    String?      // Batch number for traceability
+
+  // Cost tracking
+  cost          Float?
+  currency      String?      @default("KES")
+
+  // Weather conditions at time of activity
+  weather       String?      // e.g., "Sunny", "Cloudy", "After rain"
+  temperature   Float?       // Celsius
+
+  // Evidence
+  imageUrl      String?
+
+  // Timestamps
+  date          DateTime     @default(now()) // When the activity happened
+  createdAt     DateTime     @default(now()) // When it was logged
+
+  // Relations
+  field         FarmerFields @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId])
+  @@index([userId])
+  @@index([activityType])
+  @@index([date])
+}
 
 model Harvests {
   id         String    @id @default(cuid())
@@ -291,4 +461,40 @@ model ReportTrackingEvents {
   project_id  String
 
   @@index(project_id)
+}
+
+// ============================================
+// AI CHAT - CONVERSATIONS & MESSAGES
+// ============================================
+
+model ChatConversation {
+  id        String        @id @default(cuid())
+  userId    String        // Clerk user ID
+  title     String?       // Auto-generated from first message
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  messages  ChatMessage[]
+
+  @@index([userId])
+  @@index([updatedAt])
+}
+
+enum ChatRole {
+  user
+  assistant
+  system
+}
+
+model ChatMessage {
+  id             String           @id @default(cuid())
+  conversationId String
+  role           ChatRole
+  content        String           @db.Text // Allow long messages
+  createdAt      DateTime         @default(now())
+
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([createdAt])
 }
