@@ -1,7 +1,7 @@
 import { useUser, useAuth } from '@clerk/clerk-expo'
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Leaf, Menu, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle } from 'lucide-react-native'
+import { Leaf, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle } from 'lucide-react-native'
 import { Link } from 'expo-router'
 import { MOCK_WEATHER } from './mockData'
 import { trpc } from '../../utils/api'
@@ -201,9 +201,6 @@ export default function Page() {
               >
                 <LogOut size={24} color="white" />
               </TouchableOpacity>
-              <View className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                <Menu size={24} color="white" />
-              </View>
             </View>
           </View>
 

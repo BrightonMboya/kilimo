@@ -8,10 +8,7 @@
     "clean": "turbo clean",
     "type-check": "turbo type-check",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "supabase:start": "cd supabase && supabase start",
-    "supabase:stop": "cd supabase && supabase stop",
-    "supabase:status": "cd supabase && supabase status",
-    "supabase:logs": "cd supabase && supabase functions serve"
+    "postinstall": "cd packages/db && pnpm prisma generate"
   },
   "devDependencies": {
     "turbo": "^1.12.4",

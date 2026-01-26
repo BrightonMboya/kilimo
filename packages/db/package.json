@@ -4,6 +4,9 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "license": "MIT",
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "lint": "eslint .",
@@ -17,7 +20,7 @@
     "db:push:local": "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres DIRECT_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma db push",
     "db:seed:local": "PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f ../../supabase/test-seed.sql",
     "db:studio:local": "DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres pnpm prisma studio",
-    "db:reset:local": "pnpm supabase:stop || true && pnpm supabase:start || true && sleep 8 && pnpm run db:push:local && pnpm run db:seed:local"
+    "db:reset:local": "pnpm -r --filter supabase run supabase:stop || true && pnpm -r --filter supabase run supabase:start || true && sleep 8 && pnpm run db:push:local && pnpm run db:seed:local"
   },
   "dependencies": {
     "@prisma/client": "^5.17.0",

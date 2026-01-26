@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-import { useSignUp, useOAuth } from '@clerk/clerk-expo'
+import { useSignUp, useOAuth, useAuth } from '@clerk/clerk-expo'
 import { Link, useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as WebBrowser from 'expo-web-browser'
@@ -22,6 +22,7 @@ export const useWarmUpBrowser = () => {
 export default function SignUpScreen() {
   useWarmUpBrowser()
   const { isLoaded, signUp, setActive } = useSignUp()
+  const { signOut, isSignedIn } = useAuth()
   const router = useRouter()
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' })
 
@@ -37,7 +38,12 @@ export default function SignUpScreen() {
     if (!isLoaded) return
 
     setError('') // Clear previous errors
-    
+
+    // Sign out any existing session first to prevent "Session already exists" error
+    if (isSignedIn) {
+      await signOut()
+    }
+
     // Split full name into first and last name
     const nameParts = fullName.trim().split(' ')
     const firstName = nameParts[0]
@@ -99,6 +105,12 @@ export default function SignUpScreen() {
 
   const onGoogleSignUpPress = React.useCallback(async () => {
     setError('') // Clear previous errors
+
+    // Sign out any existing session first to prevent "Session already exists" error
+    if (isSignedIn) {
+      await signOut()
+    }
+
     try {
       const { createdSessionId, signIn, signUp, setActive } = await startOAuthFlow()
 
@@ -112,7 +124,7 @@ export default function SignUpScreen() {
       console.error('OAuth error', err)
       setError(err.errors?.[0]?.message || 'Google sign up failed. Please try again.')
     }
-  }, [])
+  }, [isSignedIn, signOut, startOAuthFlow, router])
 
   if (pendingVerification) {
     return (
