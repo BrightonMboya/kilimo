@@ -99,7 +99,7 @@ jobs:
       - name: Start Supabase local instance
         run: |
           echo "🚀 Starting Supabase..."
-          pnpm supabase:start
+          cd supabase && supabase start
           echo "⏳ Waiting for Supabase to be ready..."
           sleep 10
           echo "✅ Supabase ready"
@@ -137,7 +137,7 @@ jobs:
         if: always()
         run: |
           echo "🛑 Stopping Supabase..."
-          pnpm supabase:stop
+          cd supabase && supabase stop
           echo "✅ Supabase stopped"
 
       - name: Upload test coverage
