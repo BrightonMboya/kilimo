@@ -45,6 +45,7 @@ graph TB
     PR --> LINT
     PR --> SECURITY
 
+    LINT --> SUPABASE_HEALTH
     LINT --> TEST_UNIT
     LINT --> TEST_E2E
     SECURITY --> TEST_UNIT
@@ -57,6 +58,7 @@ graph TB
 
     style LINT fill:#90EE90
     style SECURITY fill:#90EE90
+    style SUPABASE_HEALTH fill:#87CEEB
     style TEST_UNIT fill:#87CEEB
     style TEST_E2E fill:#87CEEB
     style BUILD fill:#FFD700
@@ -103,7 +105,7 @@ graph TB
 
 **Jobs**:
 1. **lint**
-   - Prettier check (formatting)
+   - Prettier check (formatting commented for now)
    - ESLint (code quality)
    - Turbo lint (workspace-wide)
    
@@ -448,14 +450,11 @@ cp .github/workflows/ci-cd.yml .github/workflows/ci-cd.yml.backup
 
 ---
 
-## ❓ Questions for Review
 
-1. **Do you want E2E tests now or later?** (Can start with Phase 1)
-2. **Vercel deployment setup?** (Need Vercel token in secrets)
-3. **Production approval gate?** (Manual approval or auto-deploy?)
-4. **Slack/Discord notifications?** (On failures/deployments)
-5. **Matrix strategy for tests?** (Node 18, 20 or just 20?)
+1. **E2E tests now or later** (Can start with Phase 1)
+2. **Vercel deployment setup** (Need Vercel token in secrets)
+3. **Production approval gate** (Manual approval or auto-deploy?)
+4. **Slack/Discord notifications** (On failures/deployments)
+5. **Matrix strategy for tests** (Node 18, 20 or just 20?)
 
 ---
-
-**Ready to implement?** Let me know which phase to start with, and I'll create the workflow files! 🚀
