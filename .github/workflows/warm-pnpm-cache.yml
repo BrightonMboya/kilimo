@@ -1,0 +1,59 @@
+name: Warm pnpm cache
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  warm:
+    name: Warm pnpm store cache
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Enable corepack and pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ~/.local/share/pnpm
+            .turbo
+          key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
+            ${{ runner.os }}-
+
+      - name: Install dependencies (warmed cache)
+        run: |
+          echo "📥 Installing dependencies to warm pnpm store..."
+          pnpm install --frozen-lockfile
+          echo "✅ Dependencies installed"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Cache warm (Node ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "- Restored cache key: ${{ steps.pnpm-cache.outputs.STORE_PATH }}" >> $GITHUB_STEP_SUMMARY
