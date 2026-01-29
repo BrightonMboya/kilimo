@@ -17,7 +17,9 @@ on:
       - 'packages/db/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Use a distinct concurrency group for the reusable workflow to avoid
+  # deadlocks with callers that use their own concurrency group.
+  group: supabase-health-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
