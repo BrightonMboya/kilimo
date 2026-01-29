@@ -26,15 +26,13 @@ jobs:
   test-api:
     name: API Unit Tests
     runs-on: ubuntu-latest
+    needs: [supabase-health]
     if: |
-      github.event_name == 'pull_request' ||
-      github.event.workflow_run.conclusion == 'success'
-    timeout-minutes: 20
-    strategy:
-      max-parallel: 1  # Run sequentially to avoid Supabase port conflicts
-      matrix:
-        node-version: [18, 20]
-      fail-fast: false
+      needs.supabase-health.result == 'success' &&
+      (
+        github.event_name == 'pull_request' ||
+        github.event.workflow_run.conclusion == 'success'
+      )
 
     steps:
       - name: Checkout code
