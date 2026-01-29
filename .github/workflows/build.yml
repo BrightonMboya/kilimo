@@ -11,6 +11,7 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
+      - 'testing/**'
   workflow_dispatch:
 
 concurrency:
