@@ -43,6 +43,11 @@ jobs:
         run: |
           echo "===== Unit Tests workflow started: $(date -u) ====="
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Setup Node & pnpm
         uses: ./.github/actions/setup-node-pnpm
         with:
