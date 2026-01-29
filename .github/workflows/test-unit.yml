@@ -1,6 +1,12 @@
 name: Unit Tests
 
 on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
   workflow_run:
     workflows: ["Code Quality & Linting"]
     types:
