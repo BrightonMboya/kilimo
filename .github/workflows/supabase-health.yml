@@ -2,6 +2,10 @@ name: Supabase Health Check
 
 on:
   workflow_call:
+    secrets:
+      GITHUB_TOKEN:
+        description: 'GitHub token passed from caller'
+        required: false
     outputs:
       status:
         description: 'Supabase health status'
