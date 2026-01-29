@@ -97,11 +97,5 @@ const sentryConfig = {
   automaticVercelMonitors: true,
 };
 
-module.exports = withContentCollections(
-<<<<<<< HEAD
-  withPWA(withSentryConfig(nextConfig, sentryConfig)),
-);
-=======
-  withSentryConfig(nextConfig, sentryConfig),
-);
->>>>>>> supabase-local
+module.exports = withContentCollections(withSentryConfig(nextConfig, sentryConfig));
+
