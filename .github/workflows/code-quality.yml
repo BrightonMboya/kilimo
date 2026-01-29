@@ -3,17 +3,10 @@ name: Code Quality & Linting
 on:
   push:
     branches:
-      - main
-      - master
-      - develop
-      - 'feature/**'
-      - 'fix/**'
-      - 'testing/**'
+      - '**'
   pull_request:
     branches:
-      - main
-      - master
-      - develop
+      - '**'
   workflow_dispatch:
 
 concurrency:
