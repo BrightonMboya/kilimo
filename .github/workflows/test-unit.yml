@@ -1,12 +1,6 @@
 name: Unit Tests
 
 on:
-  push:
-    branches:
-      - '**'
-  pull_request:
-    branches:
-      - '**'
   workflow_run:
     workflows: ["Code Quality & Linting"]
     types:
@@ -39,6 +33,7 @@ jobs:
 
   supabase-health:
     name: Supabase Health (reusable)
+    needs: [check-quality]
     uses: ./.github/workflows/supabase-health.yml
 
   test-api:
