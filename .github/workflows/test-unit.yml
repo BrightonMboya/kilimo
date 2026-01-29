@@ -4,9 +4,7 @@ on:
   pull_request:
   workflow_run:
     workflows: ["Code Quality & Linting"]
-    types:
-      - completed
-
+    types: [completed]
   workflow_dispatch:
 
 concurrency:
@@ -18,16 +16,19 @@ permissions:
   pull-requests: write
 
 jobs:
-
   supabase-health:
     name: Supabase Health (reusable)
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/supabase-health.yml
 
   test-api:
     name: API Unit Tests
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.workflow_run.conclusion == 'success'
     timeout-minutes: 20
     strategy:
       max-parallel: 1  # Run sequentially to avoid Supabase port conflicts
