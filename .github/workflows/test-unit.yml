@@ -19,19 +19,6 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Only run if code quality passed
-  check-quality:
-    name: Verify Code Quality Passed
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-      github.event_name == 'pull_request' ||
-      github.event_name == 'push'
-    steps:
-      - name: Quality check status
-        run: |
-          echo "✅ Code quality checks passed - proceeding with tests"
 
   supabase-health:
     name: Supabase Health (reusable)
@@ -40,14 +27,7 @@ jobs:
   test-api:
     name: API Unit Tests
     runs-on: ubuntu-latest
-    needs: [check-quality, supabase-health]
-    if: |
-      (
-        github.event_name == 'workflow_dispatch' ||
-        github.event_name == 'push' ||
-        github.event_name == 'pull_request' ||
-        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
-      ) && needs.supabase-health.outputs.status == 'healthy'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     timeout-minutes: 20
     strategy:
       max-parallel: 1  # Run sequentially to avoid Supabase port conflicts
