@@ -25,7 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Code Quality & Linting' && github.event.workflow_run.conclusion == 'success')
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      github.event_name == 'pull_request' ||
+      github.event_name == 'push'
     steps:
       - name: Quality check status
         run: |
@@ -33,7 +35,6 @@ jobs:
 
   supabase-health:
     name: Supabase Health (reusable)
-    needs: [check-quality]
     uses: ./.github/workflows/supabase-health.yml
 
   test-api:
