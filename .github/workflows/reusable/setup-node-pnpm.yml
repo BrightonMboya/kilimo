@@ -72,7 +72,6 @@ jobs:
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             ~/.local/share/pnpm
             .turbo
-            **/node_modules
           key: ${{ runner.os }}-node${{ inputs.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}${{ inputs.cache-key-suffix }}
           restore-keys: |
             ${{ runner.os }}-node${{ inputs.node-version }}-pnpm-

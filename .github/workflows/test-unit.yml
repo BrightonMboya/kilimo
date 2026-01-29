@@ -6,12 +6,7 @@ on:
     types:
       - completed
     branches:
-      - main
-      - master
-      - develop
-      - 'feature/**'
-      - 'fix/**'
-      - 'testing/**'
+      - '**'
 
   workflow_dispatch:
 
@@ -80,7 +75,6 @@ jobs:
             ${{ steps.pnpm-cache.outputs.STORE_PATH }}
             ~/.local/share/pnpm
             .turbo
-            **/node_modules
           key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
