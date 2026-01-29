@@ -18,28 +18,30 @@ permissions:
 jobs:
   supabase-health:
     name: Supabase Health (reusable)
-    if: |
-      github.event_name == 'pull_request'
     uses: ./.github/workflows/supabase-health.yml
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
 
   test-api:
     name: API Unit Tests
     runs-on: ubuntu-latest
     needs: [supabase-health]
-    if: |
-      needs.supabase-health.result == 'success' &&
-      (
-        github.event_name == 'pull_request' &&
-        github.event.workflow_run.conclusion == 'success'
-      )
+    if: needs.supabase-health.result == 'success'
+
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        node-version: [18, 20]
+
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
@@ -51,8 +53,7 @@ jobs:
 
       - name: Get pnpm store directory
         id: pnpm-cache
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
         uses: actions/cache@v4
@@ -62,74 +63,57 @@ jobs:
             ~/.local/share/pnpm
             .turbo
           key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-
-            ${{ runner.os }}-
 
       - name: Install dependencies
-        run: |
-          echo "📥 Installing dependencies..."
-          pnpm install --frozen-lockfile
-          echo "✅ Dependencies installed"
+        run: pnpm install --frozen-lockfile
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
-      - name: Clean up any existing Supabase state
+      - name: Clean Supabase state
         run: |
-          echo "🧹 Cleaning existing Supabase state..."
           cd supabase
           supabase stop --no-backup || true
           docker volume ls --filter label=com.supabase.cli.project=kilimo -q | xargs -r docker volume rm || true
-          echo "✅ Cleanup complete"
 
-      - name: Start Supabase local instance
+      - name: Start Supabase
         run: |
-          echo "🚀 Starting Supabase..."
-          cd supabase && supabase start
-          echo "⏳ Waiting for Supabase to be ready..."
+          cd supabase
+          supabase start
           sleep 10
-          echo "✅ Supabase ready"
 
-      - name: Push Prisma schema to Supabase
-        run: |
-          echo "📊 Pushing Prisma schema..."
-          pnpm --filter ./packages/db run db:push:local
-          echo "✅ Schema pushed"
+      - name: Push Prisma schema
+        run: pnpm --filter ./packages/db run db:push:local
 
       - name: Install PostgreSQL client
         run: |
-          echo "📦 Installing PostgreSQL client..."
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client
-          echo "✅ PostgreSQL client installed"
 
-      - name: Seed test database
-        run: |
-          echo "🌱 Seeding database..."
-          pnpm --filter ./packages/db run db:seed:local
-          echo "✅ Database seeded"
+      - name: Seed database
+        run: pnpm --filter ./packages/db run db:seed:local
 
-      - name: Run API tests with coverage
+      - name: Run API tests
         env:
           NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: |
-          echo "🧪 Running API tests with coverage..."
-          pnpm --filter ./packages/api run test:coverage -- --coverage.threshold.lines=80 --coverage.threshold.functions=80 --coverage.threshold.branches=70 --coverage.threshold.statements=80
-          echo "✅ All tests passed"
+          pnpm --filter ./packages/api run test:coverage \
+            -- --coverage.threshold.lines=80 \
+               --coverage.threshold.functions=80 \
+               --coverage.threshold.branches=70 \
+               --coverage.threshold.statements=80
 
       - name: Stop Supabase
         if: always()
         run: |
-          echo "🛑 Stopping Supabase..."
-          cd supabase && supabase stop
-          echo "✅ Supabase stopped"
+          cd supabase
+          supabase stop
 
-      - name: Upload test coverage
+      - name: Upload coverage
         if: always() && !env.ACTS_RUNNING
         uses: actions/upload-artifact@v4
         with:
@@ -137,43 +121,18 @@ jobs:
           path: packages/api/coverage
           retention-days: 7
 
-      - name: Generate test summary
-        if: always()
-        run: |
-          echo "## 🧪 Test Results (Node ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Database**: Supabase (PostgreSQL 15)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Test Type**: API Unit Tests" >> $GITHUB_STEP_SUMMARY
-          echo "- **Coverage**: Uploaded as artifact" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ **Status**: All tests passed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Status**: Tests failed" >> $GITHUB_STEP_SUMMARY
-          fi
-
   test-gate:
     name: Test Gate
     runs-on: ubuntu-latest
     needs: [test-api]
     if: always()
-    
+
     steps:
-      - name: Check test gate
+      - name: Enforce test gate
         run: |
-          # Only fail the gate when tests actually failed or were cancelled.
-          if [ "${{ needs.test-api.result }}" = "failure" ] || [ "${{ needs.test-api.result }}" = "cancelled" ]; then
+          if [ "${{ needs.test-api.result }}" != "success" ]; then
             echo "❌ Test gate failed"
-            echo "- API Tests: ${{ needs.test-api.result }}"
             exit 1
           else
-            echo "✅ Test gate passed - all tests successful or skipped"
+            echo "✅ Test gate passed"
           fi
-
-      - name: Summary
-        run: |
-          echo "## 🎉 Test Gate Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| API Unit Tests | ${{ needs.test-api.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
