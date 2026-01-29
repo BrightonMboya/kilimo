@@ -39,45 +39,15 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Log start
         run: |
           echo "===== Unit Tests workflow started: $(date -u) ====="
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node & pnpm
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Enable corepack and pnpm
-        run: |
-          set -euo pipefail
-          echo "--- Enabling corepack and pnpm ---"
-          corepack enable
-          corepack prepare pnpm@latest --activate
-          echo "node: $(node -v)"
-          echo "pnpm: $(pnpm -v)"
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            ~/.local/share/pnpm
-            .turbo
-          key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: Install dependencies
-        run: |
-          echo "--- Installing dependencies (pnpm) ---"
-          pnpm install --frozen-lockfile
-          echo "Installed dependencies at $(date -u)"
+          install-deps: true
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
