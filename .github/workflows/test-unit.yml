@@ -1,12 +1,11 @@
 name: Unit Tests
 
 on:
+  pull_request:
   workflow_run:
     workflows: ["Code Quality & Linting"]
     types:
       - completed
-    branches:
-      - '**'
 
   workflow_dispatch:
 
@@ -22,6 +21,7 @@ jobs:
 
   supabase-health:
     name: Supabase Health (reusable)
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     uses: ./.github/workflows/supabase-health.yml
 
   test-api:
