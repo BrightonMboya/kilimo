@@ -224,7 +224,7 @@ graph TB
 
 ---
 
-#### `deploy-preview.yml` 🚀 **Preview Deployment**
+#### `deploy-preview.yml` 🚀 **Preview Deployment (Future)**
 **Trigger**: `workflow_run` (after build succeeds on PR), `pull_request` (labeled: `deploy-preview`)
 **Dependencies**: Requires `build.yml` to pass
 **Environment**: `preview`
@@ -244,7 +244,7 @@ graph TB
 
 ---
 
-#### `deploy-production.yml` 🏭 **Production Deployment**
+#### `deploy-production.yml` 🏭 **Production Deployment (Future)**
 **Trigger**: `workflow_run` (after build succeeds on `main`), `workflow_dispatch`
 **Dependencies**: Requires `build.yml` to pass on `main` branch
 **Environment**: `production` (requires approval)
@@ -398,57 +398,6 @@ if: |
 | build.yml             | ❌    | ❌            | ✅            | ❌        | ✅                 |
 | deploy-preview.yml    | ❌    | ✅ (on label) | ✅            | ❌        | ✅                 |
 | deploy-production.yml | ❌    | ❌            | ✅ (main only)| ❌        | ✅                 |
-
----
-
-## 💡 Additional Recommendations
-
-### Phase 1 (Immediate):
-1. ✅ Implement core workflows: `code-quality`, `test-unit`, `build`
-2. ✅ Create reusable setup workflow
-3. ✅ Add basic caching
-4. ✅ Configure concurrency groups
-
-### Phase 2 (Near-term):
-1. Add `security.yml` with `pnpm audit`
-2. Implement `deploy-preview.yml` for Vercel
-3. Add bundle size tracking
-4. Create custom composite actions
-
-### Phase 3 (Future):
-1. E2E tests with Playwright
-2. Visual regression testing
-3. Performance benchmarks
-4. Database migration workflows
-5. Automated dependency updates (Renovate/Dependabot)
-
----
-
-## 🔧 Migration Plan
-
-### Step 1: Backup Current Workflow
-```bash
-cp .github/workflows/ci-cd.yml .github/workflows/ci-cd.yml.backup
-```
-
-### Step 2: Create New Workflows (Order Matters)
-1. Create `reusable/setup-node-pnpm.yml` first (others depend on it)
-2. Create `code-quality.yml` (no dependencies)
-3. Create `security.yml` (no dependencies)
-4. Create `test-unit.yml` (depends on code-quality)
-5. Create `build.yml` (depends on test-unit)
-6. Create deployment workflows (depend on build)
-
-### Step 3: Test Each Workflow
-- Use `act` to test locally
-- Push to feature branch and verify
-- Check workflow run times and optimize
-
-### Step 4: Deprecate Old Workflow
-- Disable `ci-cd.yml` or delete after verification
-- Update branch protection rules
-
----
 
 
 1. **E2E tests now or later** (Can start with Phase 1)

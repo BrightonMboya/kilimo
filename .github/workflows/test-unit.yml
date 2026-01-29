@@ -148,7 +148,7 @@ jobs:
           echo "✅ Supabase stopped"
 
       - name: Upload test coverage
-        if: always()
+        if: always() && !env.ACTS_RUNNING
         uses: actions/upload-artifact@v4
         with:
           name: test-coverage-node${{ matrix.node-version }}

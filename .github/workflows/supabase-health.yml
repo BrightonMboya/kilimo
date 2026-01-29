@@ -103,8 +103,8 @@ jobs:
         run: |
           echo "📋 Checking database schema..."
           
-          # Check if main tables exist
-          PGPASSWORD=postgres psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "\dt public.*" || echo "No tables found"
+          # Check if main tables exist (disable pager to avoid interactive hangs)
+          PAGER=cat PGPASSWORD=postgres psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "\dt public.*" || echo "No tables found"
           
           echo "✅ Schema check complete"
 
