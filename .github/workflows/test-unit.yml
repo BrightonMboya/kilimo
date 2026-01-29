@@ -14,10 +14,11 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  actions: write
 
 jobs:
   supabase-health:
-    name: Supabase Health (reusable)
+    name: Supabase Health
     uses: ./.github/workflows/supabase-health.yml
     if: |
       github.event_name == 'pull_request' ||
@@ -41,6 +42,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Log start
+        run: |
+          echo "===== Unit Tests workflow started: $(date -u) ====="
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -48,8 +53,12 @@ jobs:
 
       - name: Enable corepack and pnpm
         run: |
+          set -euo pipefail
+          echo "--- Enabling corepack and pnpm ---"
           corepack enable
           corepack prepare pnpm@latest --activate
+          echo "node: $(node -v)"
+          echo "pnpm: $(pnpm -v)"
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -65,7 +74,10 @@ jobs:
           key: ${{ runner.os }}-node${{ matrix.node-version }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          echo "--- Installing dependencies (pnpm) ---"
+          pnpm install --frozen-lockfile
+          echo "Installed dependencies at $(date -u)"
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
@@ -74,26 +86,43 @@ jobs:
 
       - name: Clean Supabase state
         run: |
+          set -euo pipefail
+          echo "--- Cleaning Supabase state ---"
           cd supabase
+          echo "Stopping any running supabase (ignore errors)"
           supabase stop --no-backup || true
+          echo "Removing supabase docker volumes for project 'kilimo'"
           docker volume ls --filter label=com.supabase.cli.project=kilimo -q | xargs -r docker volume rm || true
+          echo "Clean completed: $(date -u)"
 
       - name: Start Supabase
         run: |
+          set -euo pipefail
+          echo "--- Starting Supabase ---"
           cd supabase
           supabase start
+          echo "Waiting for Supabase services to warm up"
           sleep 10
+          echo "Supabase started: $(date -u)"
 
       - name: Push Prisma schema
-        run: pnpm --filter ./packages/db run db:push:local
+        run: |
+          echo "--- Pushing Prisma schema to local DB ---"
+          pnpm --filter ./packages/db run db:push:local
+          echo "Prisma push completed: $(date -u)"
 
       - name: Install PostgreSQL client
         run: |
+          echo "--- Installing postgresql-client ---"
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client
+          echo "psql version: $(psql --version)"
 
       - name: Seed database
-        run: pnpm --filter ./packages/db run db:seed:local
+        run: |
+          echo "--- Seeding database ---"
+          pnpm --filter ./packages/db run db:seed:local
+          echo "Database seed finished: $(date -u)"
 
       - name: Run API tests
         env:
@@ -101,17 +130,21 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
           DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: |
+          echo "--- Running API tests (node ${{ matrix.node-version }}) ---"
           pnpm --filter ./packages/api run test:coverage \
             -- --coverage.threshold.lines=80 \
                --coverage.threshold.functions=80 \
                --coverage.threshold.branches=70 \
                --coverage.threshold.statements=80
+          echo "Tests finished with exit code $? at $(date -u)"
 
       - name: Stop Supabase
         if: always()
         run: |
+          echo "--- Stopping Supabase services ---"
           cd supabase
-          supabase stop
+          supabase stop || true
+          echo "Supabase stopped: $(date -u)"
 
       - name: Upload coverage
         if: always() && !env.ACTS_RUNNING
@@ -120,6 +153,11 @@ jobs:
           name: test-coverage-node${{ matrix.node-version }}
           path: packages/api/coverage
           retention-days: 7
+
+      - name: Log end
+        if: always()
+        run: |
+          echo "===== Unit Tests workflow finished: $(date -u) (matrix node ${{ matrix.node-version }}) ====="
 
   test-gate:
     name: Test Gate
@@ -130,9 +168,26 @@ jobs:
     steps:
       - name: Enforce test gate
         run: |
+          echo "--- Enforcing test gate ---"
           if [ "${{ needs.test-api.result }}" != "success" ]; then
-            echo "❌ Test gate failed"
+            echo "❌ Test gate failed — job result: ${{ needs.test-api.result }}"
             exit 1
           else
             echo "✅ Test gate passed"
           fi
+
+      - name: Dispatch Build workflow
+        if: ${{ needs.test-api.result == 'success' }}
+        run: |
+          echo "Preparing to dispatch build workflow"
+          if [ -n "${GITHUB_HEAD_REF:-}" ]; then
+            REF="$GITHUB_HEAD_REF"
+          else
+            REF="${GITHUB_REF#refs/heads/}"
+          fi
+          echo "Dispatching build.yml on ref: $REF"
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/build.yml/dispatches \
+            -d "{\"ref\":\"$REF\"}"
