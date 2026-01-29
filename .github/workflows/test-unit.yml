@@ -38,8 +38,6 @@ jobs:
   supabase-health:
     name: Supabase Health (reusable)
     uses: ./.github/workflows/supabase-health.yml
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   test-api:
     name: API Unit Tests
