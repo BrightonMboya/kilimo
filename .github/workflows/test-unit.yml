@@ -83,6 +83,7 @@ jobs:
           echo "✅ Migrations applied"
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Seed test database
@@ -156,6 +157,7 @@ jobs:
           pnpm prisma db push --skip-generate || true
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Run unit tests with Vitest
@@ -166,6 +168,7 @@ jobs:
           echo "✅ Unit tests passed"
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase.outputs.service-role-key }}
