@@ -130,20 +130,20 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        DB_URL=$(supabase status -o env 2>/dev/null | grep "DATABASE_URL=" | cut -d'=' -f2-)
+        DB_URL=$(supabase status -o env 2>/dev/null || true | grep "DATABASE_URL=" | cut -d'=' -f2-)
         echo "url=$DB_URL" >> $GITHUB_OUTPUT
         
     - name: Get API URL
       id: get-api-url
       shell: bash
       run: |
-        API_URL=$(supabase status -o env 2>/dev/null | grep "SUPABASE_URL=" | cut -d'=' -f2-)
+        API_URL=$(supabase status -o env 2>/dev/null || true | grep "SUPABASE_URL=" | cut -d'=' -f2-)
         echo "url=$API_URL" >> $GITHUB_OUTPUT
         
     - name: Get Supabase keys
       id: get-keys
       shell: bash
       run: |
-        ANON_KEY=$(supabase status -o env 2>/dev/null | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
+        ANON_KEY=$(supabase status -o env 2>/dev/null || true | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
