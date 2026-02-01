@@ -77,39 +77,46 @@ runs:
       shell: bash
       run: |
         echo "⏳ Waiting for Supabase services to be ready..."
-        max_attempts=60  # Increased from 30 to allow for Docker image pull
+        max_attempts=60
         attempt=0
         
         while [ $attempt -lt $max_attempts ]; do
-          # Check if supabase status works (services started)
-          if supabase status > /dev/null 2>&1; then
-            # Check if all containers are healthy
-            unhealthy=$(docker ps --filter "name=supabase" --format "{{.Status}}" | grep -v "(healthy)" | wc -l)
-            if [ "$unhealthy" -eq 0 ]; then
-              # All containers healthy, verify we can reach PostgreSQL
-              if docker exec supabase_db_kilimo pg_isready -U postgres > /dev/null 2>&1; then
-                echo "✅ Supabase is healthy and ready!"
-                break
-              fi
+          attempt=$((attempt + 1))
+          
+          # Check if all Supabase containers exist and are running
+          container_count=$(docker ps --filter "name=supabase" --filter "status=running" | grep -c "supabase" || echo "0")
+          
+          if [ "$container_count" -ge 9 ]; then
+            # We have at least 9 containers running, check if DB is ready
+            if docker exec supabase_db_kilimo pg_isready -U postgres > /dev/null 2>&1; then
+              echo "✅ Supabase is healthy and ready! ($container_count containers running)"
+              break
+            else
+              echo "Attempt $attempt/$max_attempts - Database not ready yet..."
             fi
+          else
+            echo "Attempt $attempt/$max_attempts - Waiting for containers ($container_count/9)..."
           fi
           
-          attempt=$((attempt + 1))
+          # Show container status every 10 attempts
           if [ $((attempt % 10)) -eq 0 ]; then
-            echo "Attempt $attempt/$max_attempts - Checking service status..."
+            echo "Current container status:"
             docker ps --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
-          else
-            echo "Attempt $attempt/$max_attempts - Waiting for services..."
           fi
+          
           sleep 3
         done
         
         if [ $attempt -eq $max_attempts ]; then
-          echo "❌ Supabase failed to become healthy"
+          echo "❌ Supabase failed to become healthy after $max_attempts attempts"
           echo "Docker containers:"
           docker ps -a --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
+          echo ""
           echo "Supabase status:"
           supabase status || true
+          echo ""
+          echo "PostgreSQL check:"
+          docker exec supabase_db_kilimo pg_isready -U postgres || echo "PostgreSQL not ready"
           exit 1
         fi
         
