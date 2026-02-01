@@ -1,0 +1,144 @@
+name: 'Notify Status'
+description: 'Multi-channel notification dispatcher for CI/CD events'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  status:
+    description: 'Status of the workflow: success, failure, warning'
+    required: true
+  channels:
+    description: 'Comma-separated list of channels: slack,teams,discord,pagerduty'
+    required: false
+    default: 'slack'
+  workflow-name:
+    description: 'Name of the workflow'
+    required: true
+  deployment-url:
+    description: 'Optional deployment URL'
+    required: false
+    default: ''
+  slack-webhook:
+    description: 'Slack webhook URL'
+    required: false
+    default: ''
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare notification message
+      id: prepare
+      shell: bash
+      run: |
+        # Set emoji and color based on status
+        case "${{ inputs.status }}" in
+          success)
+            EMOJI="✅"
+            COLOR="good"
+            ;;
+          failure)
+            EMOJI="❌"
+            COLOR="danger"
+            ;;
+          warning)
+            EMOJI="⚠️"
+            COLOR="warning"
+            ;;
+          *)
+            EMOJI="ℹ️"
+            COLOR="#808080"
+            ;;
+        esac
+        
+        echo "emoji=$EMOJI" >> $GITHUB_OUTPUT
+        echo "color=$COLOR" >> $GITHUB_OUTPUT
+        
+        # Build message
+        MESSAGE="${EMOJI} **${{ inputs.workflow-name }}** - ${{ inputs.status }}"
+        echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+        
+        # Build details
+        DETAILS="Repository: ${{ github.repository }}\n"
+        DETAILS="${DETAILS}Branch: ${{ github.ref_name }}\n"
+        DETAILS="${DETAILS}Commit: ${{ github.sha }}\n"
+        DETAILS="${DETAILS}Actor: ${{ github.actor }}\n"
+        DETAILS="${DETAILS}Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        
+        if [ -n "${{ inputs.deployment-url }}" ]; then
+          DETAILS="${DETAILS}\nDeployment: ${{ inputs.deployment-url }}"
+        fi
+        
+        echo "details<<EOF" >> $GITHUB_OUTPUT
+        echo "$DETAILS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+    - name: Send Slack notification
+      if: contains(inputs.channels, 'slack') && inputs.slack-webhook != ''
+      shell: bash
+      env:
+        SLACK_WEBHOOK: ${{ inputs.slack-webhook }}
+      run: |
+        curl -X POST "$SLACK_WEBHOOK" \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "${{ steps.prepare.outputs.color }}",
+              "title": "${{ inputs.workflow-name }}",
+              "text": "${{ steps.prepare.outputs.message }}",
+              "fields": [
+                {
+                  "title": "Status",
+                  "value": "${{ inputs.status }}",
+                  "short": true
+                },
+                {
+                  "title": "Branch",
+                  "value": "${{ github.ref_name }}",
+                  "short": true
+                },
+                {
+                  "title": "Commit",
+                  "value": "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>",
+                  "short": true
+                },
+                {
+                  "title": "Actor",
+                  "value": "${{ github.actor }}",
+                  "short": true
+                }
+              ],
+              "actions": [{
+                "type": "button",
+                "text": "View Workflow",
+                "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              }]
+            }]
+          }'
+          
+    - name: Send Teams notification
+      if: contains(inputs.channels, 'teams')
+      shell: bash
+      run: |
+        echo "ℹ️ Microsoft Teams integration not yet configured"
+        # Teams webhook integration would go here
+        
+    - name: Send Discord notification
+      if: contains(inputs.channels, 'discord')
+      shell: bash
+      run: |
+        echo "ℹ️ Discord integration not yet configured"
+        # Discord webhook integration would go here
+        
+    - name: Trigger PagerDuty alert
+      if: contains(inputs.channels, 'pagerduty') && inputs.status == 'failure'
+      shell: bash
+      run: |
+        echo "ℹ️ PagerDuty integration not yet configured"
+        # PagerDuty API integration would go here
+        
+    - name: Log notification
+      shell: bash
+      run: |
+        echo "📨 Notification sent:"
+        echo "  Status: ${{ inputs.status }}"
+        echo "  Workflow: ${{ inputs.workflow-name }}"
+        echo "  Channels: ${{ inputs.channels }}"

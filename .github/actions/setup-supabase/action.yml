@@ -1,0 +1,122 @@
+name: 'Setup Supabase'
+description: 'Sets up ephemeral Supabase instance for testing'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  supabase-version:
+    description: 'Supabase CLI version to use'
+    required: false
+    default: 'latest'
+  database-port:
+    description: 'PostgreSQL database port'
+    required: false
+    default: '54322'
+  studio-port:
+    description: 'Supabase Studio port'
+    required: false
+    default: '54323'
+  api-port:
+    description: 'Supabase API port'
+    required: false
+    default: '54321'
+
+outputs:
+  database-url:
+    description: 'PostgreSQL connection string'
+    value: ${{ steps.get-db-url.outputs.url }}
+  api-url:
+    description: 'Supabase API URL'
+    value: ${{ steps.get-api-url.outputs.url }}
+  anon-key:
+    description: 'Supabase anonymous key'
+    value: ${{ steps.get-keys.outputs.anon-key }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Supabase CLI
+      shell: bash
+      run: |
+        if [ "${{ inputs.supabase-version }}" = "latest" ]; then
+          npm install -g supabase
+        else
+          npm install -g supabase@${{ inputs.supabase-version }}
+        fi
+        supabase --version
+        
+    - name: Clean existing Supabase state
+      shell: bash
+      run: |
+        # Stop any existing Supabase instance
+        supabase stop --no-backup 2>/dev/null || true
+        
+        # Clean up Docker containers
+        docker ps -a | grep supabase | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
+        
+        # Clean up volumes
+        docker volume ls | grep supabase | awk '{print $2}' | xargs -r docker volume rm 2>/dev/null || true
+        
+    - name: Start Supabase
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        if [ -d "supabase" ]; then
+          echo "✅ Found supabase directory, starting Supabase..."
+          supabase start
+        else
+          echo "⚠️ No supabase directory found, initializing..."
+          supabase init
+          supabase start
+        fi
+        
+    - name: Wait for Supabase to be healthy
+      shell: bash
+      run: |
+        echo "⏳ Waiting for Supabase to be ready..."
+        max_attempts=30
+        attempt=0
+        
+        while [ $attempt -lt $max_attempts ]; do
+          if curl -sf http://localhost:${{ inputs.api-port }}/health > /dev/null 2>&1; then
+            echo "✅ Supabase is healthy!"
+            break
+          fi
+          
+          attempt=$((attempt + 1))
+          echo "Attempt $attempt/$max_attempts - Supabase not ready yet..."
+          sleep 2
+        done
+        
+        if [ $attempt -eq $max_attempts ]; then
+          echo "❌ Supabase failed to become healthy"
+          supabase status
+          exit 1
+        fi
+        
+    - name: Display Supabase status
+      shell: bash
+      run: |
+        echo "📊 Supabase Status:"
+        supabase status
+        
+    - name: Get database URL
+      id: get-db-url
+      shell: bash
+      run: |
+        DB_URL=$(supabase status -o env | grep "DATABASE_URL=" | cut -d'=' -f2-)
+        echo "url=$DB_URL" >> $GITHUB_OUTPUT
+        
+    - name: Get API URL
+      id: get-api-url
+      shell: bash
+      run: |
+        API_URL=$(supabase status -o env | grep "SUPABASE_URL=" | cut -d'=' -f2-)
+        echo "url=$API_URL" >> $GITHUB_OUTPUT
+        
+    - name: Get Supabase keys
+      id: get-keys
+      shell: bash
+      run: |
+        ANON_KEY=$(supabase status -o env | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
+        echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
+        echo "::add-mask::$ANON_KEY"
