@@ -14,6 +14,9 @@ on:
     branches:
       - main
       - develop
+  push:  # TODO: Remove after Phase 1 workflows pass consistently
+    branches:
+      - 'ci/**'
   workflow_dispatch: # Manual trigger
 
 concurrency:
