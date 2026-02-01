@@ -37,10 +37,13 @@ runs:
     - name: Install Supabase CLI
       shell: bash
       run: |
+        # Install Supabase CLI using official installation method
         if [ "${{ inputs.supabase-version }}" = "latest" ]; then
-          npm install -g supabase
+          curl -sSfL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz
+          sudo mv supabase /usr/local/bin/supabase
         else
-          npm install -g supabase@${{ inputs.supabase-version }}
+          curl -sSfL https://github.com/supabase/cli/releases/download/${{ inputs.supabase-version }}/supabase_linux_amd64.tar.gz | tar -xz
+          sudo mv supabase /usr/local/bin/supabase
         fi
         supabase --version
         
