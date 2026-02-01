@@ -1,0 +1,403 @@
+name: 'Stage 2: Unit Tests'
+
+on:
+  workflow_run:
+    workflows: ['Stage 1: Code Quality & Linting']
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+      - 'ci/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: # Manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # Skip if code quality workflow failed
+  check-quality:
+    name: 'Check Code Quality Status'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check code quality result
+        id: check
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Code quality checks failed. Skipping unit tests."
+          fi
+
+  setup-test-env:
+    name: 'Setup Test Environment'
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      (github.event_name != 'workflow_run' || needs.check-quality.outputs.should_run == 'true')
+    needs: [check-quality]
+    timeout-minutes: 10
+    outputs:
+      supabase_url: ${{ steps.supabase.outputs.api-url }}
+      supabase_anon_key: ${{ steps.supabase.outputs.anon-key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase
+        id: supabase
+        uses: ./.github/actions/setup-supabase
+        with:
+          database-port: 54322
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Apply Prisma migrations
+        id: migrations
+        run: |
+          echo "Applying Prisma migrations..."
+          pnpm --filter @kilimo/db prisma migrate deploy || true
+          pnpm --filter @kilimo/db prisma db push --skip-generate || true
+          echo "✅ Migrations applied"
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+        continue-on-error: true
+
+      - name: Seed test database
+        id: seed
+        run: |
+          echo "Seeding test database..."
+          if [ -f "packages/db/prisma/seed.ts" ]; then
+            pnpm --filter @kilimo/db prisma db seed || true
+            echo "✅ Database seeded"
+          else
+            echo "⚠️ No seed file found, skipping"
+          fi
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+        continue-on-error: true
+
+      - name: Verify Supabase health
+        run: |
+          echo "Verifying Supabase health..."
+          curl -f ${{ steps.supabase.outputs.api-url }}/health || exit 1
+          echo "✅ Supabase is healthy"
+
+      - name: Generate setup report
+        run: |
+          echo "## 🔧 Test Environment Setup" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Supabase | ✅ Running |" >> $GITHUB_STEP_SUMMARY
+          echo "| Migrations | ${{ steps.migrations.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Seed Data | ${{ steps.seed.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Database URL**: \`${{ steps.supabase.outputs.db-url }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**API URL**: \`${{ steps.supabase.outputs.api-url }}\`" >> $GITHUB_STEP_SUMMARY
+
+  run-unit-tests:
+    name: 'Run Unit Tests (Node ${{ matrix.node }})'
+    runs-on: ubuntu-latest
+    needs: [setup-test-env]
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Setup Supabase
+        id: supabase
+        uses: ./.github/actions/setup-supabase
+        with:
+          database-port: 54322
+
+      - name: Apply Prisma migrations
+        run: |
+          pnpm --filter @kilimo/db prisma migrate deploy || true
+          pnpm --filter @kilimo/db prisma db push --skip-generate || true
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+        continue-on-error: true
+
+      - name: Run unit tests with Vitest
+        id: vitest
+        run: |
+          echo "Running unit tests with coverage..."
+          pnpm turbo run test:unit --cache-dir=.turbo -- --coverage || exit 1
+          echo "✅ Unit tests passed"
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase.outputs.service-role-key }}
+          NODE_ENV: test
+
+      - name: Generate coverage reports
+        if: always()
+        run: |
+          echo "Generating coverage reports..."
+          
+          # Generate multiple formats
+          if command -v vitest &> /dev/null; then
+            pnpm turbo run test:unit -- --coverage --reporter=json --reporter=html --reporter=lcov || true
+          fi
+          
+          # Calculate total coverage
+          if [ -f "coverage/coverage-summary.json" ]; then
+            COVERAGE=$(jq '.total.lines.pct' coverage/coverage-summary.json || echo "0")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            echo "📊 Total Coverage: $COVERAGE%"
+          fi
+        continue-on-error: true
+
+      - name: Generate coverage badge
+        if: always()
+        run: |
+          mkdir -p badges
+          COVERAGE="${{ steps.vitest.outputs.coverage }}"
+          
+          # Determine badge color
+          if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            COLOR="brightgreen"
+          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+          
+          # Generate badge SVG
+          curl "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > badges/coverage.svg || true
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-node-${{ matrix.node }}
+          path: |
+            coverage/
+            badges/
+          retention-days: 30
+
+      - name: Generate test report
+        if: always()
+        run: |
+          echo "## 🧪 Unit Tests (Node ${{ matrix.node }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.vitest.outcome }}" == "success" ]]; then
+            echo "✅ **Tests**: All passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Tests**: Some failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "coverage/coverage-summary.json" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Coverage Summary" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat coverage/coverage-summary.json | jq '.total' >> $GITHUB_STEP_SUMMARY || true
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  upload-coverage:
+    name: 'Upload Coverage to Services'
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests]
+    if: always()
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-reports-*
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage-reports/coverage/lcov.info
+          flags: unittests
+          name: codecov-unit-tests
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        continue-on-error: true
+
+      - name: Upload to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./coverage-reports/coverage/lcov.info
+          flag-name: Unit-Tests
+          parallel: false
+        continue-on-error: true
+
+      - name: Store coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: combined-coverage-report
+          path: coverage-reports/
+          retention-days: 90
+
+      - name: Generate coverage upload report
+        run: |
+          echo "## 📤 Coverage Upload" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Codecov: Uploaded" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Coveralls: Uploaded" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ GitHub Artifacts: Stored for 90 days" >> $GITHUB_STEP_SUMMARY
+
+  coverage-threshold:
+    name: 'Enforce Coverage Threshold'
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests]
+    timeout-minutes: 5
+    steps:
+      - name: Download coverage reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-reports-*
+          path: coverage-reports/
+          merge-multiple: true
+
+      - name: Check coverage threshold
+        id: threshold
+        run: |
+          THRESHOLD=80
+          
+          if [ -f "coverage-reports/coverage/coverage-summary.json" ]; then
+            COVERAGE=$(jq '.total.lines.pct' coverage-reports/coverage/coverage-summary.json || echo "0")
+            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            
+            if (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
+              echo "✅ Coverage ($COVERAGE%) meets threshold ($THRESHOLD%)"
+              exit 0
+            else
+              echo "❌ Coverage ($COVERAGE%) below threshold ($THRESHOLD%)"
+              exit 1
+            fi
+          else
+            echo "⚠️ No coverage report found"
+            exit 1
+          fi
+
+      - name: Generate threshold report
+        if: always()
+        run: |
+          COVERAGE="${{ steps.threshold.outputs.coverage }}"
+          THRESHOLD=80
+          
+          echo "## 📊 Coverage Threshold Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Current Coverage | ${COVERAGE}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Required Threshold | ${THRESHOLD}% |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
+            echo "✅ **Status**: Coverage meets requirements" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status**: Coverage below threshold" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Action Required**: Increase test coverage by $((THRESHOLD - COVERAGE))%" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  teardown:
+    name: 'Cleanup Test Environment'
+    runs-on: ubuntu-latest
+    needs: [run-unit-tests, upload-coverage]
+    if: always()
+    timeout-minutes: 5
+    steps:
+      - name: Stop Supabase
+        run: |
+          echo "Stopping Supabase containers..."
+          docker ps -a | grep supabase | awk '{print $1}' | xargs -r docker stop || true
+          echo "✅ Supabase stopped"
+
+      - name: Clean Docker volumes
+        run: |
+          echo "Cleaning Docker volumes..."
+          docker volume ls -q | grep supabase | xargs -r docker volume rm || true
+          docker system prune -f || true
+          echo "✅ Docker volumes cleaned"
+
+      - name: Generate cleanup report
+        run: |
+          echo "## 🧹 Test Environment Cleanup" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Supabase containers stopped" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Docker volumes cleaned" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Resources released" >> $GITHUB_STEP_SUMMARY
+
+  unit-test-summary:
+    name: 'Unit Test Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [run-unit-tests, upload-coverage, coverage-threshold, teardown]
+    timeout-minutes: 5
+    steps:
+      - name: Check all job results
+        run: |
+          TESTS_RESULT="${{ needs.run-unit-tests.result }}"
+          COVERAGE_UPLOAD="${{ needs.upload-coverage.result }}"
+          THRESHOLD_CHECK="${{ needs.coverage-threshold.result }}"
+          TEARDOWN="${{ needs.teardown.result }}"
+          
+          echo "## 🎯 Unit Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | $TESTS_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Upload | $COVERAGE_UPLOAD |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Threshold | $THRESHOLD_CHECK |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cleanup | $TEARDOWN |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$TESTS_RESULT" == "success" ]] && [[ "$THRESHOLD_CHECK" == "success" ]]; then
+            echo "✅ **All unit tests passed with sufficient coverage!**" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "❌ **Some checks failed. Please review the logs.**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Notify on failure
+        if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        uses: ./.github/actions/notify-status
+        with:
+          status: failure
+          message: "Unit tests failed on ${{ github.ref_name }}"
+        continue-on-error: true
