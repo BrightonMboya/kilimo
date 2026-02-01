@@ -81,7 +81,7 @@ jobs:
           pnpm --filter @kilimo/db prisma db push --skip-generate || true
           echo "✅ Migrations applied"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Seed test database
@@ -95,7 +95,7 @@ jobs:
             echo "⚠️ No seed file found, skipping"
           fi
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Verify Supabase health
@@ -120,7 +120,7 @@ jobs:
           echo "| Migrations | ${{ steps.migrations.outcome }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Seed Data | ${{ steps.seed.outcome }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Database URL**: \`${{ steps.supabase.outputs.db-url }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Database URL**: \`${{ steps.supabase.outputs.database-url }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**API URL**: \`${{ steps.supabase.outputs.api-url }}\`" >> $GITHUB_STEP_SUMMARY
 
   run-unit-tests:
@@ -153,7 +153,7 @@ jobs:
           pnpm --filter @kilimo/db prisma migrate deploy || true
           pnpm --filter @kilimo/db prisma db push --skip-generate || true
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Run unit tests with Vitest
@@ -163,7 +163,7 @@ jobs:
           pnpm turbo run test:unit --cache-dir=.turbo -- --coverage || exit 1
           echo "✅ Unit tests passed"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase.outputs.service-role-key }}
