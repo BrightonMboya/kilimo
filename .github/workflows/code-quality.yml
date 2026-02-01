@@ -9,6 +9,7 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
+      - 'ci/**'
   pull_request:
     branches:
       - main
@@ -17,6 +18,7 @@ on:
     branches:
       - main
       - develop
+      - 'ci/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
