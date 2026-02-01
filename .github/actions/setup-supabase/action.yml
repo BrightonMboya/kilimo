@@ -73,35 +73,39 @@ runs:
           supabase start || true  # Don't fail if already running
         fi
         
-        # Verify it actually started
-        if supabase status > /dev/null 2>&1; then
-          echo "✅ Supabase is running"
-        else
-          echo "❌ Supabase failed to start"
-          exit 1
-        fi
-        
     - name: Wait for Supabase to be healthy
       shell: bash
       run: |
-        echo "⏳ Waiting for Supabase to be ready..."
-        max_attempts=30
+        echo "⏳ Waiting for Supabase services to be ready..."
+        max_attempts=60  # Increased from 30 to allow for Docker image pull
         attempt=0
         
         while [ $attempt -lt $max_attempts ]; do
-          if curl -sf http://localhost:${{ inputs.api-port }}/health > /dev/null 2>&1; then
-            echo "✅ Supabase is healthy!"
-            break
+          # Check if supabase status works (services started)
+          if supabase status > /dev/null 2>&1; then
+            # Check if the API gateway health endpoint responds
+            if curl -sf http://localhost:${{ inputs.api-port }}/health > /dev/null 2>&1; then
+              echo "✅ Supabase is healthy and ready!"
+              break
+            fi
           fi
           
           attempt=$((attempt + 1))
-          echo "Attempt $attempt/$max_attempts - Supabase not ready yet..."
-          sleep 2
+          if [ $((attempt % 10)) -eq 0 ]; then
+            echo "Attempt $attempt/$max_attempts - Checking service status..."
+            docker ps --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
+          else
+            echo "Attempt $attempt/$max_attempts - Waiting for services..."
+          fi
+          sleep 3
         done
         
         if [ $attempt -eq $max_attempts ]; then
           echo "❌ Supabase failed to become healthy"
-          supabase status
+          echo "Docker containers:"
+          docker ps -a --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
+          echo "Supabase status:"
+          supabase status || true
           exit 1
         fi
         
