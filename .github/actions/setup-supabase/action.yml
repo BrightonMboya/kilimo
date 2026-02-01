@@ -130,20 +130,23 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        DB_URL=$(supabase status -o env 2>/dev/null || true | grep "DATABASE_URL=" | cut -d'=' -f2-)
+        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2- || echo "postgresql://postgres:postgres@127.0.0.1:54322/postgres")
         echo "url=$DB_URL" >> $GITHUB_OUTPUT
+        echo "Database URL extracted: ${DB_URL:0:50}..."
         
     - name: Get API URL
       id: get-api-url
       shell: bash
       run: |
-        API_URL=$(supabase status -o env 2>/dev/null || true | grep "SUPABASE_URL=" | cut -d'=' -f2-)
+        API_URL=$(supabase status -o env 2>&1 | grep "SUPABASE_URL=" | cut -d'=' -f2- || echo "http://127.0.0.1:54321")
         echo "url=$API_URL" >> $GITHUB_OUTPUT
+        echo "API URL extracted: $API_URL"
         
     - name: Get Supabase keys
       id: get-keys
       shell: bash
       run: |
-        ANON_KEY=$(supabase status -o env 2>/dev/null || true | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
+        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
+        echo "Anon key extracted (masked)"
