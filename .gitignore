@@ -62,3 +62,10 @@ certificates
 .env
 
 event.json
+
+#docs
+
+*/*/*.md
+
+# github documentation
+.github/**/*.md
