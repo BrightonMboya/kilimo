@@ -66,11 +66,19 @@ runs:
       run: |
         if [ -d "supabase" ]; then
           echo "✅ Found supabase directory, starting Supabase..."
-          supabase start
+          supabase start || true  # Don't fail if already running
         else
           echo "⚠️ No supabase directory found, initializing..."
           supabase init
-          supabase start
+          supabase start || true  # Don't fail if already running
+        fi
+        
+        # Verify it actually started
+        if supabase status > /dev/null 2>&1; then
+          echo "✅ Supabase is running"
+        else
+          echo "❌ Supabase failed to start"
+          exit 1
         fi
         
     - name: Wait for Supabase to be healthy
