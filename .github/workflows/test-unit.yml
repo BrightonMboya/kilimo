@@ -131,7 +131,7 @@ jobs:
       matrix:
         node: [20, 22]
     needs: setup-test-env
-    if: success()
+    if: always()
     timeout-minutes: 20
     steps:
       - name: Checkout code
