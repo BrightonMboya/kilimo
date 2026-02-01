@@ -77,8 +77,9 @@ jobs:
         id: migrations
         run: |
           echo "Applying Prisma migrations..."
-          pnpm --filter @kilimo/db prisma migrate deploy || true
-          pnpm --filter @kilimo/db prisma db push --skip-generate || true
+          cd packages/db
+          pnpm prisma migrate deploy || true
+          pnpm prisma db push --skip-generate || true
           echo "✅ Migrations applied"
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
@@ -150,8 +151,9 @@ jobs:
 
       - name: Apply Prisma migrations
         run: |
-          pnpm --filter @kilimo/db prisma migrate deploy || true
-          pnpm --filter @kilimo/db prisma db push --skip-generate || true
+          cd packages/db
+          pnpm prisma migrate deploy || true
+          pnpm prisma db push --skip-generate || true
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
