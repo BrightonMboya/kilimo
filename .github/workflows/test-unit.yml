@@ -453,5 +453,6 @@ jobs:
         uses: ./.github/actions/notify-status
         with:
           status: failure
-          message: "Unit tests failed on ${{ github.ref_name }}"
+          # ARCHITECTURE VIOLATION: Action expects 'workflow-name' not 'message'
+          message: "Unit tests failed on ${{ github.ref_name }}"  # TODO: Change to workflow-name
         continue-on-error: true

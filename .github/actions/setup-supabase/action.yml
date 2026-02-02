@@ -30,6 +30,9 @@ outputs:
   anon-key:
     description: 'Supabase anonymous key'
     value: ${{ steps.get-keys.outputs.anon-key }}
+  # TODO: MISSING OUTPUTS - Add these to match workflow usage:
+  # service-role-key: Service role key for admin operations
+  # studio-url: Supabase Studio URL for debugging
 
 runs:
   using: 'composite'
@@ -66,11 +69,13 @@ runs:
       run: |
         if [ -d "supabase" ]; then
           echo "✅ Found supabase directory, starting Supabase..."
-          supabase start || true  # Don't fail if already running
+          # PRODUCTION ISSUE: || true masks real failures
+          supabase start || true  # TODO: EVALUATE - Check if already running before masking errors
         else
           echo "⚠️ No supabase directory found, initializing..."
           supabase init
-          supabase start || true  # Don't fail if already running
+          # PRODUCTION ISSUE: || true masks real failures
+          supabase start || true  # TODO: EVALUATE - Check if already running before masking errors
         fi
         
     - name: Wait for Supabase to be healthy
@@ -130,7 +135,8 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2- || echo "postgresql://postgres:postgres@127.0.0.1:54322/postgres")
+        # PRODUCTION ISSUE: Hardcoded fallback credentials - if supabase status fails, uses unsafe defaults
+        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2- || echo "postgresql://postgres:postgres@127.0.0.1:54322/postgres")  # TODO: Fail instead of fallback
         echo "url=$DB_URL" >> $GITHUB_OUTPUT
         echo "Database URL extracted: ${DB_URL:0:50}..."
         
@@ -146,7 +152,8 @@ runs:
       id: get-keys
       shell: bash
       run: |
-        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")
+        # SECURITY RISK: Hardcoded demo JWT as fallback - DO NOT USE IN PRODUCTION
+        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")  # TODO: Fail instead of using demo key
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
         echo "Anon key extracted (masked)"

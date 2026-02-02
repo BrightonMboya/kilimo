@@ -1,5 +1,7 @@
 name: 'Stage 1: Dependency Management'
 
+# ARCHITECTURE VIOLATION: Should follow Stage 1 pattern with workflow_run trigger
+# TODO: Add workflow_run trigger after validate-changes like other Stage 1 workflows
 on:
   schedule:
     # Run every Monday at 9 AM UTC

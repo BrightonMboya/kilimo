@@ -65,10 +65,11 @@ jobs:
 
       - name: Apply migrations
         run: |
-          pnpm --filter @kilimo/db prisma migrate deploy || true
-          pnpm --filter @kilimo/db prisma db push --skip-generate || true
+          pnpm --filter @kilimo/db prisma migrate deploy || true  # TODO: Remove '|| true'
+          pnpm --filter @kilimo/db prisma db push --skip-generate || true  # TODO: Remove '|| true'
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          # ARCHITECTURE VIOLATION: Using db-url which doesn't exist, should be database-url
+          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}  # TODO: FIX - Change to database-url
         continue-on-error: true
 
       - name: Validate OpenAPI/Swagger specs
@@ -309,7 +310,8 @@ jobs:
           DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase.outputs.service-role-key }}
+          # ARCHITECTURE VIOLATION: service-role-key output doesn't exist in setup-supabase action
+          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase.outputs.service-role-key }}  # TODO: FIX - Add to action.yml outputs
           NODE_ENV: test
 
       - name: Test authentication flows

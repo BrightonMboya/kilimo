@@ -445,5 +445,6 @@ jobs:
         uses: ./.github/actions/notify-status
         with:
           status: failure
-          message: "Code quality checks failed on ${{ github.ref_name }}"
+          # ARCHITECTURE VIOLATION: Action expects 'workflow-name' but we're passing 'message'
+          message: "Code quality checks failed on ${{ github.ref_name }}"  # TODO: Change to workflow-name
         continue-on-error: true

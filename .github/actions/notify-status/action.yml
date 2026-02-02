@@ -2,6 +2,8 @@ name: 'Notify Status'
 description: 'Multi-channel notification dispatcher for CI/CD events'
 author: 'Kilimo DevOps Team'
 
+# INCOMPLETE IMPLEMENTATION: Only Slack is implemented, missing Teams, Discord, PagerDuty
+# TODO: Implement remaining notification channels or remove from description
 inputs:
   status:
     description: 'Status of the workflow: success, failure, warning'
@@ -9,7 +11,7 @@ inputs:
   channels:
     description: 'Comma-separated list of channels: slack,teams,discord,pagerduty'
     required: false
-    default: 'slack'
+    default: 'slack'  # TODO: Only slack works, others not implemented
   workflow-name:
     description: 'Name of the workflow'
     required: true
