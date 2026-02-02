@@ -14,9 +14,9 @@ on:
     branches:
       - main
       - develop
-  push:  # TODO: Remove after Phase 1 workflows pass consistently
+  push:  # TODO: REMOVE this entire push trigger - only for testing during development
     branches:
-      - 'ci/**'
+      - 'ci/**'  # Allows testing without triggering from Phase 1 workflow_run
   workflow_dispatch: # Manual trigger
 
 concurrency:
@@ -29,8 +29,9 @@ permissions:
   checks: write
 
 jobs:
-  # TODO: Re-enable strict quality check after fixing Phase 1 issues
-  # Temporarily allowing unit tests to run even if code quality fails
+  # TODO: CRITICAL - Re-enable strict quality gate after Phase 1 workflows consistently pass
+  # Currently bypassing code quality check to allow test development in parallel
+  # CHANGE: Make should_run=false when workflow_run.conclusion != 'success'
   check-quality:
     name: 'Check Code Quality Status'
     runs-on: ubuntu-latest
@@ -41,10 +42,12 @@ jobs:
       - name: Check code quality result
         id: check
         run: |
-          # Temporarily always running tests regardless of quality check status
+          # TODO: REMOVE - Temporarily always running tests regardless of Phase 1 status
           echo "should_run=true" >> $GITHUB_OUTPUT
           if [[ "${{ github.event_name }}" == "workflow_run" ]] && [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
             echo "⚠️ Code quality checks failed but continuing (temporary)."
+            # TODO: Uncomment this line to enforce quality gate:
+            # exit 1
           fi
 
   setup-test-env:
@@ -78,37 +81,37 @@ jobs:
         run: |
           echo "Applying Prisma migrations..."
           cd packages/db
-          pnpm prisma migrate deploy || true
-          pnpm prisma db push --skip-generate || true
+          pnpm prisma migrate deploy || true  # TODO: Remove '|| true' - should fail if migrations fail
+          pnpm prisma db push --skip-generate || true  # TODO: Remove '|| true' after migrations stabilize
           echo "✅ Migrations applied"
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
-        continue-on-error: true
+        continue-on-error: true  # TODO: REMOVE - Should fail job if migrations fail
 
       - name: Seed test database
         id: seed
         run: |
           echo "Seeding test database..."
           if [ -f "packages/db/prisma/seed.ts" ]; then
-            pnpm --filter @kilimo/db prisma db seed || true
+            pnpm --filter @kilimo/db prisma db seed || true  # TODO: Remove '|| true' after seed script is stable
             echo "✅ Database seeded"
           else
             echo "⚠️ No seed file found, skipping"
           fi
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
-        continue-on-error: true
+        continue-on-error: true  # TODO: EVALUATE - May want to fail if seeding fails for certain test scenarios
 
-      - name: Verify Supabase health
+      - name: Verify Supabase health  # TODO: DEBUGGING - Remove verbose logging after Supabase setup is stable
         run: |
           echo "Verifying Supabase health..."
           if [ -z "${{ steps.supabase.outputs.api-url }}" ]; then
-            echo "⚠️ API URL not available, checking containers directly..."
-            docker ps --filter "name=supabase" --format "{{.Names}}: {{.Status}}"
+            echo "⚠️ API URL not available, checking containers directly..."  # DEBUG output
+            docker ps --filter "name=supabase" --format "{{.Names}}: {{.Status}}"  # DEBUG: Show container status
           else
-            echo "API URL: ${{ steps.supabase.outputs.api-url }}"
-            curl -f "${{ steps.supabase.outputs.api-url }}" > /dev/null 2>&1 || echo "⚠️ API not responding but containers are healthy"
+            echo "API URL: ${{ steps.supabase.outputs.api-url }}"  # DEBUG output
+            curl -f "${{ steps.supabase.outputs.api-url }}" > /dev/null 2>&1 || echo "⚠️ API not responding but containers are healthy"  # TODO: Make this check strict
           fi
           echo "✅ Supabase setup verified"
 
@@ -153,12 +156,12 @@ jobs:
       - name: Apply Prisma migrations
         run: |
           cd packages/db
-          pnpm prisma migrate deploy || true
-          pnpm prisma db push --skip-generate || true
+          pnpm prisma migrate deploy || true  # TODO: Remove '|| true' - should fail if migrations fail
+          pnpm prisma db push --skip-generate || true  # TODO: Remove '|| true' after migrations stabilize
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
-        continue-on-error: true
+        continue-on-error: true  # TODO: REMOVE - Should fail job if migrations fail
 
       - name: Run unit tests with Vitest
         id: vitest
@@ -314,14 +317,15 @@ jobs:
       - name: Check coverage threshold
         id: threshold
         run: |
-          THRESHOLD=80
+          THRESHOLD=80  # TODO: EVALUATE - May want to lower to 70% initially and gradually increase
           
-          # Debug: List downloaded files
+          # TODO: DEBUGGING - Remove verbose artifact logging after coverage upload is stable
           echo "📁 Downloaded artifact structure:"
           ls -la coverage-reports/ || echo "coverage-reports/ not found"
           find coverage-reports/ -type f -name "*.json" || echo "No JSON files found"
           
-          # Try multiple possible paths
+          # TODO: SIMPLIFY - Once coverage path is stable, remove fallback logic and use single path
+          # Currently checking multiple paths to handle different artifact download structures
           if [ -f "coverage-reports/coverage/coverage-summary.json" ]; then
             COVERAGE_FILE="coverage-reports/coverage/coverage-summary.json"
           elif [ -f "coverage-reports/coverage-summary.json" ]; then
@@ -329,7 +333,7 @@ jobs:
           elif [ -f "coverage/coverage-summary.json" ]; then
             COVERAGE_FILE="coverage/coverage-summary.json"
           else
-            # Check if we have coverage-final.json instead
+            # TODO: REMOVE - Fallback for missing summary file (should always exist with json-summary reporter)
             if [ -f "coverage-reports/coverage/coverage-final.json" ]; then
               echo "⚠️ Found coverage-final.json but not coverage-summary.json"
               echo "This means Vitest coverage was generated but summary wasn't created"
@@ -371,13 +375,14 @@ jobs:
           echo "| Required Threshold | ${THRESHOLD}% |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Use bc for floating point comparison
+          # NOTE: Using 'bc' for floating point math because bash doesn't support decimals natively
           if [ -n "$COVERAGE" ] && (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
             echo "✅ **Status**: Coverage meets requirements" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Status**: Coverage below threshold" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             if [ -n "$COVERAGE" ]; then
+              # TODO: KNOWN ISSUE - Coverage currently at ~51%, needs more test cases to reach 80%
               DIFF=$(echo "$THRESHOLD - $COVERAGE" | bc -l | awk '{printf "%.2f", $0}')
               echo "**Action Required**: Increase test coverage by $DIFF%" >> $GITHUB_STEP_SUMMARY
             fi

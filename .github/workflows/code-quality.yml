@@ -18,7 +18,7 @@ on:
     branches:
       - main
       - develop
-      - 'ci/**'
+      - 'ci/**'  # TODO: Remove 'ci/**' after testing complete - only for development
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -60,7 +60,7 @@ jobs:
       (github.event_name != 'workflow_run' || needs.check-validation.outputs.should_run == 'true')
     needs: [check-validation]
     timeout-minutes: 10
-    continue-on-error: true  # TODO: Remove after fixing lint issues
+    continue-on-error: true  # TODO: REMOVE - Temporarily non-blocking to allow CI to pass while fixing ESLint errors
     strategy:
       fail-fast: false
       matrix:
@@ -92,7 +92,7 @@ jobs:
         id: eslint
         run: |
           pnpm turbo run lint --cache-dir=.turbo --continue
-        continue-on-error: true
+        continue-on-error: true  # TODO: REMOVE - Should fail on lint errors in production
 
       - name: Check for console statements
         id: console-check
@@ -108,7 +108,7 @@ jobs:
             echo "✅ No console statements found"
             echo "has_console=false" >> $GITHUB_OUTPUT
           fi
-        continue-on-error: true
+        continue-on-error: true  # TODO: REMOVE - Should fail on console statements in production code
 
       - name: Generate ESLint SARIF report
         if: always()
@@ -154,7 +154,7 @@ jobs:
       (github.event_name != 'workflow_run' || needs.check-validation.outputs.should_run == 'true')
     needs: [check-validation]
     timeout-minutes: 8
-    continue-on-error: true  # TODO: Remove after fixing format issues
+    continue-on-error: true  # TODO: REMOVE - Temporarily non-blocking to allow CI to pass while fixing Prettier formatting
     strategy:
       fail-fast: false
       matrix:
@@ -406,8 +406,11 @@ jobs:
     steps:
       - name: Check all job results
         id: check
-        # TODO: Re-enable strict failure mode after fixing code quality issues
-        # This is temporarily non-blocking to allow Phase 2 testing workflows to run
+        # TODO: CRITICAL - REMOVE continue-on-error after fixing:
+        #   1. ESLint errors (console.log statements, unused vars, etc.)
+        #   2. Prettier formatting issues
+        #   3. TypeScript errors (if any)
+        # Currently non-blocking to allow Phase 2 testing workflows to run during development
         continue-on-error: true
         run: |
           LINT_RESULT="${{ needs.lint-code.result }}"
@@ -434,7 +437,7 @@ jobs:
             echo "⚠️ **Some quality checks failed but continuing (temporary).**" >> $GITHUB_STEP_SUMMARY
             echo "📝 TODO: Fix quality issues and remove this workaround" >> $GITHUB_STEP_SUMMARY
           fi
-          # TODO: Change exit 0 to exit 1 after fixing code quality issues
+          # TODO: CRITICAL - Change 'exit 0' to 'exit 1' to block merges on quality failures
           exit 0
 
       - name: Notify on failure

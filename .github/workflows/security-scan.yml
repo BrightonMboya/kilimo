@@ -7,7 +7,7 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
-      - 'ci/**'
+      - 'ci/**'  # TODO: Remove 'ci/**' after testing complete - only for development
   pull_request:
     branches:
       - main
@@ -105,7 +105,7 @@ jobs:
     name: 'Dependency Security Audit'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: true  # TODO: Remove after fixing dependency vulnerabilities
+    continue-on-error: true  # TODO: REMOVE - Temporarily non-blocking while fixing HIGH/CRITICAL dependency vulnerabilities
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -400,8 +400,11 @@ jobs:
     steps:
       - name: Check all security job results
         id: check
-        # TODO: Re-enable strict failure mode after fixing security issues
-        # This is temporarily non-blocking to allow Phase 2 testing workflows to run
+        # TODO: CRITICAL - REMOVE continue-on-error after fixing:
+        #   1. Dependency vulnerabilities (HIGH/CRITICAL from pnpm audit and Grype)
+        #   2. SAST findings from CodeQL and Semgrep
+        #   3. License compliance issues (if any)
+        # Currently non-blocking to allow Phase 2 testing during development
         continue-on-error: true
         run: |
           SECRETS_RESULT="${{ needs.secret-scanning.result }}"
@@ -429,7 +432,7 @@ jobs:
             echo "📝 TODO: Fix security issues and remove this workaround" >> $GITHUB_STEP_SUMMARY
             echo "⚠️ **Action Required**: Review security findings and remediate vulnerabilities" >> $GITHUB_STEP_SUMMARY
           fi
-          # TODO: Change to 'exit 0  # TODO: Change back to exit 1 after fixing security issues' after fixing security issues
+          # TODO: CRITICAL - Change 'exit 0' to 'exit 1' to block merges on security failures
           exit 0
 
       - name: Notify on critical failures
