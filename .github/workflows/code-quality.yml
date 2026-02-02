@@ -35,14 +35,17 @@ jobs:
   check-validation:
     name: 'Check Validation Status'
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run'
+    if: github.event_name == 'workflow_run' || github.event_name == 'push'
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
       - name: Check validation result
         id: check
         run: |
-          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # For push events, always run quality checks
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
             echo "should_run=true" >> $GITHUB_OUTPUT
           else
             echo "should_run=false" >> $GITHUB_OUTPUT

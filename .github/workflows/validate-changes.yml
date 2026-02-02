@@ -102,7 +102,7 @@ jobs:
 
   commit-lint:
     name: 'Lint Commit Messages'
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -143,13 +143,18 @@ jobs:
           
   check-branch-name:
     name: 'Validate Branch Name'
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Check branch naming convention
         run: |
-          BRANCH="${{ github.head_ref }}"
+          # For PRs use head_ref, for push use ref_name
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+          else
+            BRANCH="${{ github.ref_name }}"
+          fi
           echo "🔍 Validating branch name: $BRANCH"
           
           # Valid patterns: feature/*, fix/*, hotfix/*, chore/*, docs/*, ci/*, refactor/*

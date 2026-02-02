@@ -34,7 +34,7 @@ jobs:
   check-quality:
     name: 'Check Code Quality Status'
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run'
+    if: github.event_name == 'workflow_run' || github.event_name == 'push'
     outputs:
       should_run: ${{ steps.check.outputs.should_run }}
     steps:
@@ -43,7 +43,7 @@ jobs:
         run: |
           # Temporarily always running tests regardless of quality check status
           echo "should_run=true" >> $GITHUB_OUTPUT
-          if [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_run" ]] && [[ "${{ github.event.workflow_run.conclusion }}" != "success" ]]; then
             echo "⚠️ Code quality checks failed but continuing (temporary)."
           fi
 
