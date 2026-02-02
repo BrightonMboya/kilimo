@@ -65,7 +65,6 @@ runs:
       with:
         path: |
           ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          **/node_modules
           .turbo
           ~/.cache/Cypress
           .next/cache
