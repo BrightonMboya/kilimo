@@ -312,19 +312,36 @@ jobs:
         run: |
           THRESHOLD=80
           
+          # Debug: List downloaded files
+          echo "📁 Downloaded artifact structure:"
+          ls -la coverage-reports/ || echo "coverage-reports/ not found"
+          find coverage-reports/ -type f -name "*.json" || echo "No JSON files found"
+          
+          # Try multiple possible paths
           if [ -f "coverage-reports/coverage/coverage-summary.json" ]; then
-            COVERAGE=$(jq '.total.lines.pct' coverage-reports/coverage/coverage-summary.json || echo "0")
-            echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
-            
-            if (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
-              echo "✅ Coverage ($COVERAGE%) meets threshold ($THRESHOLD%)"
-              exit 0
-            else
-              echo "❌ Coverage ($COVERAGE%) below threshold ($THRESHOLD%)"
-              exit 1
-            fi
+            COVERAGE_FILE="coverage-reports/coverage/coverage-summary.json"
+          elif [ -f "coverage-reports/coverage-summary.json" ]; then
+            COVERAGE_FILE="coverage-reports/coverage-summary.json"
+          elif [ -f "coverage/coverage-summary.json" ]; then
+            COVERAGE_FILE="coverage/coverage-summary.json"
           else
-            echo "⚠️ No coverage report found"
+            echo "⚠️ No coverage report found in expected locations"
+            echo "Checked paths:"
+            echo "  - coverage-reports/coverage/coverage-summary.json"
+            echo "  - coverage-reports/coverage-summary.json"
+            echo "  - coverage/coverage-summary.json"
+            exit 1
+          fi
+          
+          echo "✅ Found coverage report: $COVERAGE_FILE"
+          COVERAGE=$(jq '.total.lines.pct' "$COVERAGE_FILE" || echo "0")
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          
+          if (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
+            echo "✅ Coverage ($COVERAGE%) meets threshold ($THRESHOLD%)"
+            exit 0
+          else
+            echo "❌ Coverage ($COVERAGE%) below threshold ($THRESHOLD%)"
             exit 1
           fi
 
