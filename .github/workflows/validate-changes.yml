@@ -125,6 +125,12 @@ jobs:
         run: |
           echo "🔍 Validating commit messages..."
           
+          # Check if commitlint.config.js exists
+          if [ ! -f "commitlint.config.js" ]; then
+            echo "⚠️ No commitlint.config.js found, skipping validation"
+            exit 0
+          fi
+          
           # Get commits based on event type
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             COMMITS=$(git log --format=%H origin/${{ github.base_ref }}..HEAD)

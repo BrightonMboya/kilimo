@@ -371,12 +371,16 @@ jobs:
           echo "| Required Threshold | ${THRESHOLD}% |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          if (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
+          # Use bc for floating point comparison
+          if [ -n "$COVERAGE" ] && (( $(echo "$COVERAGE >= $THRESHOLD" | bc -l) )); then
             echo "✅ **Status**: Coverage meets requirements" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Status**: Coverage below threshold" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Action Required**: Increase test coverage by $((THRESHOLD - COVERAGE))%" >> $GITHUB_STEP_SUMMARY
+            if [ -n "$COVERAGE" ]; then
+              DIFF=$(echo "$THRESHOLD - $COVERAGE" | bc -l | awk '{printf "%.2f", $0}')
+              echo "**Action Required**: Increase test coverage by $DIFF%" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 
   teardown:
