@@ -297,6 +297,7 @@ jobs:
     name: 'Enforce Coverage Threshold'
     runs-on: ubuntu-latest
     needs: [run-unit-tests]
+    if: always() && needs.run-unit-tests.result == 'success'
     timeout-minutes: 5
     steps:
       - name: Download coverage reports
