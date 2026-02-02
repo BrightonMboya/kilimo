@@ -125,8 +125,13 @@ jobs:
         run: |
           echo "🔍 Validating commit messages..."
           
-          # Get all commits in the PR
-          COMMITS=$(git log --format=%H origin/${{ github.base_ref }}..HEAD)
+          # Get commits based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMITS=$(git log --format=%H origin/${{ github.base_ref }}..HEAD)
+          else
+            # For push events, validate the last commit
+            COMMITS=$(git log --format=%H -n 1)
+          fi
           
           for commit in $COMMITS; do
             MESSAGE=$(git log --format=%B -n 1 $commit)

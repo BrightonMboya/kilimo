@@ -179,9 +179,13 @@ jobs:
         run: |
           echo "Generating coverage reports..."
           
-          # Generate multiple formats
-          if command -v vitest &> /dev/null; then
-            pnpm turbo run test:unit -- --coverage --reporter=json --reporter=html --reporter=lcov || true
+          # Coverage is already generated in packages/api/coverage from the test step
+          # Copy it to root for easier artifact upload
+          if [ -d "packages/api/coverage" ]; then
+            cp -r packages/api/coverage ./coverage
+            echo "✅ Coverage reports copied from packages/api/coverage"
+          else
+            echo "⚠️ No coverage directory found in packages/api"
           fi
           
           # Calculate total coverage
