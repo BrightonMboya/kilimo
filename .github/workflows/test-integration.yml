@@ -65,8 +65,8 @@ jobs:
 
       - name: Apply migrations
         run: |
-          pnpm --filter @kilimo/db prisma migrate deploy || true  # TODO: Remove '|| true'
-          pnpm --filter @kilimo/db prisma db push --skip-generate || true  # TODO: Remove '|| true'
+          pnpm --filter @kilimo/db prisma migrate deploy  # TODO: Remove '|| true'
+          pnpm --filter @kilimo/db prisma db push --skip-generate  # TODO: Remove '|| true'
         env:
           # ARCHITECTURE VIOLATION: Using db-url which doesn't exist, should be database-url
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}  # TODO: FIX - Change to database-url
@@ -180,7 +180,7 @@ jobs:
             
             # Prisma doesn't support direct rollback, but we can test by resetting
             pnpm --filter @kilimo/db prisma migrate reset --force --skip-seed || true
-            pnpm --filter @kilimo/db prisma migrate deploy || true
+            pnpm --filter @kilimo/db prisma migrate deploy
             
             echo "✅ Rollback test completed"
           else
@@ -274,9 +274,9 @@ jobs:
 
       - name: Apply migrations and seed
         run: |
-          pnpm --filter @kilimo/db prisma migrate deploy || true
-          pnpm --filter @kilimo/db prisma db push --skip-generate || true
-          pnpm --filter @kilimo/db prisma db seed || true
+          pnpm --filter @kilimo/db prisma migrate deploy
+          pnpm --filter @kilimo/db prisma db push --skip-generate
+          pnpm --filter @kilimo/db prisma db seed
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true

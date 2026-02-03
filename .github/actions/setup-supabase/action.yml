@@ -72,13 +72,16 @@ runs:
       run: |
         if [ -d "supabase" ]; then
           echo "✅ Found supabase directory, starting Supabase..."
-          # PRODUCTION ISSUE: || true masks real failures
-          supabase start || true  # TODO: EVALUATE - Check if already running before masking errors
+          # Check if already running first
+          if docker ps --filter "name=supabase" | grep -q supabase; then
+            echo "⚠️ Supabase containers already running, stopping first..."
+            supabase stop --no-backup
+          fi
+          supabase start
         else
           echo "⚠️ No supabase directory found, initializing..."
           supabase init
-          # PRODUCTION ISSUE: || true masks real failures
-          supabase start || true  # TODO: EVALUATE - Check if already running before masking errors
+          supabase start
         fi
         
     - name: Wait for Supabase to be healthy
@@ -138,8 +141,13 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        # PRODUCTION ISSUE: Hardcoded fallback credentials - if supabase status fails, uses unsafe defaults
-        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2- || echo "postgresql://postgres:postgres@127.0.0.1:54322/postgres")  # TODO: Fail instead of fallback
+        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2-)
+        if [ -z "$DB_URL" ]; then
+          echo "❌ Failed to get DATABASE_URL from Supabase"
+          echo "Supabase status output:"
+          supabase status || true
+          exit 1
+        fi
         echo "url=$DB_URL" >> $GITHUB_OUTPUT
         echo "Database URL extracted: ${DB_URL:0:50}..."
         
@@ -147,7 +155,11 @@ runs:
       id: get-api-url
       shell: bash
       run: |
-        API_URL=$(supabase status -o env 2>&1 | grep "SUPABASE_URL=" | cut -d'=' -f2- || echo "http://127.0.0.1:54321")
+        API_URL=$(supabase status -o env 2>&1 | grep "SUPABASE_URL=" | cut -d'=' -f2-)
+        if [ -z "$API_URL" ]; then
+          echo "❌ Failed to get SUPABASE_URL from Supabase"
+          exit 1
+        fi
         echo "url=$API_URL" >> $GITHUB_OUTPUT
         echo "API URL extracted: $API_URL"
         
@@ -155,12 +167,20 @@ runs:
       id: get-keys
       shell: bash
       run: |
-        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")
+        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
+        if [ -z "$ANON_KEY" ]; then
+          echo "❌ Failed to get SUPABASE_ANON_KEY from Supabase"
+          exit 1
+        fi
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
         echo "Anon key extracted (masked)"
         
-        SERVICE_ROLE_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_SERVICE_ROLE_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU")
+        SERVICE_ROLE_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_SERVICE_ROLE_KEY=" | cut -d'=' -f2-)
+        if [ -z "$SERVICE_ROLE_KEY" ]; then
+          echo "❌ Failed to get SUPABASE_SERVICE_ROLE_KEY from Supabase"
+          exit 1
+        fi
         echo "service-role-key=$SERVICE_ROLE_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$SERVICE_ROLE_KEY"
         echo "Service role key extracted (masked)"
@@ -169,6 +189,10 @@ runs:
       id: get-studio-url
       shell: bash
       run: |
-        STUDIO_URL=$(supabase status -o env 2>&1 | grep "STUDIO_URL=" | cut -d'=' -f2- || echo "http://127.0.0.1:54323")
+        STUDIO_URL=$(supabase status -o env 2>&1 | grep "STUDIO_URL=" | cut -d'=' -f2-)
+        if [ -z "$STUDIO_URL" ]; then
+          echo "⚠️ Failed to get STUDIO_URL, using default"
+          STUDIO_URL="http://127.0.0.1:54323"
+        fi
         echo "url=$STUDIO_URL" >> $GITHUB_OUTPUT
         echo "Studio URL extracted: $STUDIO_URL"

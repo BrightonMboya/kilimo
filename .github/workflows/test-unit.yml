@@ -81,8 +81,8 @@ jobs:
         run: |
           echo "Applying Prisma migrations..."
           cd packages/db
-          pnpm prisma migrate deploy || true  # TODO: Remove '|| true' - should fail if migrations fail
-          pnpm prisma db push --skip-generate || true  # TODO: Remove '|| true' after migrations stabilize
+          pnpm prisma migrate deploy  # TODO: Remove '|| true' - should fail if migrations fail
+          pnpm prisma db push --skip-generate  # TODO: Remove '|| true' after migrations stabilize
           echo "✅ Migrations applied"
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
@@ -94,7 +94,7 @@ jobs:
         run: |
           echo "Seeding test database..."
           if [ -f "packages/db/prisma/seed.ts" ]; then
-            pnpm --filter @kilimo/db prisma db seed || true  # TODO: Remove '|| true' after seed script is stable
+            pnpm --filter @kilimo/db prisma db seed  # TODO: Remove '|| true' after seed script is stable
             echo "✅ Database seeded"
           else
             echo "⚠️ No seed file found, skipping"
@@ -156,8 +156,8 @@ jobs:
       - name: Apply Prisma migrations
         run: |
           cd packages/db
-          pnpm prisma migrate deploy || true  # TODO: Remove '|| true' - should fail if migrations fail
-          pnpm prisma db push --skip-generate || true  # TODO: Remove '|| true' after migrations stabilize
+          pnpm prisma migrate deploy  # TODO: Remove '|| true' - should fail if migrations fail
+          pnpm prisma db push --skip-generate  # TODO: Remove '|| true' after migrations stabilize
         env:
           DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           DIRECT_URL: ${{ steps.supabase.outputs.database-url }}
