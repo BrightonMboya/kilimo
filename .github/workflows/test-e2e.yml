@@ -9,7 +9,6 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
-      - 'ci/**'  # TODO: REMOVE - Only for development testing
   schedule:
     # Run nightly at 3 AM UTC
     - cron: '0 3 * * *'

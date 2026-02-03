@@ -9,14 +9,10 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
-      - 'ci/**'
   pull_request:
     branches:
       - main
       - develop
-  push:  # TODO: REMOVE this entire push trigger - only for testing during development
-    branches:
-      - 'ci/**'  # Allows testing without triggering from Phase 1 workflow_run
   workflow_dispatch: # Manual trigger
 
 concurrency:

@@ -9,16 +9,10 @@ on:
       - develop
       - 'feature/**'
       - 'fix/**'
-      - 'ci/**'
   pull_request:
     branches:
       - main
       - develop
-  push:
-    branches:
-      - main
-      - develop
-      - 'ci/**'  # TODO: Remove 'ci/**' after testing complete - only for development
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

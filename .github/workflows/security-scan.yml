@@ -1,13 +1,6 @@
 name: 'Stage 1: Security Scanning'
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - 'feature/**'
-      - 'fix/**'
-      - 'ci/**'  # TODO: Remove 'ci/**' after testing complete - only for development
   pull_request:
     branches:
       - main
