@@ -141,17 +141,17 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        # Extract DATABASE_URL from supabase status
-        DB_URL=$(supabase status -o env 2>/dev/null | grep -E "^DATABASE_URL=" | cut -d'=' -f2- || echo "")
+        # Extract DB_URL from supabase status -o env (note: it's DB_URL not DATABASE_URL)
+        DB_URL=$(supabase status -o env 2>/dev/null | grep -E "^DB_URL=" | cut -d'=' -f2- | tr -d '"' || echo "")
         
-        # If not found, try alternative extraction from supabase status
+        # If not found, try alternative extraction from supabase status table
         if [ -z "$DB_URL" ]; then
-          # Get connection string from status table format
-          DB_URL=$(supabase status 2>/dev/null | grep "DB URL" | awk '{print $NF}' || echo "")
+          # Get connection string from status table format (last column after "URL │")
+          DB_URL=$(supabase status 2>/dev/null | grep "│ URL │" | awk -F'│' '{print $3}' | tr -d ' ' || echo "")
         fi
         
         if [ -z "$DB_URL" ]; then
-          echo "❌ Failed to extract DATABASE_URL from Supabase"
+          echo "❌ Failed to extract DB_URL from Supabase"
           echo ""
           echo "Debugging: supabase status -o env output:"
           supabase status -o env 2>&1 || true
@@ -168,19 +168,14 @@ runs:
       id: get-api-url
       shell: bash
       run: |
-        # Extract SUPABASE_URL from supabase status
-        API_URL=$(supabase status -o env 2>/dev/null | grep -E "^SUPABASE_URL=" | cut -d'=' -f2- || echo "")
+        # Extract API_URL from supabase status -o env
+        API_URL=$(supabase status -o env 2>/dev/null | grep -E "^API_URL=" | cut -d'=' -f2- | tr -d '"' || echo "")
         
-        # If not found, try alternative extraction
+        # If not found, use default based on api-port input
         if [ -z "$API_URL" ]; then
-          # Get API URL from status (typically port 54321)
           API_URL="http://127.0.0.1:${{ inputs.api-port }}"
         fi
         
-        if [ -z "$API_URL" ]; then
-          echo "❌ Failed to extract SUPABASE_URL"
-          exit 1
-        fi
         echo "url=$API_URL" >> $GITHUB_OUTPUT
         echo "✅ API URL: $API_URL"
         echo "API URL extracted: $API_URL"
