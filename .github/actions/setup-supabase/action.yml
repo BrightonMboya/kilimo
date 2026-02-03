@@ -184,23 +184,25 @@ runs:
       id: get-keys
       shell: bash
       run: |
-        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2-)
+        # Extract ANON_KEY (not SUPABASE_ANON_KEY)
+        ANON_KEY=$(supabase status -o env 2>/dev/null | grep -E "^ANON_KEY=" | cut -d'=' -f2- | tr -d '"' || echo "")
         if [ -z "$ANON_KEY" ]; then
-          echo "❌ Failed to get SUPABASE_ANON_KEY from Supabase"
+          echo "❌ Failed to get ANON_KEY from Supabase"
           exit 1
         fi
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
-        echo "Anon key extracted (masked)"
+        echo "✅ Anon key extracted (masked)"
         
-        SERVICE_ROLE_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_SERVICE_ROLE_KEY=" | cut -d'=' -f2-)
+        # Extract SERVICE_ROLE_KEY (not SUPABASE_SERVICE_ROLE_KEY)
+        SERVICE_ROLE_KEY=$(supabase status -o env 2>/dev/null | grep -E "^SERVICE_ROLE_KEY=" | cut -d'=' -f2- | tr -d '"' || echo "")
         if [ -z "$SERVICE_ROLE_KEY" ]; then
-          echo "❌ Failed to get SUPABASE_SERVICE_ROLE_KEY from Supabase"
+          echo "❌ Failed to get SERVICE_ROLE_KEY from Supabase"
           exit 1
         fi
         echo "service-role-key=$SERVICE_ROLE_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$SERVICE_ROLE_KEY"
-        echo "Service role key extracted (masked)"
+        echo "✅ Service role key extracted (masked)"
     
     - name: Get Studio URL
       id: get-studio-url
