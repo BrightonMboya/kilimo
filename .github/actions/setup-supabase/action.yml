@@ -141,26 +141,48 @@ runs:
       id: get-db-url
       shell: bash
       run: |
-        DB_URL=$(supabase status -o env 2>&1 | grep "DATABASE_URL=" | cut -d'=' -f2-)
+        # Extract DATABASE_URL from supabase status
+        DB_URL=$(supabase status -o env 2>/dev/null | grep -E "^DATABASE_URL=" | cut -d'=' -f2- || echo "")
+        
+        # If not found, try alternative extraction from supabase status
         if [ -z "$DB_URL" ]; then
-          echo "❌ Failed to get DATABASE_URL from Supabase"
-          echo "Supabase status output:"
-          supabase status || true
+          # Get connection string from status table format
+          DB_URL=$(supabase status 2>/dev/null | grep "DB URL" | awk '{print $NF}' || echo "")
+        fi
+        
+        if [ -z "$DB_URL" ]; then
+          echo "❌ Failed to extract DATABASE_URL from Supabase"
+          echo ""
+          echo "Debugging: supabase status -o env output:"
+          supabase status -o env 2>&1 || true
+          echo ""
+          echo "Debugging: supabase status output:"
+          supabase status 2>&1 || true
           exit 1
         fi
         echo "url=$DB_URL" >> $GITHUB_OUTPUT
-        echo "Database URL extracted: ${DB_URL:0:50}..."
+        echo "::add-mask::$DB_URL"
+        echo "✅ Database URL extracted successfully"
         
     - name: Get API URL
       id: get-api-url
       shell: bash
       run: |
-        API_URL=$(supabase status -o env 2>&1 | grep "SUPABASE_URL=" | cut -d'=' -f2-)
+        # Extract SUPABASE_URL from supabase status
+        API_URL=$(supabase status -o env 2>/dev/null | grep -E "^SUPABASE_URL=" | cut -d'=' -f2- || echo "")
+        
+        # If not found, try alternative extraction
         if [ -z "$API_URL" ]; then
-          echo "❌ Failed to get SUPABASE_URL from Supabase"
+          # Get API URL from status (typically port 54321)
+          API_URL="http://127.0.0.1:${{ inputs.api-port }}"
+        fi
+        
+        if [ -z "$API_URL" ]; then
+          echo "❌ Failed to extract SUPABASE_URL"
           exit 1
         fi
         echo "url=$API_URL" >> $GITHUB_OUTPUT
+        echo "✅ API URL: $API_URL"
         echo "API URL extracted: $API_URL"
         
     - name: Get Supabase keys

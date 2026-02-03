@@ -1,7 +1,5 @@
 name: 'Stage 1: Dependency Management'
 
-name: 'Stage 1: Dependency Management'
-
 on:
   workflow_run:
     workflows: ['Validate Changes']

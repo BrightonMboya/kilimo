@@ -341,9 +341,6 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install license-checker
-        run: pnpm add -g license-checker
-
       - name: Check licenses
         id: licenses
         run: |
@@ -352,14 +349,14 @@ jobs:
           # Define forbidden licenses
           FORBIDDEN="GPL-2.0;GPL-3.0;AGPL-1.0;AGPL-3.0"
           
-          license-checker --json --exclude "MIT,ISC,Apache-2.0,BSD-2-Clause,BSD-3-Clause,0BSD" \
+          npx license-checker --json --exclude "MIT,ISC,Apache-2.0,BSD-2-Clause,BSD-3-Clause,0BSD" \
             > licenses-all.json || true
           
-          license-checker --json --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense" \
+          npx license-checker --json --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense" \
             > licenses-summary.json || true
           
           # Check for forbidden licenses
-          if license-checker --failOn "$FORBIDDEN" > /dev/null 2>&1; then
+          if npx license-checker --failOn "$FORBIDDEN" > /dev/null 2>&1; then
             echo "✅ No forbidden licenses found"
             echo "compliant=true" >> $GITHUB_OUTPUT
           else
