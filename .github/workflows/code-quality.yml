@@ -298,16 +298,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install madge
-        run: pnpm add -g madge
-
       - name: Check for circular dependencies
         id: madge
         run: |
           echo "Checking for circular dependencies..."
           CIRCULAR_DEPS=$(find apps packages -type f -name "tsconfig.json" -exec dirname {} \; | while read dir; do
             echo "Checking $dir..."
-            madge --circular --extensions ts,tsx,js,jsx "$dir/src" 2>/dev/null || true
+            npx madge --circular --extensions ts,tsx,js,jsx "$dir/src" 2>/dev/null || true
           done)
           
           if [ -n "$CIRCULAR_DEPS" ]; then

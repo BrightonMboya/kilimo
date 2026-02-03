@@ -82,7 +82,13 @@ runs:
       id: turbo-version
       shell: bash
       run: |
-        echo "version=$(pnpm turbo --version 2>/dev/null || echo 'not-installed')" >> $GITHUB_OUTPUT
+        # Turbo might not be installed yet, check safely
+        if command -v pnpm &> /dev/null && pnpm turbo --version &> /dev/null 2>&1; then
+          VERSION=$(pnpm turbo --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=${VERSION:-not-installed}" >> $GITHUB_OUTPUT
+        else
+          echo "version=not-installed" >> $GITHUB_OUTPUT
+        fi
         
     - name: Configure Turborepo cache
       if: inputs.enable-turbo-cache == 'true'
