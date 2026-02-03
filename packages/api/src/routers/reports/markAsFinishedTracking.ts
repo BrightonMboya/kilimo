@@ -2,9 +2,8 @@ import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { FAILED_TO_CREATE } from "@kilimo/utils";
 import { z } from "zod";
 
-
-export const markAsFinishedTracking  = createTRPCRouter({
-      markAsFinishedTracking: protectedProcedure
+export const markAsFinishedTracking = createTRPCRouter({
+  markAsFinishedTracking: protectedProcedure
     .input(z.object({ reportId: z.string(), workspaceSlug: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const workspace = await ctx.db.project.findUnique({
@@ -31,4 +30,4 @@ export const markAsFinishedTracking  = createTRPCRouter({
         throw FAILED_TO_CREATE;
       }
     }),
-})
+});

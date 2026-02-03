@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import {columns} from "./HarvestTableColumns";
+import { columns } from "./HarvestTableColumns";
 
 export type Harvests = {
   id: string;
@@ -47,8 +47,6 @@ export type Harvests = {
   farmersId: string;
   organizationId: string;
 };
-
-
 
 export default function HarvestsTable({ data }: any) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -167,7 +165,7 @@ export default function HarvestsTable({ data }: any) {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex-1 text-sm">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>

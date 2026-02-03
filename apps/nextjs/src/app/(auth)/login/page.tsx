@@ -8,8 +8,8 @@ export const metadata = constructMetadata({
 
 export default function Page() {
   return (
-    <div className="container relative h-screen flex items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:space-x-10 ">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
+    <div className="container relative flex h-screen items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:space-x-10 ">
+      <div className="bg-muted relative hidden h-full flex-col p-10 text-white lg:flex dark:border-r">
         <div className="absolute inset-0 bg-zinc-900 " />
         <Image
           src="https://images.unsplash.com/photo-1618775293437-91b843a7bcc6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzV8fGZhcm1lcnxlbnwwfDF8MHx8fDA%3D"

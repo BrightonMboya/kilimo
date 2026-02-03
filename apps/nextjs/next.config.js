@@ -5,9 +5,8 @@
 // await import("./src/env.js");
 // Injected content via Sentry wizard below
 const { withSentryConfig } = require("@sentry/nextjs");
-const NextMDX = require("@next/mdx")
+const NextMDX = require("@next/mdx");
 const { withContentCollections } = require("@content-collections/next");
-
 
 const withMDX = NextMDX();
 
@@ -98,6 +97,5 @@ const sentryConfig = {
   automaticVercelMonitors: true,
 };
 
-module.exports = withContentCollections(
-  withSentryConfig(nextConfig, sentryConfig),
-);
+module.exports = withContentCollections(withSentryConfig(nextConfig, sentryConfig));
+

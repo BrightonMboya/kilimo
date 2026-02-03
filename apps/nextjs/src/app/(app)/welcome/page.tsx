@@ -11,7 +11,7 @@ export default function WelcomePage() {
   return (
     <>
       {/* <Suspense> */}
-        <WelcomePageClient />
+      <WelcomePageClient />
       {/* </Suspense> */}
     </>
   );

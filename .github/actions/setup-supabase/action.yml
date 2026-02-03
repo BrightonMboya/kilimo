@@ -1,0 +1,217 @@
+name: 'Setup Supabase'
+description: 'Sets up ephemeral Supabase instance for testing'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  supabase-version:
+    description: 'Supabase CLI version to use'
+    required: false
+    default: 'latest'
+  database-port:
+    description: 'PostgreSQL database port'
+    required: false
+    default: '54322'
+  studio-port:
+    description: 'Supabase Studio port'
+    required: false
+    default: '54323'
+  api-port:
+    description: 'Supabase API port'
+    required: false
+    default: '54321'
+
+outputs:
+  database-url:
+    description: 'PostgreSQL connection string'
+    value: ${{ steps.get-db-url.outputs.url }}
+  api-url:
+    description: 'Supabase API URL'
+    value: ${{ steps.get-api-url.outputs.url }}
+  anon-key:
+    description: 'Supabase anonymous key'
+    value: ${{ steps.get-keys.outputs.anon-key }}
+  service-role-key:
+    description: 'Supabase service role key for admin operations'
+    value: ${{ steps.get-keys.outputs.service-role-key }}
+  studio-url:
+    description: 'Supabase Studio URL'
+    value: ${{ steps.get-studio-url.outputs.url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Supabase CLI
+      shell: bash
+      run: |
+        # Install Supabase CLI using official installation method
+        if [ "${{ inputs.supabase-version }}" = "latest" ]; then
+          curl -sSfL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz -C /tmp
+          sudo mv /tmp/supabase /usr/local/bin/supabase
+        else
+          curl -sSfL https://github.com/supabase/cli/releases/download/${{ inputs.supabase-version }}/supabase_linux_amd64.tar.gz | tar -xz -C /tmp
+          sudo mv /tmp/supabase /usr/local/bin/supabase
+        fi
+        sudo chmod +x /usr/local/bin/supabase
+        supabase --version
+        
+    - name: Clean existing Supabase state
+      shell: bash
+      run: |
+        # Stop any existing Supabase instance
+        supabase stop --no-backup 2>/dev/null || true
+        
+        # Clean up Docker containers
+        docker ps -a | grep supabase | awk '{print $1}' | xargs -r docker rm -f 2>/dev/null || true
+        
+        # Clean up volumes
+        docker volume ls | grep supabase | awk '{print $2}' | xargs -r docker volume rm 2>/dev/null || true
+        
+    - name: Start Supabase
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        if [ -d "supabase" ]; then
+          echo "✅ Found supabase directory, starting Supabase..."
+          # Check if already running first
+          if docker ps --filter "name=supabase" | grep -q supabase; then
+            echo "⚠️ Supabase containers already running, stopping first..."
+            supabase stop --no-backup
+          fi
+          supabase start
+        else
+          echo "⚠️ No supabase directory found, initializing..."
+          supabase init
+          supabase start
+        fi
+        
+    - name: Wait for Supabase to be healthy
+      shell: bash
+      run: |
+        echo "⏳ Waiting for Supabase services to be ready..."
+        max_attempts=60
+        attempt=0
+        
+        while [ $attempt -lt $max_attempts ]; do
+          attempt=$((attempt + 1))
+          
+          # Check if all Supabase containers exist and are running
+          container_count=$(docker ps --filter "name=supabase" --filter "status=running" | grep -c "supabase" || echo "0")
+          
+          if [ "$container_count" -ge 9 ]; then
+            # We have at least 9 containers running, check if DB is ready
+            if docker exec supabase_db_kilimo pg_isready -U postgres > /dev/null 2>&1; then
+              echo "✅ Supabase is healthy and ready! ($container_count containers running)"
+              break
+            else
+              echo "Attempt $attempt/$max_attempts - Database not ready yet..."
+            fi
+          else
+            echo "Attempt $attempt/$max_attempts - Waiting for containers ($container_count/9)..."
+          fi
+          
+          # Show container status every 10 attempts
+          if [ $((attempt % 10)) -eq 0 ]; then
+            echo "Current container status:"
+            docker ps --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
+          fi
+          
+          sleep 3
+        done
+        
+        if [ $attempt -eq $max_attempts ]; then
+          echo "❌ Supabase failed to become healthy after $max_attempts attempts"
+          echo "Docker containers:"
+          docker ps -a --filter "name=supabase" --format "table {{.Names}}\t{{.Status}}" || true
+          echo ""
+          echo "Supabase status:"
+          supabase status || true
+          echo ""
+          echo "PostgreSQL check:"
+          docker exec supabase_db_kilimo pg_isready -U postgres || echo "PostgreSQL not ready"
+          exit 1
+        fi
+        
+    - name: Display Supabase status
+      shell: bash
+      run: |
+        echo "📊 Supabase Status:"
+        supabase status || true
+        
+    - name: Get database URL
+      id: get-db-url
+      shell: bash
+      run: |
+        # Extract DB_URL from supabase status -o env (note: it's DB_URL not DATABASE_URL)
+        DB_URL=$(supabase status -o env 2>/dev/null | grep -E "^DB_URL=" | cut -d'=' -f2- | tr -d '"' || echo "")
+        
+        # If not found, try alternative extraction from supabase status table
+        if [ -z "$DB_URL" ]; then
+          # Get connection string from status table format (last column after "URL │")
+          DB_URL=$(supabase status 2>/dev/null | grep "│ URL │" | awk -F'│' '{print $3}' | tr -d ' ' || echo "")
+        fi
+        
+        if [ -z "$DB_URL" ]; then
+          echo "❌ Failed to extract DB_URL from Supabase"
+          echo ""
+          echo "Debugging: supabase status -o env output:"
+          supabase status -o env 2>&1 || true
+          echo ""
+          echo "Debugging: supabase status output:"
+          supabase status 2>&1 || true
+          exit 1
+        fi
+        echo "url=$DB_URL" >> $GITHUB_OUTPUT
+        echo "::add-mask::$DB_URL"
+        echo "✅ Database URL extracted successfully"
+        
+    - name: Get API URL
+      id: get-api-url
+      shell: bash
+      run: |
+        # Extract API_URL from supabase status -o env
+        API_URL=$(supabase status -o env 2>/dev/null | grep -E "^API_URL=" | cut -d'=' -f2- | tr -d '"' || echo "")
+        
+        # If not found, use default based on api-port input
+        if [ -z "$API_URL" ]; then
+          API_URL="http://127.0.0.1:${{ inputs.api-port }}"
+        fi
+        
+        echo "url=$API_URL" >> $GITHUB_OUTPUT
+        echo "✅ API URL: $API_URL"
+        echo "API URL extracted: $API_URL"
+        
+    - name: Get Supabase keys
+      id: get-keys
+      shell: bash
+      run: |
+        # Extract ANON_KEY (not SUPABASE_ANON_KEY)
+        ANON_KEY=$(supabase status -o env 2>/dev/null | grep -E "^ANON_KEY=" | cut -d'=' -f2- | tr -d '"' || echo "")
+        if [ -z "$ANON_KEY" ]; then
+          echo "❌ Failed to get ANON_KEY from Supabase"
+          exit 1
+        fi
+        echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
+        echo "::add-mask::$ANON_KEY"
+        echo "✅ Anon key extracted (masked)"
+        
+        # Extract SERVICE_ROLE_KEY (not SUPABASE_SERVICE_ROLE_KEY)
+        SERVICE_ROLE_KEY=$(supabase status -o env 2>/dev/null | grep -E "^SERVICE_ROLE_KEY=" | cut -d'=' -f2- | tr -d '"' || echo "")
+        if [ -z "$SERVICE_ROLE_KEY" ]; then
+          echo "❌ Failed to get SERVICE_ROLE_KEY from Supabase"
+          exit 1
+        fi
+        echo "service-role-key=$SERVICE_ROLE_KEY" >> $GITHUB_OUTPUT
+        echo "::add-mask::$SERVICE_ROLE_KEY"
+        echo "✅ Service role key extracted (masked)"
+    
+    - name: Get Studio URL
+      id: get-studio-url
+      shell: bash
+      run: |
+        STUDIO_URL=$(supabase status -o env 2>&1 | grep "STUDIO_URL=" | cut -d'=' -f2-)
+        if [ -z "$STUDIO_URL" ]; then
+          echo "⚠️ Failed to get STUDIO_URL, using default"
+          STUDIO_URL="http://127.0.0.1:54323"
+        fi
+        echo "url=$STUDIO_URL" >> $GITHUB_OUTPUT
+        echo "Studio URL extracted: $STUDIO_URL"

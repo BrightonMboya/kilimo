@@ -14,9 +14,9 @@ export default function About() {
                   Manage your Agribusiness the Smart Way.
                 </h2>
                 <p className="text-body-color  mb-10 text-base leading-relaxed lg:text-lg">
-                  Recording your company data in an Excel sheet doesn't scale well
-                  enough and soon you will have Excel sheets that
-                  is hard to keep track of.
+                  Recording your company data in an Excel sheet doesn't scale
+                  well enough and soon you will have Excel sheets that is hard
+                  to keep track of.
                   <br />
                   <br />
                   At JANI, we cover that for you and you can focus on the core
@@ -24,7 +24,7 @@ export default function About() {
                 </p>
 
                 <Link href="https://cal.com/brightonmboya/15min">
-                  <p className="inline-flex items-center  justify-center rounded-md border border-primary bg-primary px-7 py-3 text-center text-base font-medium text-white">
+                  <p className="border-primary bg-primary  inline-flex items-center justify-center rounded-md border px-7 py-3 text-center text-base font-medium text-white">
                     Contact Us
                   </p>
                 </Link>

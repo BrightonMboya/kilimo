@@ -1,0 +1,248 @@
+name: 'Validate Changes'
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  path-filter:
+    name: 'Detect Changed Paths'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      infra: ${{ steps.filter.outputs.infra }}
+      docs: ${{ steps.filter.outputs.docs }}
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check path filters
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'packages/api/**'
+              - 'packages/db/**'
+              - 'packages/emails/**'
+            frontend:
+              - 'apps/nextjs/**'
+              - 'apps/farmers-app/**'
+            infra:
+              - '.github/**'
+              - 'supabase/**'
+              - 'docker-compose*.yml'
+              - 'Dockerfile*'
+            docs:
+              - '**.md'
+              - 'docs/**'
+            code:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.json'
+              - '**/package.json'
+              - 'pnpm-lock.yaml'
+
+  validate-lockfile:
+    name: 'Validate Lockfile'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: '20'
+          install-dependencies: 'false'
+          
+      - name: Check lockfile integrity
+        run: |
+          echo "🔍 Validating pnpm-lock.yaml integrity..."
+          
+          # Check if lockfile exists
+          if [ ! -f "pnpm-lock.yaml" ]; then
+            echo "❌ pnpm-lock.yaml not found"
+            exit 1
+          fi
+          
+          # Check if lockfile is committed
+          if git diff --name-only HEAD~1 HEAD | grep -q "package.json"; then
+            if ! git diff --name-only HEAD~1 HEAD | grep -q "pnpm-lock.yaml"; then
+              echo "❌ package.json changed but pnpm-lock.yaml was not updated"
+              exit 1
+            fi
+          fi
+          
+          echo "✅ Lockfile validation passed"
+          
+      - name: Verify no workspace protocol violations
+        run: |
+          echo "🔍 Checking for workspace protocol usage..."
+          
+          # Check that workspace dependencies use workspace: protocol
+          if grep -r '"workspace:' packages/*/package.json apps/*/package.json 2>/dev/null; then
+            echo "✅ Workspace protocol found"
+          fi
+          
+          echo "✅ Workspace protocol check passed"
+
+  commit-lint:
+    name: 'Lint Commit Messages'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: '20'
+          install-dependencies: 'false'
+          
+      - name: Install commitlint
+        run: |
+          npm install -g @commitlint/cli @commitlint/config-conventional
+          
+      - name: Validate commit messages
+        run: |
+          echo "🔍 Validating commit messages..."
+          
+          # Check if commitlint.config.js exists
+          if [ ! -f "commitlint.config.js" ]; then
+            echo "⚠️ No commitlint.config.js found, skipping validation"
+            exit 0
+          fi
+          
+          # Get commits based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            COMMITS=$(git log --format=%H origin/${{ github.base_ref }}..HEAD)
+          else
+            # For push events, validate the last commit
+            COMMITS=$(git log --format=%H -n 1)
+          fi
+          
+          for commit in $COMMITS; do
+            MESSAGE=$(git log --format=%B -n 1 $commit)
+            echo "Checking commit: $commit"
+            echo "$MESSAGE" | commitlint --verbose || {
+              echo "❌ Commit message does not follow conventional commits format"
+              echo "Expected format: <type>(<scope>): <subject>"
+              echo "Types: feat, fix, docs, style, refactor, test, chore, ci"
+              exit 1
+            }
+          done
+          
+          echo "✅ All commit messages are valid"
+          
+  check-branch-name:
+    name: 'Validate Branch Name'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check branch naming convention
+        run: |
+          # For PRs use head_ref, for push use ref_name
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+          else
+            BRANCH="${{ github.ref_name }}"
+          fi
+          echo "🔍 Validating branch name: $BRANCH"
+          
+          # Valid patterns: feature/*, fix/*, hotfix/*, chore/*, docs/*, ci/*, refactor/*
+          if [[ $BRANCH =~ ^(feature|fix|hotfix|chore|docs|ci|refactor)/.+ ]]; then
+            echo "✅ Branch name follows convention"
+          else
+            echo "⚠️ Branch name should follow pattern: <type>/<description>"
+            echo "Valid types: feature, fix, hotfix, chore, docs, ci, refactor"
+            echo "Example: feature/add-user-auth"
+            # Don't fail, just warn
+          fi
+
+  check-duplicates:
+    name: 'Check for Duplicate Dependencies'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: '20'
+          install-dependencies: 'true'
+          
+      - name: Check for duplicate dependencies
+        run: |
+          echo "🔍 Checking for duplicate dependencies..."
+          
+          # Check for duplicate dependencies
+          DUPLICATES=$(pnpm list --depth=0 --json | grep -o '"[^"]*":' | sort | uniq -d | wc -l)
+          
+          if [ "$DUPLICATES" -gt 0 ]; then
+            echo "⚠️ Found duplicate dependencies"
+            pnpm list --depth=0
+            echo ""
+            echo "💡 Run 'pnpm dedupe' to fix"
+          else
+            echo "✅ No duplicate dependencies found"
+          fi
+          
+      - name: Check for multiple versions
+        run: |
+          echo "🔍 Checking for multiple versions of the same package..."
+          
+          # This is informational only
+          pnpm why typescript 2>/dev/null || echo "ℹ️ Checking package versions..."
+          
+          echo "✅ Dependency check complete"
+
+  validation-summary:
+    name: 'Validation Summary'
+    needs: [path-filter, validate-lockfile, check-duplicates]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check validation results
+        run: |
+          echo "📊 Validation Summary:"
+          echo "  - Path Filter: ${{ needs.path-filter.result }}"
+          echo "  - Lockfile: ${{ needs.validate-lockfile.result }}"
+          echo "  - Duplicates: ${{ needs.check-duplicates.result }}"
+          
+          if [ "${{ needs.validate-lockfile.result }}" != "success" ]; then
+            echo "❌ Validation failed"
+            exit 1
+          fi
+          
+          echo "✅ All validations passed"
+          
+      - name: Display changed areas
+        run: |
+          echo "📁 Changed Areas:"
+          echo "  - Backend: ${{ needs.path-filter.outputs.backend }}"
+          echo "  - Frontend: ${{ needs.path-filter.outputs.frontend }}"
+          echo "  - Infrastructure: ${{ needs.path-filter.outputs.infra }}"
+          echo "  - Documentation: ${{ needs.path-filter.outputs.docs }}"
+          echo "  - Code: ${{ needs.path-filter.outputs.code }}"

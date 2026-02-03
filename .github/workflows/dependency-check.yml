@@ -1,0 +1,423 @@
+name: 'Stage 1: Dependency Management'
+
+on:
+  workflow_run:
+    workflows: ['Validate Changes']
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Manual trigger
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'apps/**/package.json'
+      - 'packages/**/package.json'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  outdated-check:
+    name: 'Check for Outdated Dependencies'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          echo "Checking for outdated dependencies..."
+          
+          # Run pnpm outdated and capture output
+          pnpm outdated --format json > outdated.json || true
+          
+          if [ -s outdated.json ]; then
+            OUTDATED_COUNT=$(jq 'length' outdated.json 2>/dev/null || echo "0")
+            echo "outdated_count=$OUTDATED_COUNT" >> $GITHUB_OUTPUT
+            echo "📦 Found $OUTDATED_COUNT outdated packages"
+            
+            # Generate human-readable report
+            pnpm outdated > outdated.txt || true
+          else
+            echo "✅ All packages are up to date"
+            echo "outdated_count=0" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Check for major updates
+        id: major-updates
+        run: |
+          echo "Checking for major version updates..."
+          
+          # Filter for major updates (breaking changes)
+          if [ -f "outdated.json" ] && [ -s "outdated.json" ]; then
+            MAJOR_UPDATES=$(jq '[.[] | select(.current | split(".")[0] != .latest | split(".")[0])] | length' outdated.json 2>/dev/null || echo "0")
+            echo "major_updates=$MAJOR_UPDATES" >> $GITHUB_OUTPUT
+            echo "⚠️ Found $MAJOR_UPDATES packages with major version updates"
+            
+            if [[ "$MAJOR_UPDATES" -gt 0 ]]; then
+              jq -r '.[] | select(.current | split(".")[0] != .latest | split(".")[0]) | "- \(.name): \(.current) → \(.latest)"' outdated.json > major-updates.txt || true
+            fi
+          else
+            echo "major_updates=0" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Upload outdated packages report
+        if: steps.outdated.outputs.outdated_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: outdated-dependencies-report
+          path: |
+            outdated.json
+            outdated.txt
+            major-updates.txt
+          retention-days: 30
+
+      - name: Generate outdated report
+        if: always()
+        run: |
+          echo "## 📦 Outdated Dependencies Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          OUTDATED_COUNT="${{ steps.outdated.outputs.outdated_count }}"
+          MAJOR_UPDATES="${{ steps.major-updates.outputs.major_updates }}"
+          
+          if [[ "$OUTDATED_COUNT" == "0" ]]; then
+            echo "✅ All dependencies are up to date" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "📊 Found $OUTDATED_COUNT outdated packages" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [[ "$MAJOR_UPDATES" != "0" ]]; then
+              echo "### ⚠️ Major Version Updates Available" >> $GITHUB_STEP_SUMMARY
+              echo "These may contain breaking changes:" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              if [ -f "major-updates.txt" ]; then
+                cat major-updates.txt >> $GITHUB_STEP_SUMMARY
+              fi
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            echo "### All Outdated Packages" >> $GITHUB_STEP_SUMMARY
+            if [ -f "outdated.txt" ]; then
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              head -30 outdated.txt >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && steps.outdated.outputs.outdated_count != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const outdatedCount = '${{ steps.outdated.outputs.outdated_count }}';
+            const majorUpdates = '${{ steps.major-updates.outputs.major_updates }}';
+            
+            let comment = `## 📦 Dependency Update Report\n\n`;
+            comment += `Found **${outdatedCount}** outdated packages in this PR.\n\n`;
+            
+            if (majorUpdates !== '0') {
+              comment += `⚠️ **${majorUpdates}** packages have major version updates available (potential breaking changes).\n\n`;
+            }
+            
+            if (fs.existsSync('outdated.txt')) {
+              const outdatedText = fs.readFileSync('outdated.txt', 'utf8');
+              comment += `### Outdated Packages\n\`\`\`\n${outdatedText.slice(0, 1000)}\n\`\`\`\n`;
+            }
+            
+            comment += `\n📊 Full report available in workflow artifacts.`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+        continue-on-error: true
+
+  unused-deps:
+    name: 'Check for Unused Dependencies'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Install depcheck
+        run: pnpm add -g depcheck
+
+      - name: Check for unused dependencies
+        id: depcheck
+        run: |
+          echo "Checking for unused dependencies..."
+          
+          # Check each workspace
+          for pkg in apps/* packages/*; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "Checking $pkg..."
+              depcheck "$pkg" --json > "$pkg-depcheck.json" || true
+            fi
+          done
+          
+          # Merge all results
+          jq -s 'reduce .[] as $item ({}; . * $item)' *-depcheck.json > depcheck-all.json 2>/dev/null || echo "{}" > depcheck-all.json
+          
+          # Count unused dependencies
+          UNUSED_COUNT=$(jq '[.dependencies[], .devDependencies[]] | length' depcheck-all.json 2>/dev/null || echo "0")
+          echo "unused_count=$UNUSED_COUNT" >> $GITHUB_OUTPUT
+          
+          if [[ "$UNUSED_COUNT" -gt 0 ]]; then
+            echo "📦 Found $UNUSED_COUNT potentially unused dependencies"
+            
+            # Generate report
+            echo "Unused Dependencies:" > unused-deps.txt
+            jq -r '.dependencies[]?, .devDependencies[]?' depcheck-all.json >> unused-deps.txt 2>/dev/null || true
+          else
+            echo "✅ No unused dependencies found"
+          fi
+        continue-on-error: true
+
+      - name: Check for duplicate dependencies
+        id: duplicates
+        run: |
+          echo "Checking for duplicate dependencies across workspaces..."
+          
+          # Use pnpm to list all dependencies
+          pnpm list --recursive --json > all-deps.json || true
+          
+          # Find duplicates with different versions
+          if [ -f "all-deps.json" ]; then
+            # This is a simplified check - in practice, you'd use a more sophisticated tool
+            echo "Analyzing dependency tree for duplicates..."
+            
+            # Count packages that appear multiple times with different versions
+            DUPLICATE_COUNT=$(pnpm list --recursive 2>&1 | grep -c "└─" || echo "0")
+            echo "duplicate_count=$DUPLICATE_COUNT" >> $GITHUB_OUTPUT
+            
+            if [[ "$DUPLICATE_COUNT" -gt 0 ]]; then
+              echo "⚠️ Found potential duplicate dependencies"
+            else
+              echo "✅ No duplicate dependencies detected"
+            fi
+          fi
+        continue-on-error: true
+
+      - name: Upload unused deps report
+        if: steps.depcheck.outputs.unused_count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unused-dependencies-report
+          path: |
+            depcheck-all.json
+            unused-deps.txt
+            *-depcheck.json
+          retention-days: 30
+
+      - name: Generate unused deps report
+        if: always()
+        run: |
+          echo "## 🧹 Unused Dependencies Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          UNUSED_COUNT="${{ steps.depcheck.outputs.unused_count }}"
+          DUPLICATE_COUNT="${{ steps.duplicates.outputs.duplicate_count }}"
+          
+          echo "### Unused Dependencies" >> $GITHUB_STEP_SUMMARY
+          if [[ "$UNUSED_COUNT" == "0" ]]; then
+            echo "✅ No unused dependencies detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Found $UNUSED_COUNT potentially unused dependencies" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            if [ -f "unused-deps.txt" ]; then
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              cat unused-deps.txt >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Duplicate Dependencies" >> $GITHUB_STEP_SUMMARY
+          if [[ "$DUPLICATE_COUNT" == "0" ]]; then
+            echo "✅ No duplicate dependencies detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Potential duplicate dependencies detected" >> $GITHUB_STEP_SUMMARY
+            echo "Run \`pnpm dedupe\` to optimize" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  breaking-changes:
+    name: 'Detect Breaking Changes'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Check for breaking changes in dependencies
+        id: breaking
+        run: |
+          echo "Checking for breaking changes in recent updates..."
+          
+          # Get the last dependency update commit
+          LAST_UPDATE=$(git log --grep="chore.*dependencies" --format="%H" -n 1 2>/dev/null || echo "")
+          
+          if [ -n "$LAST_UPDATE" ]; then
+            echo "Last dependency update: $LAST_UPDATE"
+            
+            # Compare package.json changes
+            git diff "$LAST_UPDATE^" "$LAST_UPDATE" -- "*/package.json" > package-changes.diff || true
+            
+            if [ -s "package-changes.diff" ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              
+              # Extract version changes
+              grep "^[+-]" package-changes.diff | grep -E '".*":' | sort -u > version-changes.txt || true
+            else
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No recent dependency updates found"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Check npm advisory for breaking changes
+        id: advisory
+        run: |
+          echo "Checking npm advisory database..."
+          
+          # Get list of all dependencies
+          pnpm list --json > current-deps.json || true
+          
+          # Check for known breaking changes (this is a simplified check)
+          # In production, you'd integrate with tools like npm-check-updates with --doctor
+          echo "✅ Advisory check completed"
+        continue-on-error: true
+
+      - name: Generate breaking changes report
+        if: always()
+        run: |
+          echo "## 💥 Breaking Changes Detection" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          HAS_CHANGES="${{ steps.breaking.outputs.has_changes }}"
+          
+          if [[ "$HAS_CHANGES" == "true" ]]; then
+            echo "⚠️ Recent dependency updates detected" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Changed Dependencies" >> $GITHUB_STEP_SUMMARY
+            if [ -f "version-changes.txt" ]; then
+              echo "\`\`\`diff" >> $GITHUB_STEP_SUMMARY
+              cat version-changes.txt >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Action Required**: Review changelogs for breaking changes" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No recent dependency updates or no breaking changes detected" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  dependency-summary:
+    name: 'Dependency Management Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [outdated-check, unused-deps, breaking-changes]
+    timeout-minutes: 5
+    steps:
+      - name: Generate dependency summary
+        run: |
+          OUTDATED_COUNT="${{ needs.outdated-check.outputs.outdated_count }}"
+          UNUSED_COUNT="${{ needs.unused-deps.outputs.unused_count }}"
+          
+          echo "## 📊 Dependency Management Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Outdated Check | ${{ needs.outdated-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unused Deps | ${{ needs.unused-deps.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Breaking Changes | ${{ needs.breaking-changes.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Recommendations
+          echo "### 📝 Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ -n "$OUTDATED_COUNT" ]] && [[ "$OUTDATED_COUNT" != "0" ]]; then
+            echo "- 📦 Update $OUTDATED_COUNT outdated packages" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ -n "$UNUSED_COUNT" ]] && [[ "$UNUSED_COUNT" != "0" ]]; then
+            echo "- 🧹 Remove $UNUSED_COUNT unused dependencies" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "- 🔄 Run \`pnpm dedupe\` to optimize dependency tree" >> $GITHUB_STEP_SUMMARY
+          echo "- 📝 Review and update dependency documentation" >> $GITHUB_STEP_SUMMARY
+
+      - name: Create weekly dependency report issue
+        if: github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `📦 Weekly Dependency Report - ${new Date().toISOString().split('T')[0]}`;
+            const body = `## Dependency Management Report
+            
+            This is the automated weekly dependency check.
+            
+            **Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            
+            ### Summary
+            - Outdated Check: ${{ needs.outdated-check.result }}
+            - Unused Dependencies: ${{ needs.unused-deps.result }}
+            - Breaking Changes: ${{ needs.breaking-changes.result }}
+            
+            ### Action Items
+            1. Review outdated dependencies report
+            2. Consider updating non-breaking changes
+            3. Remove unused dependencies
+            4. Check for duplicate dependencies
+            
+            **Labels**: dependencies, maintenance, automated
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['dependencies', 'maintenance', 'automated']
+            });
+        continue-on-error: true

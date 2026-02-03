@@ -9,7 +9,10 @@ import {
 } from "react-hook-form";
 import FormRow from "~/components/shared/FormRow";
 import Input from "~/components/shared/Input";
-import { defaultReportEventsObjects, type IReportSchema } from "@kilimo/api/schemas/reports";
+import {
+  defaultReportEventsObjects,
+  type IReportSchema,
+} from "@kilimo/api/schemas/reports";
 import Button from "~/components/ui/Button";
 import { Trash2 } from "lucide-react";
 import { DatePicker } from "~/components/ui/DatePicker";
@@ -67,7 +70,6 @@ interface EventFormProps {
   register: UseFormRegister<IReportSchema>;
   errors: FieldErrors<IReportSchema>;
   remove: UseFieldArrayRemove;
-
 }
 
 function EventsForm(props: EventFormProps) {

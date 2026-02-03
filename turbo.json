@@ -9,8 +9,39 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "format:check": {
+      "dependsOn": ["^format:check"]
+    },
     "type-check": {
       "dependsOn": ["^type-check"]
+    },
+    "test:unit": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:integration": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["test-results/**", "playwright-report/**"]
+    },
+    "test:contract": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:auth": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:rls": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
+    },
+    "test:visual": {
+      "dependsOn": ["build"],
+      "outputs": ["test-results/**"]
     },
     "dev": {
       "cache": false,

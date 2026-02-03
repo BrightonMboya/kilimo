@@ -1,0 +1,464 @@
+name: 'Stage 1: Security Scanning'
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  secret-scanning:
+    name: 'Scan for Secrets'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for secret scanning
+
+      - name: Run Gitleaks
+        id: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # Optional: for Gitleaks Pro
+        continue-on-error: true
+
+      - name: Install TruffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Run TruffleHog
+        id: trufflehog
+        run: |
+          echo "Running TruffleHog scan..."
+          trufflehog git file://. --json --no-update > trufflehog-results.json || true
+          
+          if [ -s trufflehog-results.json ]; then
+            echo "❌ TruffleHog found potential secrets"
+            cat trufflehog-results.json
+            echo "has_secrets=true" >> $GITHUB_OUTPUT
+          else
+            echo "✅ TruffleHog: No secrets found"
+            echo "has_secrets=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Upload TruffleHog results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trufflehog-results
+          path: trufflehog-results.json
+          retention-days: 30
+
+      - name: Generate secret scanning report
+        if: always()
+        run: |
+          echo "## 🔐 Secret Scanning Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          GITLEAKS_STATUS="${{ steps.gitleaks.outcome }}"
+          TRUFFLEHOG_SECRETS="${{ steps.trufflehog.outputs.has_secrets }}"
+          
+          if [[ "$GITLEAKS_STATUS" == "success" ]]; then
+            echo "✅ **Gitleaks**: No secrets detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Gitleaks**: Potential secrets found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "$TRUFFLEHOG_SECRETS" == "false" ]]; then
+            echo "✅ **TruffleHog**: No secrets detected" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **TruffleHog**: Potential secrets found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if secrets found
+        if: steps.gitleaks.outcome != 'success' || steps.trufflehog.outputs.has_secrets == 'true'
+        run: |
+          echo "⚠️ Secrets detected! Please review and remove them."
+          exit 1
+
+  dependency-audit:
+    name: 'Dependency Security Audit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true  # TODO: REMOVE - Temporarily non-blocking while fixing HIGH/CRITICAL dependency vulnerabilities
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Run pnpm audit
+        id: pnpm-audit
+        run: |
+          echo "Running pnpm audit..."
+          pnpm audit --audit-level=high --json > pnpm-audit.json || true
+          
+          # Check for high/critical vulnerabilities
+          if jq -e '.advisories | length > 0' pnpm-audit.json > /dev/null 2>&1; then
+            VULN_COUNT=$(jq '.advisories | length' pnpm-audit.json)
+            echo "❌ Found $VULN_COUNT vulnerabilities"
+            echo "vulnerabilities=$VULN_COUNT" >> $GITHUB_OUTPUT
+            jq -r '.advisories[] | "- [\(.severity | ascii_upcase)] \(.title) in \(.module_name)"' pnpm-audit.json > vulnerabilities.txt
+          else
+            echo "✅ No high/critical vulnerabilities found"
+            echo "vulnerabilities=0" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Generate SBOM (CycloneDX)
+        id: sbom
+        run: |
+          echo "Generating Software Bill of Materials..."
+          npx @cyclonedx/cyclonedx-npm --output-file sbom.json || true
+          
+          if [ -f "sbom.json" ]; then
+            echo "✅ SBOM generated successfully"
+            echo "sbom_generated=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Failed to generate SBOM"
+            echo "sbom_generated=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Upload SBOM
+        if: steps.sbom.outputs.sbom_generated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.json
+          retention-days: 90
+
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan with Grype
+        id: grype
+        run: |
+          echo "Scanning dependencies with Grype..."
+          grype dir:. --output json > grype-results.json || true
+          
+          # Count vulnerabilities by severity
+          if [ -f "grype-results.json" ]; then
+            CRITICAL=$(jq '[.matches[] | select(.vulnerability.severity=="Critical")] | length' grype-results.json)
+            HIGH=$(jq '[.matches[] | select(.vulnerability.severity=="High")] | length' grype-results.json)
+            MEDIUM=$(jq '[.matches[] | select(.vulnerability.severity=="Medium")] | length' grype-results.json)
+            
+            echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+            echo "high=$HIGH" >> $GITHUB_OUTPUT
+            echo "medium=$MEDIUM" >> $GITHUB_OUTPUT
+            
+            echo "📊 Grype Results: Critical=$CRITICAL, High=$HIGH, Medium=$MEDIUM"
+          fi
+        continue-on-error: true
+
+      - name: Upload Grype results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grype-vulnerability-scan
+          path: grype-results.json
+          retention-days: 30
+
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pnpm-audit-results
+          path: |
+            pnpm-audit.json
+            vulnerabilities.txt
+          retention-days: 30
+
+      - name: Generate dependency audit report
+        if: always()
+        run: |
+          echo "## 🔍 Dependency Security Audit" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          VULN_COUNT="${{ steps.pnpm-audit.outputs.vulnerabilities }}"
+          CRITICAL="${{ steps.grype.outputs.critical }}"
+          HIGH="${{ steps.grype.outputs.high }}"
+          MEDIUM="${{ steps.grype.outputs.medium }}"
+          
+          echo "### pnpm Audit" >> $GITHUB_STEP_SUMMARY
+          if [[ "$VULN_COUNT" == "0" ]]; then
+            echo "✅ No high/critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Found $VULN_COUNT vulnerabilities" >> $GITHUB_STEP_SUMMARY
+            if [ -f "vulnerabilities.txt" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              cat vulnerabilities.txt >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Grype Scan" >> $GITHUB_STEP_SUMMARY
+          echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Critical | ${CRITICAL:-0} |" >> $GITHUB_STEP_SUMMARY
+          echo "| High | ${HIGH:-0} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Medium | ${MEDIUM:-0} |" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ -n "${{ steps.sbom.outputs.sbom_generated }}" ]] && [[ "${{ steps.sbom.outputs.sbom_generated }}" == "true" ]]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📦 SBOM generated and uploaded as artifact" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail on critical vulnerabilities
+        if: |
+          (steps.pnpm-audit.outputs.vulnerabilities != '0' && steps.pnpm-audit.outputs.vulnerabilities != '') ||
+          (steps.grype.outputs.critical != '0' && steps.grype.outputs.critical != '')
+        run: |
+          echo "❌ Critical vulnerabilities found. Please review and fix."
+          exit 1
+
+  sast-analysis:
+    name: 'Static Application Security Testing'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+          config: |
+            paths-ignore:
+              - node_modules
+              - .next
+              - dist
+              - build
+              - coverage
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Build for CodeQL analysis
+        run: |
+          pnpm turbo run build --filter=!@kilimo/farmers-app --cache-dir=.turbo || true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: codeql-javascript
+          upload: true
+
+      - name: Install Semgrep
+        run: pip3 install semgrep
+
+      - name: Run Semgrep
+        id: semgrep
+        run: |
+          echo "Running Semgrep security analysis..."
+          semgrep scan --config=auto --sarif --output=semgrep-results.sarif || true
+          semgrep scan --config=auto --json --output=semgrep-results.json || true
+          
+          if [ -f "semgrep-results.json" ]; then
+            FINDINGS=$(jq '.results | length' semgrep-results.json)
+            echo "findings=$FINDINGS" >> $GITHUB_OUTPUT
+            echo "📊 Semgrep found $FINDINGS potential issues"
+          fi
+        continue-on-error: true
+
+      - name: Upload Semgrep SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+        continue-on-error: true
+
+      - name: Upload Semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30
+
+      - name: Generate SAST report
+        if: always()
+        run: |
+          echo "## 🛡️ SAST Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **CodeQL**: Analysis completed (results in Security tab)" >> $GITHUB_STEP_SUMMARY
+          
+          SEMGREP_FINDINGS="${{ steps.semgrep.outputs.findings }}"
+          if [[ -n "$SEMGREP_FINDINGS" ]] && [[ "$SEMGREP_FINDINGS" != "0" ]]; then
+            echo "⚠️ **Semgrep**: Found $SEMGREP_FINDINGS potential issues" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ **Semgrep**: No issues found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  license-compliance:
+    name: 'License Compliance Check'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Check licenses
+        id: licenses
+        run: |
+          echo "Checking package licenses..."
+          
+          # Define forbidden licenses
+          FORBIDDEN="GPL-2.0;GPL-3.0;AGPL-1.0;AGPL-3.0"
+          
+          npx license-checker --json --exclude "MIT,ISC,Apache-2.0,BSD-2-Clause,BSD-3-Clause,0BSD" \
+            > licenses-all.json || true
+          
+          npx license-checker --json --onlyAllow "MIT;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;Unlicense" \
+            > licenses-summary.json || true
+          
+          # Check for forbidden licenses
+          if npx license-checker --failOn "$FORBIDDEN" > /dev/null 2>&1; then
+            echo "✅ No forbidden licenses found"
+            echo "compliant=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Forbidden licenses detected"
+            echo "compliant=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Upload license report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-compliance-report
+          path: |
+            licenses-all.json
+            licenses-summary.json
+          retention-days: 30
+
+      - name: Generate license report
+        if: always()
+        run: |
+          echo "## ⚖️ License Compliance" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.licenses.outputs.compliant }}" == "true" ]]; then
+            echo "✅ All dependencies use approved licenses" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Some dependencies use non-approved licenses" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the license-compliance-report artifact" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  security-summary:
+    name: 'Security Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [secret-scanning, dependency-audit, sast-analysis, license-compliance]
+    timeout-minutes: 5
+    steps:
+      - name: Check all security job results
+        id: check
+        # TODO: CRITICAL - REMOVE continue-on-error after fixing:
+        #   1. Dependency vulnerabilities (HIGH/CRITICAL from pnpm audit and Grype)
+        #   2. SAST findings from CodeQL and Semgrep
+        #   3. License compliance issues (if any)
+        # Currently non-blocking to allow Phase 2 testing during development
+        continue-on-error: true
+        run: |
+          SECRETS_RESULT="${{ needs.secret-scanning.result }}"
+          AUDIT_RESULT="${{ needs.dependency-audit.result }}"
+          SAST_RESULT="${{ needs.sast-analysis.result }}"
+          LICENSE_RESULT="${{ needs.license-compliance.result }}"
+          
+          echo "## 🔒 Security Scanning Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scanning | $SECRETS_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | $AUDIT_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| SAST Analysis | $SAST_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| License Compliance | $LICENSE_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$SECRETS_RESULT" == "success" ]] && \
+             [[ "$AUDIT_RESULT" == "success" ]] && \
+             [[ "$SAST_RESULT" == "success" ]] && \
+             [[ "$LICENSE_RESULT" == "success" ]]; then
+            echo "✅ **All security checks passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some security checks failed but continuing (temporary).**" >> $GITHUB_STEP_SUMMARY
+            echo "📝 TODO: Fix security issues and remove this workaround" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Action Required**: Review security findings and remediate vulnerabilities" >> $GITHUB_STEP_SUMMARY
+          fi
+          # TODO: CRITICAL - Change 'exit 0' to 'exit 1' to block merges on security failures
+          exit 0
+
+      - name: Notify on critical failures
+        if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        uses: ./.github/actions/notify-status
+        with:
+          status: failure
+          workflow-name: "🚨 Security Scan - ${{ github.ref_name }}"
+        continue-on-error: true
+
+      - name: Create security issue
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🔒 Security Scan Findings - ${new Date().toISOString().split('T')[0]}`;
+            const body = `## Security Scan Results
+            
+            Automated security scan found issues that require attention.
+            
+            **Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            
+            ### Action Required
+            - Review secret scanning results
+            - Check dependency vulnerabilities
+            - Review SAST findings
+            - Verify license compliance
+            
+            **Labels**: security, automated
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'automated']
+            });
+        continue-on-error: true

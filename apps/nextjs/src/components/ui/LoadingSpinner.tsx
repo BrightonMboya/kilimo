@@ -1,4 +1,4 @@
-import {cn} from "@kilimo/utils"
+import { cn } from "@kilimo/utils";
 
 export default function LoadingSpinner({ className }: { className?: string }) {
   return (

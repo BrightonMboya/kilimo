@@ -17,7 +17,7 @@ export function CopyButton({
 }) {
   const [copied, setCopied] = useState(false);
   const Comp = icon || Copy;
-  const {toast} = useToast()
+  const { toast } = useToast();
   return (
     <button
       onClick={(e) => {
@@ -25,9 +25,8 @@ export function CopyButton({
         setCopied(true);
         navigator.clipboard.writeText(value).then(() => {
           toast({
-            description: "Copied to clipboard!"
-          })
-
+            description: "Copied to clipboard!",
+          });
         });
         setTimeout(() => setCopied(false), 3000);
       }}

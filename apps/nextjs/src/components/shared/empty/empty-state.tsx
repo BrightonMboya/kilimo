@@ -20,7 +20,6 @@ export const EmptyState = ({ customContent, modelName }: CustomEmptyState) => {
     p: `What are you waiting for? Create your first object now!`,
   };
 
-
   return (
     <Card>
       <div className="flex h-full flex-col justify-center gap-[32px] px-4 py-[100px] text-center">

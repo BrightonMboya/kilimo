@@ -1,7 +1,6 @@
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
-import {FAILED_TO_MUTATE} from "@kilimo/utils";
-
+import { FAILED_TO_MUTATE } from "@kilimo/utils";
 
 export const deleteTrackingEvent = createTRPCRouter({
   deleteTrackingEvent: protectedProcedure

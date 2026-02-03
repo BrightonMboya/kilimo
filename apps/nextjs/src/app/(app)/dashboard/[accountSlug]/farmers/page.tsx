@@ -6,14 +6,13 @@ import Header from "~/components/Layout/header/header";
 import Link from "next/link";
 import { api, HydrateClient } from "~/trpc/server";
 
-
 import { Suspense } from "react";
 
 export default async function Page(props: { params: { accountSlug: string } }) {
   const farmers = await api.farmers.fetchByOrganization({
     workspaceSlug: props.params.accountSlug,
   });
-return (
+  return (
     <HydrateClient>
       <main className="">
         <Header classNames="" title="All Farmers">

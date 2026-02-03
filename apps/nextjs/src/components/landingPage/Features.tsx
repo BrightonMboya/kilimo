@@ -23,8 +23,8 @@ export default function Features() {
         <div className="-mx-4 flex flex-wrap px-5">
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".1s">
-              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
-                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
+                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"
@@ -49,8 +49,8 @@ export default function Features() {
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".15s">
-              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
-                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
+                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="36"
                   height="36"
@@ -75,8 +75,8 @@ export default function Features() {
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".2s">
-              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
-                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
+                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"
@@ -133,8 +133,8 @@ export default function Features() {
           </div>
           <div className="w-full px-4 md:w-1/2 lg:w-1/4">
             <div className="wow fadeInUp group mb-12" data-wow-delay=".25s">
-              <div className="relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px] bg-primary">
-                <span className="absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-primary bg-opacity-20 duration-300 group-hover:rotate-45"></span>
+              <div className="bg-primary relative z-10 mb-10 flex h-[70px] w-[70px] items-center justify-center rounded-[14px]">
+                <span className="bg-primary absolute left-0 top-0 -z-[1] mb-8 flex h-[70px] w-[70px] rotate-[25deg] items-center justify-center rounded-[14px] bg-opacity-20 duration-300 group-hover:rotate-45"></span>
                 <svg
                   width="37"
                   height="37"

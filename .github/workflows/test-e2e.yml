@@ -1,0 +1,456 @@
+name: 'Stage 2: E2E Tests'
+
+on:
+  workflow_run:
+    workflows: ['Stage 2: Integration Tests']
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'fix/**'
+  schedule:
+    # Run nightly at 3 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # Skip if integration tests failed (only for workflow_run trigger)
+  check-integration:
+    name: 'Check Integration Tests Status'
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check integration tests result
+        id: check
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Integration tests failed. Skipping E2E tests."
+          fi
+
+  setup-full-stack:
+    name: 'Setup Full Stack Environment'
+    runs-on: ubuntu-latest
+    if: |
+      always() &&
+      (github.event_name != 'workflow_run' || needs.check-integration.outputs.should_run == 'true')
+    needs: [check-integration]
+    timeout-minutes: 15
+    outputs:
+      app_url: ${{ steps.app.outputs.url }}
+      supabase_url: ${{ steps.supabase.outputs.api-url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create docker-compose.test.yml
+        run: |
+          cat > docker-compose.test.yml << 'EOF'
+          version: '3.8'
+          
+          services:
+            postgres:
+              image: supabase/postgres:15.1.0.117
+              environment:
+                POSTGRES_PASSWORD: postgres
+                POSTGRES_DB: kilimo_test
+              ports:
+                - "54326:5432"
+              healthcheck:
+                test: ["CMD-SHELL", "pg_isready -U postgres"]
+                interval: 5s
+                timeout: 5s
+                retries: 5
+          
+            # Add more services as needed (Redis, etc.)
+          EOF
+          echo "✅ Docker Compose config created"
+
+      - name: Start services
+        run: |
+          docker-compose -f docker-compose.test.yml up -d
+          echo "✅ Services started"
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Setup Supabase
+        id: supabase
+        uses: ./.github/actions/setup-supabase
+        with:
+          database-port: 54326
+
+      - name: Apply migrations and seed
+        run: |
+          pnpm --filter @kilimo/db prisma migrate deploy  # TODO: Add '|| true' or handle errors properly
+          pnpm --filter @kilimo/db prisma db push --skip-generate  # TODO: Remove '|| true'
+          pnpm --filter @kilimo/db prisma db seed  # TODO: Remove '|| true'
+        env:
+          # ARCHITECTURE VIOLATION: Using db-url output that doesn't exist
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}  # TODO: FIX - Change to database-url
+
+      - name: Build Next.js application
+        run: |
+          echo "Building Next.js application for E2E tests..."
+          pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
+          echo "✅ Application built"
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+
+      - name: Start Next.js application
+        id: app
+        run: |
+          echo "Starting Next.js application..."
+          cd apps/nextjs
+          pnpm start &
+          APP_PID=$!
+          echo "app_pid=$APP_PID" >> $GITHUB_OUTPUT
+          echo "url=http://localhost:3000" >> $GITHUB_OUTPUT
+          echo "✅ Application started (PID: $APP_PID)"
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+          PORT: 3000
+
+      - name: Wait for services to be ready
+        uses: ./.github/actions/wait-for-services
+        with:
+          services: 'postgres,api,app'
+          postgres-port: 54326
+          api-url: ${{ steps.supabase.outputs.api-url }}
+          app-url: http://localhost:3000
+        timeout-minutes: 5
+
+      - name: Generate setup report
+        run: |
+          echo "## 🚀 Full Stack Environment Setup" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| PostgreSQL | ✅ Running | localhost:54326 |" >> $GITHUB_STEP_SUMMARY
+          echo "| Supabase | ✅ Running | ${{ steps.supabase.outputs.api-url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Next.js | ✅ Running | http://localhost:3000 |" >> $GITHUB_STEP_SUMMARY
+
+  run-e2e-tests:
+    name: 'Run E2E Tests (Shard ${{ matrix.shard }})'
+    runs-on: ubuntu-latest
+    needs: [setup-full-stack]
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Setup Supabase
+        id: supabase
+        uses: ./.github/actions/setup-supabase
+        with:
+          database-port: 54326
+
+      - name: Apply migrations and seed
+        run: |
+          pnpm --filter @kilimo/db prisma migrate deploy
+          pnpm --filter @kilimo/db prisma db push --skip-generate
+          pnpm --filter @kilimo/db prisma db seed
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+
+      - name: Build application
+        run: |
+          pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+
+      - name: Start application
+        run: |
+          cd apps/nextjs
+          pnpm start &
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+          PORT: 3000
+
+      - name: Wait for application to be ready
+        uses: ./.github/actions/wait-for-services
+        with:
+          services: 'app'
+          app-url: http://localhost:3000
+          max-attempts: 30
+          wait-interval: 2
+
+      - name: Install Playwright browsers
+        run: |
+          pnpm exec playwright install --with-deps chromium firefox webkit
+
+      - name: Run E2E tests with Playwright
+        id: e2e
+        run: |
+          echo "Running E2E tests (Shard ${{ matrix.shard }}/4)..."
+          pnpm turbo run test:e2e --cache-dir=.turbo -- \
+            --shard=${{ matrix.shard }}/4 \
+            --retries=2 \
+            --reporter=html,json
+          echo "✅ E2E tests passed"
+        env:
+          BASE_URL: http://localhost:3000
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+
+      - name: Run visual regression tests
+        id: visual
+        run: |
+          echo "Running visual regression tests..."
+          if pnpm turbo run test:visual --dry=json 2>/dev/null | jq -e '.tasks | length > 0' > /dev/null; then
+            pnpm turbo run test:visual --cache-dir=.turbo -- --shard=${{ matrix.shard }}/4
+            echo "✅ Visual regression tests passed"
+          else
+            echo "⚠️ No visual regression tests configured"
+          fi
+        env:
+          BASE_URL: http://localhost:3000
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-shard-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            test-results/
+            screenshots/
+          retention-days: 30
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-videos-shard-${{ matrix.shard }}
+          path: |
+            videos/
+            traces/
+          retention-days: 7
+
+      - name: Generate E2E test report
+        if: always()
+        run: |
+          echo "## 🎭 E2E Tests (Shard ${{ matrix.shard }}/4)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.e2e.outcome }}" == "success" ]]; then
+            echo "✅ **E2E Tests**: All passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **E2E Tests**: Some failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [[ "${{ steps.visual.outcome }}" == "success" ]]; then
+            echo "✅ **Visual Regression**: Passed" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ steps.visual.outcome }}" == "skipped" ]]; then
+            echo "⏭️ **Visual Regression**: Skipped" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  performance-tests:
+    name: 'Performance Tests with Lighthouse'
+    runs-on: ubuntu-latest
+    needs: [setup-full-stack]
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: 22
+
+      - name: Setup Supabase
+        id: supabase
+        uses: ./.github/actions/setup-supabase
+        with:
+          database-port: 54326
+
+      - name: Apply migrations and seed
+        run: |
+          pnpm --filter @kilimo/db prisma migrate deploy
+          pnpm --filter @kilimo/db prisma db push --skip-generate
+          pnpm --filter @kilimo/db prisma db seed
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+
+      - name: Build application (production mode)
+        run: |
+          pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+          NODE_ENV: production
+
+      - name: Start application
+        run: |
+          cd apps/nextjs
+          pnpm start &
+        env:
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
+          PORT: 3000
+
+      - name: Wait for application to be ready
+        uses: ./.github/actions/wait-for-services
+        with:
+          services: 'app'
+          app-url: http://localhost:3000
+          max-attempts: 30
+          wait-interval: 2
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: |
+          npm install -g @lhci/cli@0.13.x
+          
+          # Create Lighthouse CI config
+          cat > lighthouserc.json << 'EOF'
+          {
+            "ci": {
+              "collect": {
+                "url": ["http://localhost:3000/"],
+                "numberOfRuns": 3
+              },
+              "assert": {
+                "preset": "lighthouse:recommended",
+                "assertions": {
+                  "categories:performance": ["error", {"minScore": 0.8}],
+                  "categories:accessibility": ["error", {"minScore": 0.9}],
+                  "categories:best-practices": ["error", {"minScore": 0.9}],
+                  "categories:seo": ["error", {"minScore": 0.9}]
+                }
+              },
+              "upload": {
+                "target": "temporary-public-storage"
+              }
+            }
+          }
+          EOF
+          
+          lhci autorun --config=lighthouserc.json || exit 1
+          echo "✅ Lighthouse CI passed"
+
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: |
+            .lighthouseci/
+            lighthouserc.json
+          retention-days: 30
+
+      - name: Generate performance report
+        if: always()
+        run: |
+          echo "## ⚡ Performance Tests (Lighthouse)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f ".lighthouseci/manifest.json" ]; then
+            echo "### Lighthouse Scores" >> $GITHUB_STEP_SUMMARY
+            echo "| Category | Score |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Performance | 🔍 See artifacts |" >> $GITHUB_STEP_SUMMARY
+            echo "| Accessibility | 🔍 See artifacts |" >> $GITHUB_STEP_SUMMARY
+            echo "| Best Practices | 🔍 See artifacts |" >> $GITHUB_STEP_SUMMARY
+            echo "| SEO | 🔍 See artifacts |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  e2e-summary:
+    name: 'E2E Test Summary'
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [run-e2e-tests, performance-tests]
+    timeout-minutes: 5
+    steps:
+      - name: Check all job results
+        run: |
+          E2E_RESULT="${{ needs.run-e2e-tests.result }}"
+          PERF_RESULT="${{ needs.performance-tests.result }}"
+          
+          echo "## 🎯 E2E Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests (4 shards) | $E2E_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | $PERF_RESULT |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "$E2E_RESULT" == "success" ]] && [[ "$PERF_RESULT" == "success" ]]; then
+            echo "✅ **All E2E and performance tests passed!**" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          else
+            echo "❌ **Some E2E or performance tests failed. Please review the logs.**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Notify on failure
+        if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+        uses: ./.github/actions/notify-status
+        with:
+          status: failure
+          workflow-name: "E2E Tests - ${{ github.ref_name }}"
+        continue-on-error: true
+
+      - name: Create nightly test report
+        if: github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🌙 Nightly E2E Test Report - ${new Date().toISOString().split('T')[0]}`;
+            const body = `## E2E Test Results
+            
+            **Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}
+            
+            ### Results
+            - E2E Tests: ${{ needs.run-e2e-tests.result }}
+            - Performance Tests: ${{ needs.performance-tests.result }}
+            
+            **Labels**: e2e, automated, nightly
+            `;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['e2e', 'automated', 'nightly']
+            });
+        continue-on-error: true

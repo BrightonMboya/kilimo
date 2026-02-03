@@ -116,7 +116,6 @@ const organization = createTRPCRouter({
     }),
 
   // fetching individual details of the farmer
- 
 });
 
 export default organization;

@@ -42,7 +42,9 @@ export default function Page() {
       });
       utils.reports.fetchByOrganization.invalidate();
       reset();
-      router.push(`/dashboard/${params.accountSlug}/reports/view/?reportId=${report?.id}`);
+      router.push(
+        `/dashboard/${params.accountSlug}/reports/view/?reportId=${report?.id}`,
+      );
     },
     // onMutate: (report) => {
     //   utils.reports.fetchByOrganization.invalidate();

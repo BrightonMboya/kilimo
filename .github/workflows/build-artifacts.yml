@@ -1,0 +1,309 @@
+name: 'Stage 3: Build & Artifacts'
+
+on:
+  workflow_run:
+    workflows: ['Stage 2: E2E Tests']
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  workflow_dispatch:
+    inputs:
+      skip-docker:
+        description: 'Skip Docker image builds'
+        type: boolean
+        default: false
+      platforms:
+        description: 'Docker platforms (comma-separated)'
+        type: string
+        default: 'linux/amd64'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false  # Don't cancel builds, they're expensive
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+  checks: write
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Check if workflow should run based on test results
+  check-prerequisites:
+    name: 'Check Build Prerequisites'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      should-build: ${{ steps.check.outputs.should-build }}
+      test-status: ${{ steps.check.outputs.test-status }}
+    steps:
+      - name: Check test workflow status
+        id: check
+        run: |
+          # If triggered by workflow_run, check if tests passed
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+              echo "should-build=true" >> $GITHUB_OUTPUT
+              echo "test-status=passed" >> $GITHUB_OUTPUT
+              echo "✅ Tests passed, proceeding with build"
+            else
+              echo "should-build=false" >> $GITHUB_OUTPUT
+              echo "test-status=failed" >> $GITHUB_OUTPUT
+              echo "❌ Tests failed, skipping build"
+              exit 1
+            fi
+          else
+            # Manual trigger or push - always build
+            echo "should-build=true" >> $GITHUB_OUTPUT
+            echo "test-status=skipped" >> $GITHUB_OUTPUT
+            echo "⚠️ Building without test validation"
+          fi
+
+  build-packages:
+    name: 'Build Packages'
+    needs: check-prerequisites
+    if: needs.check-prerequisites.outputs.should-build == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        node-version: [20, 22]
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for Turbo cache
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: ${{ matrix.node-version }}
+          enable-turbo-cache: true
+
+      - name: Clean previous builds
+        run: |
+          echo "🧹 Cleaning previous build artifacts..."
+          pnpm turbo clean
+          
+      - name: Build all packages
+        run: |
+          echo "🔨 Building all packages with Turbo..."
+          pnpm turbo build --force
+          
+      - name: Generate build manifest
+        run: |
+          echo "📋 Generating build manifest..."
+          pnpm turbo build --dry-run=json > build-manifest.json
+          cat build-manifest.json | jq '.packages' > packages-built.json
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs-node-${{ matrix.node-version }}
+          path: |
+            apps/*/dist
+            apps/*/.next
+            packages/*/dist
+            build-manifest.json
+            packages-built.json
+          retention-days: 7
+
+      - name: Build summary
+        if: always()
+        run: |
+          echo "## 🔨 Build Summary (Node ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "build-manifest.json" ]; then
+            PACKAGES=$(cat packages-built.json | jq -r '.[]' | wc -l)
+            echo "- **Packages built**: $PACKAGES" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Built Packages" >> $GITHUB_STEP_SUMMARY
+            cat packages-built.json | jq -r '.[]' | while read pkg; do
+              echo "- \`$pkg\`" >> $GITHUB_STEP_SUMMARY
+            done
+          fi
+
+  bundle-analysis:
+    name: 'Bundle Size Analysis'
+    needs: build-packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs-node-20
+          path: .
+
+      - name: Analyze Next.js bundle
+        uses: ./.github/actions/analyze-bundle
+        with:
+          app-path: apps/nextjs
+          output-file: bundle-analysis.json
+
+      - name: Check bundle size limits
+        run: |
+          echo "📦 Checking bundle size limits..."
+          
+          # Define bundle size limits (in KB)
+          MAX_MAIN_BUNDLE=500
+          MAX_TOTAL_SIZE=2000
+          
+          if [ -f "apps/nextjs/.next/analyze/client.json" ]; then
+            MAIN_SIZE=$(cat apps/nextjs/.next/analyze/client.json | jq '.bundles[] | select(.label=="main") | .size' || echo "0")
+            MAIN_SIZE_KB=$((MAIN_SIZE / 1024))
+            
+            echo "Main bundle size: ${MAIN_SIZE_KB}KB (limit: ${MAX_MAIN_BUNDLE}KB)"
+            
+            if [ $MAIN_SIZE_KB -gt $MAX_MAIN_BUNDLE ]; then
+              echo "❌ Main bundle exceeds size limit!"
+              exit 1
+            fi
+            
+            echo "✅ Bundle size within limits"
+          else
+            echo "⚠️ Bundle analysis file not found, skipping size check"
+          fi
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            apps/nextjs/.next/analyze
+            bundle-analysis.json
+          retention-days: 30
+
+      - name: Comment bundle size on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('bundle-analysis.json')) {
+              const analysis = JSON.parse(fs.readFileSync('bundle-analysis.json', 'utf8'));
+              const comment = `## 📦 Bundle Size Analysis\n\n${analysis.summary}`;
+              
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+  build-docker-images:
+    name: 'Build Docker Images'
+    needs: build-packages
+    if: ${{ !inputs.skip-docker || inputs.skip-docker == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        app: [nextjs]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: apps/${{ matrix.app }}/Dockerfile
+          platforms: ${{ inputs.platforms || 'linux/amd64' }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_VERSION=20
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+
+      - name: Generate image SBOM
+        run: |
+          echo "📋 Generating SBOM for Docker image..."
+          docker sbom ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ github.sha }} \
+            --format cyclonedx-json \
+            --output sbom-${{ matrix.app }}.json || echo "⚠️ SBOM generation not available"
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: sbom-${{ matrix.app }}
+          path: sbom-${{ matrix.app }}.json
+          retention-days: 90
+
+  build-summary:
+    name: 'Build Summary Report'
+    needs: [build-packages, bundle-analysis, build-docker-images]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🏗️ Build & Artifacts Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Build | ${{ needs.build-packages.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bundle Analysis | ${{ needs.bundle-analysis.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Images | ${{ needs.build-docker-images.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.build-packages.result }}" == "success" ]] && \
+             [[ "${{ needs.bundle-analysis.result }}" == "success" ]] && \
+             [[ "${{ needs.build-docker-images.result }}" == "success" ]]; then
+            echo "✅ **All build stages completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some build stages failed. Please review the logs.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify build status
+        if: always()
+        uses: ./.github/actions/notify-status
+        with:
+          workflow-name: 'Build & Artifacts'
+          status: ${{ job.status }}

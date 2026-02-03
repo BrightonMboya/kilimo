@@ -33,7 +33,6 @@ export interface WorkspaceProps {
 }
 
 export interface UserProps {
- 
   id: string;
   name: string;
   email: string;
@@ -42,7 +41,6 @@ export interface UserProps {
   // source: string | null;
   // migratedWorkspace: string | null;
   // defaultWorkspace?: string;
-
 }
 
 export interface WorkspaceUserProps extends UserProps {

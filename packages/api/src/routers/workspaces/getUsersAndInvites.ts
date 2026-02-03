@@ -3,9 +3,11 @@ import { z } from "zod";
 
 export const getUsersAndInvites = createTRPCRouter({
   getUsersAndInvites: protectedProcedure
-    .input(z.object({
-      projectId: z.string(),
-    }))
+    .input(
+      z.object({
+        projectId: z.string(),
+      }),
+    )
     .query(async ({ input, ctx }) => {
       // gets invites for a specific workspace
       const invites = await ctx.db.projectInvite.findMany({

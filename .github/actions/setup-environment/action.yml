@@ -1,0 +1,106 @@
+name: 'Setup Node.js Environment'
+description: 'Sets up Node.js, pnpm, and caching for optimal CI/CD performance'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
+  enable-turbo-cache:
+    description: 'Enable Turborepo remote caching'
+    required: false
+    default: 'true'
+  cache-key-prefix:
+    description: 'Optional prefix for cache keys'
+    required: false
+    default: ''
+  install-dependencies:
+    description: 'Whether to install dependencies'
+    required: false
+    default: 'true'
+
+outputs:
+  cache-hit:
+    description: 'Whether cache was restored'
+    value: ${{ steps.cache.outputs.cache-hit }}
+  node-version:
+    description: 'Node.js version installed'
+    value: ${{ steps.node-setup.outputs.node-version }}
+  pnpm-version:
+    description: 'pnpm version installed'
+    value: ${{ steps.pnpm-version.outputs.version }}
+  turbo-version:
+    description: 'Turborepo version'
+    value: ${{ steps.turbo-version.outputs.version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      id: node-setup
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+      
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        
+    - name: Get pnpm version
+      id: pnpm-version
+      shell: bash
+      run: |
+        echo "version=$(pnpm --version)" >> $GITHUB_OUTPUT
+        
+    - name: Setup pnpm cache
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          .turbo
+          ~/.cache/Cypress
+          .next/cache
+        key: ${{ inputs.cache-key-prefix }}${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx') }}
+        restore-keys: |
+          ${{ inputs.cache-key-prefix }}${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}-
+          ${{ inputs.cache-key-prefix }}${{ runner.os }}-pnpm-
+          
+    - name: Install dependencies
+      if: inputs.install-dependencies == 'true'
+      shell: bash
+      run: pnpm install --frozen-lockfile
+      
+    - name: Get Turbo version
+      id: turbo-version
+      shell: bash
+      run: |
+        # Turbo might not be installed yet, check safely
+        if command -v pnpm &> /dev/null && pnpm turbo --version &> /dev/null 2>&1; then
+          VERSION=$(pnpm turbo --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          echo "version=${VERSION:-not-installed}" >> $GITHUB_OUTPUT
+        else
+          echo "version=not-installed" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Configure Turborepo cache
+      if: inputs.enable-turbo-cache == 'true'
+      shell: bash
+      env:
+        TURBO_TOKEN: ${{ env.TURBO_TOKEN }}
+        TURBO_TEAM: ${{ env.TURBO_TEAM }}
+      run: |
+        if [ -n "$TURBO_TOKEN" ] && [ -n "$TURBO_TEAM" ]; then
+          echo "✅ Turborepo remote cache configured"
+          echo "TURBO_TOKEN=$TURBO_TOKEN" >> $GITHUB_ENV
+          echo "TURBO_TEAM=$TURBO_TEAM" >> $GITHUB_ENV
+        else
+          echo "⚠️ Turborepo remote cache not configured (missing TURBO_TOKEN or TURBO_TEAM)"
+        fi

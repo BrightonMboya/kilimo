@@ -14,7 +14,7 @@ export const DesktopNavLink: React.FC<Props> = ({ href, label, external }) => {
       className={cn(
         "text-sm tracking-[0.07px] text-black duration-200 hover:text-black/60",
         {
-          "text-black/90 underline decoration-primary decoration-dashed underline-offset-4":
+          "decoration-primary text-black/90 underline decoration-dashed underline-offset-4":
             href.startsWith(`/${segment}`),
         },
       )}
@@ -40,12 +40,9 @@ export function MobileNavLink({
   return (
     <button
       type="button"
-      className={cn(
-        "py-3 text-lg font-medium tracking-[0.07px] duration-200",
-        {
-          "text-white": href.startsWith(`/${segment}`),
-        },
-      )}
+      className={cn("py-3 text-lg font-medium tracking-[0.07px] duration-200", {
+        "text-white": href.startsWith(`/${segment}`),
+      })}
       onClick={() => {
         onClick();
         router.push(href);

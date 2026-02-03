@@ -7,6 +7,7 @@ node_modules/
 
 # testing
 /coverage
+*/*/coverage
 
 # database
 /prisma/db.sqlite
@@ -59,3 +60,12 @@ certificates
 .turbo
 
 .env
+
+event.json
+
+#docs
+
+*/*/*.md
+
+# github documentation
+.github/**/*.md

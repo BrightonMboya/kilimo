@@ -22,5 +22,4 @@ export const authors: Authors = {
     role: "Engineer",
     image: { src: "/images/team/dom.jpeg" },
   },
-  
 };

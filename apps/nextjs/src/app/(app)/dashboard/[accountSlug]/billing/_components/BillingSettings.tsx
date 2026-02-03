@@ -19,7 +19,6 @@ import {
 import { Textarea } from "~/components/ui/TextArea";
 import Button from "~/components/ui/Button";
 
-
 export default function BillingSettings() {
   return (
     <Card>

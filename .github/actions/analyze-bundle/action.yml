@@ -1,0 +1,119 @@
+name: 'Analyze Bundle Size'
+description: 'Analyzes bundle size and generates reports'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  app-path:
+    description: 'Path to the Next.js app'
+    required: false
+    default: 'apps/nextjs'
+  size-limit-kb:
+    description: 'Maximum allowed bundle size in KB'
+    required: false
+    default: '500'
+  compare-with-base:
+    description: 'Compare with base branch'
+    required: false
+    default: 'true'
+
+outputs:
+  bundle-size:
+    description: 'Total bundle size in KB'
+    value: ${{ steps.analyze.outputs.size }}
+  size-change:
+    description: 'Percentage change from base branch'
+    value: ${{ steps.compare.outputs.change }}
+  report-url:
+    description: 'Link to detailed report'
+    value: ${{ steps.upload-report.outputs.url }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Analyze bundle
+      id: analyze
+      shell: bash
+      working-directory: ${{ inputs.app-path }}
+      run: |
+        if [ ! -d ".next" ]; then
+          echo "❌ Build output not found. Please build the app first."
+          exit 1
+        fi
+        
+        # Calculate total size
+        TOTAL_SIZE=$(du -sk .next | cut -f1)
+        TOTAL_SIZE_MB=$(echo "scale=2; $TOTAL_SIZE / 1024" | bc)
+        
+        echo "size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+        echo "size-mb=$TOTAL_SIZE_MB" >> $GITHUB_OUTPUT
+        
+        echo "📦 Total bundle size: ${TOTAL_SIZE_MB}MB (${TOTAL_SIZE}KB)"
+        
+        # Check size limit
+        if [ "$TOTAL_SIZE" -gt "${{ inputs.size-limit-kb }}" ]; then
+          echo "⚠️ Bundle size exceeds limit: ${TOTAL_SIZE}KB > ${{ inputs.size-limit-kb }}KB"
+          echo "exceeded=true" >> $GITHUB_OUTPUT
+        else
+          echo "✅ Bundle size within limit: ${TOTAL_SIZE}KB ≤ ${{ inputs.size-limit-kb }}KB"
+          echo "exceeded=false" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Generate bundle report
+      shell: bash
+      working-directory: ${{ inputs.app-path }}
+      run: |
+        mkdir -p bundle-reports
+        
+        # Create detailed report
+        cat > bundle-reports/bundle-analysis.md << EOF
+        # Bundle Analysis Report
+        
+        **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        **Commit**: ${{ github.sha }}
+        **Branch**: ${{ github.ref_name }}
+        
+        ## Summary
+        
+        - **Total Size**: ${{ steps.analyze.outputs.size-mb }}MB
+        - **Size Limit**: ${{ inputs.size-limit-kb }}KB
+        - **Within Limit**: $([ "${{ steps.analyze.outputs.exceeded }}" = "false" ] && echo "✅ Yes" || echo "❌ No")
+        
+        ## Detailed Breakdown
+        
+        \`\`\`
+        $(du -h .next | sort -h | tail -20)
+        \`\`\`
+        
+        ## Files
+        
+        \`\`\`
+        $(find .next -type f -exec du -h {} \; | sort -h | tail -20)
+        \`\`\`
+        EOF
+        
+        cat bundle-reports/bundle-analysis.md
+        
+    - name: Compare with base branch
+      id: compare
+      if: inputs.compare-with-base == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      continue-on-error: true
+      run: |
+        # This would require artifacts from the base branch
+        # For now, just output placeholder
+        echo "change=0" >> $GITHUB_OUTPUT
+        echo "ℹ️ Bundle comparison with base branch requires artifact from base build"
+        
+    - name: Upload bundle report
+      id: upload-report
+      uses: actions/upload-artifact@v4
+      with:
+        name: bundle-analysis-${{ github.sha }}
+        path: ${{ inputs.app-path }}/bundle-reports/
+        retention-days: 30
+        
+    - name: Generate report URL
+      shell: bash
+      run: |
+        REPORT_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        echo "url=$REPORT_URL" >> $GITHUB_OUTPUT

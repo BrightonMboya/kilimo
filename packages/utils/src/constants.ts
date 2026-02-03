@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 
-
 export const HOME_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}`;
 
 export const DEFAULT_REDIRECTS = {
@@ -20,7 +19,6 @@ export const DEFAULT_REDIRECTS = {
 export const DICEBEAR_AVATAR_URL =
   "https://api.dicebear.com/7.x/initials/svg?backgroundType=gradientLinear&fontFamily=Helvetica&fontSize=40&seed=";
 
-
 export const NOT_FOUND_ERROR = new TRPCError({
   code: "NOT_FOUND",
   message: "Requested resource is not found",
@@ -35,12 +33,10 @@ export const organizationEmailSchema = z.object({
   organizationEmail: z.string(),
 });
 
-
-export const FAILED_TO_MUTATE =  new TRPCError({
+export const FAILED_TO_MUTATE = new TRPCError({
   code: "BAD_REQUEST",
-  message: "Failed to perform this operation"
-})
-
+  message: "Failed to perform this operation",
+});
 
 export const APP_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
@@ -49,10 +45,8 @@ export const APP_DOMAIN =
       ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
       : "http://localhost:3000";
 
-
-export const GOOGLE_FAVICON_URL = "https://www.google.com/s2/favicons?sz=64&domain_url=";
-
-
+export const GOOGLE_FAVICON_URL =
+  "https://www.google.com/s2/favicons?sz=64&domain_url=";
 
 export const FADE_IN_ANIMATION_SETTINGS = {
   initial: { opacity: 0 },
@@ -60,7 +54,6 @@ export const FADE_IN_ANIMATION_SETTINGS = {
   exit: { opacity: 0 },
   transition: { duration: 0.2 },
 };
-
 
 export const APP_HOSTNAMES = new Set([
   `app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,

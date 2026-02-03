@@ -26,7 +26,6 @@ const farmers = createTRPCRouter({
         },
       });
       try {
-
         return await ctx.db.farmers.create({
           data: {
             fullName: input.fullName,
@@ -49,12 +48,13 @@ const farmers = createTRPCRouter({
       }
     }),
 
-  editFarmer: protectedProcedure.input(
-    farmersSchema.merge(
-      z.object({ id: z.string(), workspaceSlug: z.string() }),
-    ),
-  ).mutation(
-    async ({ ctx, input }) => {
+  editFarmer: protectedProcedure
+    .input(
+      farmersSchema.merge(
+        z.object({ id: z.string(), workspaceSlug: z.string() }),
+      ),
+    )
+    .mutation(async ({ ctx, input }) => {
       const workspace = await ctx.db.project.findUnique({
         where: {
           slug: input.workspaceSlug,
@@ -88,14 +88,15 @@ const farmers = createTRPCRouter({
           message: "Failed to edit farmer",
         });
       }
-    },
-  ),
+    }),
 
   // fetch all farmers belonging to a specific workspace/ project
   fetchByOrganization: protectedProcedure
-    .input(z.object({
-      workspaceSlug: z.string(),
-    }))
+    .input(
+      z.object({
+        workspaceSlug: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       // we need to get the project in the first place
       const workspace = await ctx.db.project.findUnique({

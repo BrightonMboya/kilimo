@@ -7,9 +7,11 @@ const inventory = createTRPCRouter({
     .input(inventorySchema)
     .mutation(async ({ ctx, input }) => {
       try {
+        const { warehouseId, ...rest } = input;
         return await ctx.db.inventory.create({
           data: {
-            ...input,
+            ...rest,
+            warehousesId: warehouseId, // Map to Prisma schema field name
           },
         });
       } catch (cause) {

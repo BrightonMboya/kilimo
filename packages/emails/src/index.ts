@@ -43,21 +43,20 @@ export const sendEmail = async ({
   //   return Promise.resolve();
   // }
 
-
   const emailResponse = client!.sendEmail({
     From:
       from || marketing
         ? "reggie@jani-ai.com"
         : process.env.NEXT_PUBLIC_IS_DUB
           ? "developer@jani-ai.com"
-          // : `${process.env.NEXT_PUBLIC_APP_NAME} <system@${process.env.NEXT_PUBLIC_APP_DOMAIN}>`
-          : "developer@jani-ai.com",
+          : // : `${process.env.NEXT_PUBLIC_APP_NAME} <system@${process.env.NEXT_PUBLIC_APP_DOMAIN}>`
+            "developer@jani-ai.com",
     To: email,
     Bcc: bcc,
     ReplyTo: process.env.NEXT_PUBLIC_IS_DUB
       ? "reggie@jani-ai.com"
-      // : `support@${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-      : "developer@jani-ai.com",
+      : // : `support@${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+        "developer@jani-ai.com",
     Subject: subject,
     ...(text && { TextBody: text }),
     ...(react && { HtmlBody: render(react) }),
@@ -66,5 +65,5 @@ export const sendEmail = async ({
     }),
   });
   // console.log(emailResponse, "{}{}{}{][][][][][]")
-  return emailResponse
+  return emailResponse;
 };

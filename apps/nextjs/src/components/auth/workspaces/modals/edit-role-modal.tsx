@@ -93,7 +93,6 @@ function EditRoleModal({
               workspaceSlug: params.accountSlug as unknown as string,
             });
           }}
-
         />
       </div>
     </Modal>

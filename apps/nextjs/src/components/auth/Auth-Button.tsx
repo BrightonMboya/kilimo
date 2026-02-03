@@ -7,8 +7,7 @@ import { Tooltip } from "../ui/tooltip";
 export const buttonVariants = cva("transition-all", {
   variants: {
     variant: {
-      primary:
-        " bg-primary text-white hover:bg-primary/90",
+      primary: " bg-primary text-white hover:bg-primary/90",
       secondary: cn(
         "border-gray-200 bg-white text-gray-900 hover:bg-gray-50 focus-visible:border-gray-500 outline-none",
         "data-[state=open]:border-gray-500 data-[state=open]:ring-4 data-[state=open]:ring-gray-200",

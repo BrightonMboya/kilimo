@@ -19,8 +19,8 @@ const navigation = {
     // { name: "Help Center", href: "#" },
   ],
   // legal: [
-    // { name: "Privacy", href: "/privacy" },
-    // { name: "Terms", href: "/terms" },
+  // { name: "Privacy", href: "/privacy" },
+  // { name: "Terms", href: "/terms" },
   // ],
 };
 
@@ -71,7 +71,6 @@ export default function Footer() {
                 <span className="sr-only">LinkedIn</span>
                 <LinkedIn className="h-4 w-4 text-gray-600 transition-colors group-hover:text-[#0077b5]" />
               </a>
-             
             </div>
           </div>
           <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">

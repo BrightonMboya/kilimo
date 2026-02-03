@@ -33,7 +33,7 @@ function RemoveTeammateModal({
 }) {
   const router = useRouter();
   const [removing, setRemoving] = useState(false);
-//   const { id: workspaceId, name: workspaceName, logo } = useWorkspace();
+  //   const { id: workspaceId, name: workspaceName, logo } = useWorkspace();
   const { data: session } = useSession();
   const { id, name, email } = user;
   const { isMobile } = useMediaQuery();

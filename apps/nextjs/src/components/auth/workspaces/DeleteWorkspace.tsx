@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useDeleteWorkspaceModal } from "./modals/delete-workspace-modal";
 import { Button } from "../Auth-Button";
 import { cn } from "@kilimo/utils";
@@ -13,8 +12,8 @@ export default function DeleteWorkspace() {
     slug: params.accountSlug as unknown as string,
   });
   const isOwner = data?.isOwner;
-    const { setShowDeleteWorkspaceModal, DeleteWorkspaceModal } =
-      useDeleteWorkspaceModal();
+  const { setShowDeleteWorkspaceModal, DeleteWorkspaceModal } =
+    useDeleteWorkspaceModal();
   return (
     <div
       className={cn("rounded-lg border border-red-600 bg-white", {

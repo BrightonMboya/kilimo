@@ -40,7 +40,6 @@ type Props = {
 };
 
 export default async function Blog(props: Props) {
-
   const posts = allPosts.sort((a: Post, b: Post) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
@@ -49,7 +48,6 @@ export default async function Blog(props: Props) {
   return (
     <>
       <div className="container mx-auto w-full overflow-hidden scroll-smooth pt-48">
-     
         <div className="mx-0 w-full rounded-3xl px-0">
           <Link href={`${posts[0]?.url}`} key={posts[0]?.url}>
             <BlogHero
@@ -65,7 +63,6 @@ export default async function Blog(props: Props) {
           </Link>
         </div>
         <BlogGrid posts={blogGridPosts} searchParams={props.searchParams} />
-
       </div>
     </>
   );

@@ -4,10 +4,12 @@ import { Prisma } from "@prisma/client";
 
 export const deleteTeamInvite = createTRPCRouter({
   deleteInvite: protectedProcedure
-    .input(z.object({
-      workspaceSlug: z.string(),
-      email: z.string(),
-    }))
+    .input(
+      z.object({
+        workspaceSlug: z.string(),
+        email: z.string(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const workspace = await ctx.db.project.findUnique({
         where: {

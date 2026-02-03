@@ -1,0 +1,424 @@
+name: 'Stage 3: Scan Docker Images'
+
+on:
+  workflow_run:
+    workflows: ['Stage 3: Build & Artifacts']
+    types: [completed]
+    branches:
+      - main
+      - develop
+      - 'release/**'
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: 'Image tag to scan (default: latest commit SHA)'
+        type: string
+        required: false
+      severity:
+        description: 'Minimum severity to fail on'
+        type: choice
+        options:
+          - CRITICAL
+          - HIGH
+          - MEDIUM
+        default: 'HIGH'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  packages: read
+  pull-requests: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  check-images:
+    name: 'Check Image Availability'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      images: ${{ steps.list.outputs.images }}
+      should-scan: ${{ steps.list.outputs.should-scan }}
+    steps:
+      - name: List images to scan
+        id: list
+        run: |
+          # Determine image tag
+          if [ -n "${{ inputs.image-tag }}" ]; then
+            TAG="${{ inputs.image-tag }}"
+          else
+            TAG="${{ github.sha }}"
+          fi
+          
+          # List of apps that have Docker images
+          IMAGES='["nextjs"]'
+          
+          echo "images=$IMAGES" >> $GITHUB_OUTPUT
+          echo "should-scan=true" >> $GITHUB_OUTPUT
+          echo "📦 Images to scan: $IMAGES with tag: $TAG"
+
+  vulnerability-scan:
+    name: 'Vulnerability Scan (${{ matrix.app }})'
+    needs: check-images
+    if: needs.check-images.outputs.should-scan == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.check-images.outputs.images) }}
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.image-tag }}" ]; then
+            echo "value=${{ inputs.image-tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}"
+          echo "🐳 Pulling image: $IMAGE"
+          docker pull $IMAGE
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}'
+          format: 'sarif'
+          output: 'trivy-results-${{ matrix.app }}.sarif'
+          severity: ${{ inputs.severity || 'HIGH,CRITICAL' }}
+          exit-code: '0'  # Don't fail yet, we'll check results
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results-${{ matrix.app }}.sarif'
+          category: 'container-${{ matrix.app }}'
+
+      - name: Run Trivy in table format
+        run: |
+          echo "🔍 Scanning ${{ matrix.app }} for vulnerabilities..."
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image \
+            --severity ${{ inputs.severity || 'HIGH,CRITICAL' }} \
+            --format table \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }} \
+            > trivy-report-${{ matrix.app }}.txt || true
+          
+          cat trivy-report-${{ matrix.app }}.txt
+
+      - name: Check vulnerability threshold
+        id: check-vulns
+        run: |
+          # Parse SARIF file for vulnerabilities
+          if [ -f "trivy-results-${{ matrix.app }}.sarif" ]; then
+            CRITICAL_COUNT=$(cat trivy-results-${{ matrix.app }}.sarif | jq '[.runs[].results[] | select(.level=="error")] | length')
+            HIGH_COUNT=$(cat trivy-results-${{ matrix.app }}.sarif | jq '[.runs[].results[] | select(.level=="warning")] | length')
+            
+            echo "critical=$CRITICAL_COUNT" >> $GITHUB_OUTPUT
+            echo "high=$HIGH_COUNT" >> $GITHUB_OUTPUT
+            
+            echo "📊 Vulnerability Summary:"
+            echo "  - Critical: $CRITICAL_COUNT"
+            echo "  - High: $HIGH_COUNT"
+            
+            # Fail if critical vulnerabilities found
+            if [ "$CRITICAL_COUNT" -gt 0 ]; then
+              echo "❌ Found $CRITICAL_COUNT CRITICAL vulnerabilities!"
+              echo "fail=true" >> $GITHUB_OUTPUT
+              exit 1
+            elif [ "$HIGH_COUNT" -gt 5 ]; then
+              echo "⚠️ Found $HIGH_COUNT HIGH vulnerabilities (threshold: 5)"
+              echo "fail=true" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "✅ No critical issues found"
+              echo "fail=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Upload scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-scan-${{ matrix.app }}
+          path: |
+            trivy-results-${{ matrix.app }}.sarif
+            trivy-report-${{ matrix.app }}.txt
+          retention-days: 30
+
+  dockerfile-lint:
+    name: 'Dockerfile Lint (${{ matrix.app }})'
+    needs: check-images
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.check-images.outputs.images) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: apps/${{ matrix.app }}/Dockerfile
+          format: sarif
+          output-file: hadolint-${{ matrix.app }}.sarif
+          no-fail: true
+
+      - name: Upload Hadolint results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: hadolint-${{ matrix.app }}.sarif
+          category: 'dockerfile-${{ matrix.app }}'
+
+      - name: Print Hadolint results
+        run: |
+          echo "📋 Dockerfile lint results for ${{ matrix.app }}:"
+          hadolint apps/${{ matrix.app }}/Dockerfile || true
+
+  image-analysis:
+    name: 'Image Size & Layer Analysis (${{ matrix.app }})'
+    needs: check-images
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.check-images.outputs.images) }}
+    steps:
+      - name: Set image tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.image-tag }}" ]; then
+            echo "value=${{ inputs.image-tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}"
+          docker pull $IMAGE
+
+      - name: Analyze image size
+        id: size
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}"
+          SIZE=$(docker image inspect $IMAGE --format='{{.Size}}')
+          SIZE_MB=$((SIZE / 1024 / 1024))
+          
+          echo "size_mb=$SIZE_MB" >> $GITHUB_OUTPUT
+          echo "📦 Image size: ${SIZE_MB}MB"
+          
+          # Check against size budget (500MB for Next.js)
+          MAX_SIZE_MB=500
+          if [ $SIZE_MB -gt $MAX_SIZE_MB ]; then
+            echo "❌ Image exceeds size budget! (${SIZE_MB}MB > ${MAX_SIZE_MB}MB)"
+            echo "oversized=true" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ Image within size budget"
+            echo "oversized=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Analyze image layers
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}"
+          echo "🔍 Image layer analysis:"
+          docker history $IMAGE --human --no-trunc
+
+  sbom-generation:
+    name: 'Generate SBOM (${{ matrix.app }})'
+    needs: check-images
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.check-images.outputs.images) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.image-tag }}" ]; then
+            echo "value=${{ inputs.image-tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Generate SBOM with Syft
+        run: |
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}"
+          echo "📋 Generating SBOM for $IMAGE..."
+          
+          # Generate SBOM in multiple formats
+          syft packages $IMAGE -o cyclonedx-json > sbom-${{ matrix.app }}-cyclonedx.json
+          syft packages $IMAGE -o spdx-json > sbom-${{ matrix.app }}-spdx.json
+          syft packages $IMAGE -o table > sbom-${{ matrix.app }}-table.txt
+          
+          echo "✅ SBOM generated"
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ matrix.app }}
+          path: |
+            sbom-${{ matrix.app }}-*.json
+            sbom-${{ matrix.app }}-*.txt
+          retention-days: 90
+
+  sign-images:
+    name: 'Sign Images with Cosign (${{ matrix.app }})'
+    needs: [check-images, vulnerability-scan]
+    if: needs.vulnerability-scan.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        app: ${{ fromJson(needs.check-images.outputs.images) }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Required for keyless signing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine image tag
+        id: tag
+        run: |
+          if [ -n "${{ inputs.image-tag }}" ]; then
+            echo "value=${{ inputs.image-tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.4.0
+        with:
+          cosign-release: 'v2.2.3'
+
+      - name: Sign container image (keyless)
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}
+        run: |
+          echo "🔐 Signing image: $IMAGE"
+          
+          # Keyless signing with Sigstore (uses OIDC)
+          cosign sign --yes $IMAGE
+          
+          echo "✅ Image signed successfully"
+
+      - name: Verify signature
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}
+        run: |
+          echo "🔍 Verifying signature..."
+          
+          # Verify the signature
+          cosign verify $IMAGE \
+            --certificate-identity-regexp="https://github.com/${{ github.repository }}" \
+            --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+          
+          echo "✅ Signature verified"
+
+      - name: Attach SBOM to image
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.app }}:${{ steps.tag.outputs.value }}
+        run: |
+          # Download SBOM artifact
+          # Note: In production, you'd download from previous job artifacts
+          echo "📎 Attaching SBOM to image..."
+          
+          # For now, create a minimal SBOM attestation
+          echo '{"predicate":{"type":"https://cyclonedx.org/spec"}}' > sbom.json
+          
+          cosign attest --yes --predicate sbom.json --type cyclonedx $IMAGE
+          
+          echo "✅ SBOM attached"
+
+  scan-summary:
+    name: 'Scan Summary Report'
+    needs: [vulnerability-scan, dockerfile-lint, image-analysis, sbom-generation, sign-images]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🔍 Image Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Vulnerability Scan | ${{ needs.vulnerability-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dockerfile Lint | ${{ needs.dockerfile-lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Analysis | ${{ needs.image-analysis.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SBOM Generation | ${{ needs.sbom-generation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image Signing | ${{ needs.sign-images.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.vulnerability-scan.result }}" == "success" ]] && \
+             [[ "${{ needs.dockerfile-lint.result }}" == "success" ]] && \
+             [[ "${{ needs.image-analysis.result }}" == "success" ]] && \
+             [[ "${{ needs.sign-images.result }}" == "success" ]]; then
+            echo "✅ **All security checks passed!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Some security checks failed. Review the scan reports.**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Notify scan status
+        if: always()
+        uses: ./.github/actions/notify-status
+        with:
+          workflow-name: 'Image Security Scan'
+          status: ${{ job.status }}

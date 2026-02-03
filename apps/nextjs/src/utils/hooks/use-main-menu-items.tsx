@@ -1,6 +1,5 @@
 import Icon from "~/components/ui/icons/icons";
 
-
 export function useMainMenuItems({ accountSlug }: { accountSlug: string }) {
   let menuItemsTop = [
     // {

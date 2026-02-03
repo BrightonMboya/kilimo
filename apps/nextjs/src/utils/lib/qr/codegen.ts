@@ -235,7 +235,11 @@ namespace qrcodegen {
     // If the given coordinates are out of bounds, then false (light) is returned.
     public getModule(x: int, y: int): boolean {
       return (
-        0 <= x && x < this.size && 0 <= y && y < this.size && this.modules[y]![x]!
+        0 <= x &&
+        x < this.size &&
+        0 <= y &&
+        y < this.size &&
+        this.modules[y]![x]!
       );
     }
 
@@ -376,7 +380,8 @@ namespace qrcodegen {
       // Calculate parameter numbers
       const numBlocks: int =
         QrCode.NUM_ERROR_CORRECTION_BLOCKS[ecl.ordinal]![ver]!;
-      const blockEccLen: int = QrCode.ECC_CODEWORDS_PER_BLOCK[ecl.ordinal]![ver]!;
+      const blockEccLen: int =
+        QrCode.ECC_CODEWORDS_PER_BLOCK[ecl.ordinal]![ver]!;
       const rawCodewords: int = Math.floor(
         QrCode.getNumRawDataModules(ver) / 8,
       );

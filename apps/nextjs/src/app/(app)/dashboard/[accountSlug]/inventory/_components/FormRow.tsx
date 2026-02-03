@@ -12,7 +12,6 @@ export function SubHeading({ children, className }: Props) {
   );
 }
 
-
 interface Props {
   /** Label to be rendered on the left side of the row */
   rowLabel: string;

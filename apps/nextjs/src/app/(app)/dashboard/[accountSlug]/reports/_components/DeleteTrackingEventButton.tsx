@@ -63,10 +63,10 @@ export default function DeleteTrackingEventButton(props: Props) {
         });
       },
       onSettled: () => {
-        utils.reports.fetchById.invalidate(),
+        (utils.reports.fetchById.invalidate(),
           toast({
             description: "Deleted the event succesfully",
-          });
+          }));
         setIsOpen(false);
       },
       //   onSuccess: () => {

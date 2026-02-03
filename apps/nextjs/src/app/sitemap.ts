@@ -21,10 +21,11 @@
 //   ];
 // }
 
-import { MetadataRoute } from 'next'
-import { allPosts } from 'content-collections'
+import { MetadataRoute } from "next";
+import { allPosts } from "content-collections";
 
-export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://jani-ai.com"
+export const baseUrl =
+  process.env.NEXT_PUBLIC_BASE_URL || "https://jani-ai.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Define your static routes here
@@ -35,23 +36,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/privacy",
     "/terms",
     "/blog",
-    "/features/farmerManagement"
-  ]
+    "/features/farmerManagement",
+  ];
 
-  const staticEntries = staticRoutes.map(route => ({
+  const staticEntries = staticRoutes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 1,
-  }))
+  }));
 
   // Generate entries for blog posts using content collections
-  const blogEntries = allPosts.map(post => ({
+  const blogEntries = allPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.date),
-    changeFrequency: 'weekly' as const,
+    changeFrequency: "weekly" as const,
     priority: 0.7,
-  }))
+  }));
 
-  return [...staticEntries, ...blogEntries]
+  return [...staticEntries, ...blogEntries];
 }

@@ -1,18 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 // import { withAccelerate } from "@prisma/extension-accelerate";
 
-import { env } from "~/env";
-
+// Use process.env for server-side NODE_ENV to avoid importing the app's
+// runtime `env` helper (which may be untyped in this package).
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const nodeEnv: string | undefined = process.env.NODE_ENV as unknown as
+  | string
+  | undefined;
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-export const db = globalForPrisma.prisma ??
+export const db =
+  globalForPrisma.prisma ??
   new PrismaClient({
-    log: env.NODE_ENV === "development"
-      ? ["query", "error", "warn"]
-      : ["error"],
+    log: nodeEnv === "development" ? ["query", "error", "warn"] : ["error"],
   });
 // .$extends(withAccelerate());
 
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+if (nodeEnv !== "production") globalForPrisma.prisma = db;

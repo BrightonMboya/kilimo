@@ -15,6 +15,8 @@ export function AssetLabel({
 
 export function ItemLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="md:grid md:grid-cols-2 md:items-center md:gap-[50px]">{children}</div>
+    <div className="md:grid md:grid-cols-2 md:items-center md:gap-[50px]">
+      {children}
+    </div>
   );
 }
