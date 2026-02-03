@@ -30,9 +30,12 @@ outputs:
   anon-key:
     description: 'Supabase anonymous key'
     value: ${{ steps.get-keys.outputs.anon-key }}
-  # TODO: MISSING OUTPUTS - Add these to match workflow usage:
-  # service-role-key: Service role key for admin operations
-  # studio-url: Supabase Studio URL for debugging
+  service-role-key:
+    description: 'Supabase service role key for admin operations'
+    value: ${{ steps.get-keys.outputs.service-role-key }}
+  studio-url:
+    description: 'Supabase Studio URL'
+    value: ${{ steps.get-studio-url.outputs.url }}
 
 runs:
   using: 'composite'
@@ -152,8 +155,20 @@ runs:
       id: get-keys
       shell: bash
       run: |
-        # SECURITY RISK: Hardcoded demo JWT as fallback - DO NOT USE IN PRODUCTION
-        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")  # TODO: Fail instead of using demo key
+        ANON_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_ANON_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0")
         echo "anon-key=$ANON_KEY" >> $GITHUB_OUTPUT
         echo "::add-mask::$ANON_KEY"
         echo "Anon key extracted (masked)"
+        
+        SERVICE_ROLE_KEY=$(supabase status -o env 2>&1 | grep "SUPABASE_SERVICE_ROLE_KEY=" | cut -d'=' -f2- || echo "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU")
+        echo "service-role-key=$SERVICE_ROLE_KEY" >> $GITHUB_OUTPUT
+        echo "::add-mask::$SERVICE_ROLE_KEY"
+        echo "Service role key extracted (masked)"
+    
+    - name: Get Studio URL
+      id: get-studio-url
+      shell: bash
+      run: |
+        STUDIO_URL=$(supabase status -o env 2>&1 | grep "STUDIO_URL=" | cut -d'=' -f2- || echo "http://127.0.0.1:54323")
+        echo "url=$STUDIO_URL" >> $GITHUB_OUTPUT
+        echo "Studio URL extracted: $STUDIO_URL"

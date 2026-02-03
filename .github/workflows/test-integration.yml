@@ -69,7 +69,7 @@ jobs:
           pnpm --filter @kilimo/db prisma db push --skip-generate || true  # TODO: Remove '|| true'
         env:
           # ARCHITECTURE VIOLATION: Using db-url which doesn't exist, should be database-url
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}  # TODO: FIX - Change to database-url
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}  # TODO: FIX - Change to database-url
         continue-on-error: true
 
       - name: Validate OpenAPI/Swagger specs
@@ -101,7 +101,7 @@ jobs:
             echo "⚠️ No contract tests configured"
           fi
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
         continue-on-error: true
@@ -163,7 +163,7 @@ jobs:
           pnpm --filter @kilimo/db prisma migrate deploy
           echo "✅ Migrations applied successfully"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
 
       - name: Test migrations (down/rollback)
         id: migrate-down
@@ -187,7 +187,7 @@ jobs:
             echo "⚠️ No migrations to test"
           fi
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Test RLS policies
@@ -203,7 +203,7 @@ jobs:
             echo "⚠️ No RLS tests configured"
           fi
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Test data integrity
@@ -234,7 +234,7 @@ jobs:
           
           echo "✅ Data integrity tests completed"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Generate database test report
@@ -278,7 +278,7 @@ jobs:
           pnpm --filter @kilimo/db prisma db push --skip-generate || true
           pnpm --filter @kilimo/db prisma db seed || true
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
         continue-on-error: true
 
       - name: Start mock services
@@ -307,7 +307,7 @@ jobs:
           pnpm turbo run test:integration --cache-dir=.turbo || exit 1
           echo "✅ Inter-service tests passed"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           # ARCHITECTURE VIOLATION: service-role-key output doesn't exist in setup-supabase action
@@ -327,7 +327,7 @@ jobs:
             echo "⚠️ No auth tests configured"
           fi
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
         continue-on-error: true
@@ -399,5 +399,5 @@ jobs:
         uses: ./.github/actions/notify-status
         with:
           status: failure
-          message: "Integration tests failed on ${{ github.ref_name }}"
+          workflow-name: "Integration Tests - ${{ github.ref_name }}"
         continue-on-error: true

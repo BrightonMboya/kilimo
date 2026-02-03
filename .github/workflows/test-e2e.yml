@@ -104,7 +104,7 @@ jobs:
           pnpm --filter @kilimo/db prisma db seed || true  # TODO: Remove '|| true'
         env:
           # ARCHITECTURE VIOLATION: Using db-url output that doesn't exist
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}  # TODO: FIX - Change to database-url
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}  # TODO: FIX - Change to database-url
 
       - name: Build Next.js application
         run: |
@@ -112,7 +112,7 @@ jobs:
           pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
           echo "✅ Application built"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
 
@@ -127,15 +127,18 @@ jobs:
           echo "url=http://localhost:3000" >> $GITHUB_OUTPUT
           echo "✅ Application started (PID: $APP_PID)"
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           PORT: 3000
 
       - name: Wait for services to be ready
-        # CRITICAL BUG: This action doesn't exist! Will fail in production
-        # TODO: Create .github/actions/wait-for-services/action.yml or use inline script
         uses: ./.github/actions/wait-for-services
+        with:
+          services: 'postgres,api,app'
+          postgres-port: 54326
+          api-url: ${{ steps.supabase.outputs.api-url }}
+          app-url: http://localhost:3000
         timeout-minutes: 5
 
       - name: Generate setup report
@@ -178,13 +181,13 @@ jobs:
           pnpm --filter @kilimo/db prisma db push --skip-generate || true
           pnpm --filter @kilimo/db prisma db seed || true
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
 
       - name: Build application
         run: |
           pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
 
@@ -194,7 +197,7 @@ jobs:
           pnpm start &
           sleep 10
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           PORT: 3000
@@ -214,7 +217,7 @@ jobs:
           echo "✅ E2E tests passed"
         env:
           BASE_URL: http://localhost:3000
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
 
@@ -297,13 +300,13 @@ jobs:
           pnpm --filter @kilimo/db prisma db push --skip-generate || true
           pnpm --filter @kilimo/db prisma db seed || true
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
 
       - name: Build application (production mode)
         run: |
           pnpm turbo run build --filter=@kilimo/nextjs --cache-dir=.turbo
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           NODE_ENV: production
@@ -314,7 +317,7 @@ jobs:
           pnpm start &
           sleep 10
         env:
-          DATABASE_URL: ${{ steps.supabase.outputs.db-url }}
+          DATABASE_URL: ${{ steps.supabase.outputs.database-url }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ steps.supabase.outputs.api-url }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ steps.supabase.outputs.anon-key }}
           PORT: 3000
@@ -410,7 +413,7 @@ jobs:
         uses: ./.github/actions/notify-status
         with:
           status: failure
-          message: "E2E tests failed on ${{ github.ref_name }}"
+          workflow-name: "E2E Tests - ${{ github.ref_name }}"
         continue-on-error: true
 
       - name: Create nightly test report

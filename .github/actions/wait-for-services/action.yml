@@ -1,0 +1,120 @@
+name: 'Wait for Services'
+description: 'Waits for services to be ready with health checks'
+author: 'Kilimo DevOps Team'
+
+inputs:
+  services:
+    description: 'Comma-separated list of services to wait for: postgres,api,app'
+    required: false
+    default: 'postgres,api,app'
+  postgres-host:
+    description: 'PostgreSQL host'
+    required: false
+    default: 'localhost'
+  postgres-port:
+    description: 'PostgreSQL port'
+    required: false
+    default: '54322'
+  api-url:
+    description: 'API URL to check'
+    required: false
+    default: 'http://localhost:54321'
+  app-url:
+    description: 'Application URL to check'
+    required: false
+    default: 'http://localhost:3000'
+  max-attempts:
+    description: 'Maximum number of attempts'
+    required: false
+    default: '60'
+  wait-interval:
+    description: 'Seconds to wait between attempts'
+    required: false
+    default: '2'
+
+outputs:
+  ready:
+    description: 'Whether all services are ready'
+    value: ${{ steps.wait.outputs.ready }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Wait for services
+      id: wait
+      shell: bash
+      run: |
+        MAX_ATTEMPTS=${{ inputs.max-attempts }}
+        WAIT_INTERVAL=${{ inputs.wait-interval }}
+        SERVICES="${{ inputs.services }}"
+        
+        echo "⏳ Waiting for services: $SERVICES"
+        echo "Max attempts: $MAX_ATTEMPTS (${WAIT_INTERVAL}s interval)"
+        
+        attempt=0
+        all_ready=false
+        
+        while [ $attempt -lt $MAX_ATTEMPTS ]; do
+          attempt=$((attempt + 1))
+          echo ""
+          echo "Attempt $attempt/$MAX_ATTEMPTS..."
+          
+          postgres_ready=false
+          api_ready=false
+          app_ready=false
+          
+          # Check PostgreSQL
+          if [[ "$SERVICES" == *"postgres"* ]]; then
+            if pg_isready -h ${{ inputs.postgres-host }} -p ${{ inputs.postgres-port }} > /dev/null 2>&1; then
+              echo "✅ PostgreSQL is ready"
+              postgres_ready=true
+            else
+              echo "⏳ PostgreSQL not ready yet..."
+            fi
+          else
+            postgres_ready=true
+          fi
+          
+          # Check API
+          if [[ "$SERVICES" == *"api"* ]]; then
+            if curl -sf "${{ inputs.api-url }}/health" > /dev/null 2>&1 || curl -sf "${{ inputs.api-url }}" > /dev/null 2>&1; then
+              echo "✅ API is ready"
+              api_ready=true
+            else
+              echo "⏳ API not ready yet..."
+            fi
+          else
+            api_ready=true
+          fi
+          
+          # Check App
+          if [[ "$SERVICES" == *"app"* ]]; then
+            if curl -sf "${{ inputs.app-url }}" > /dev/null 2>&1; then
+              echo "✅ Application is ready"
+              app_ready=true
+            else
+              echo "⏳ Application not ready yet..."
+            fi
+          else
+            app_ready=true
+          fi
+          
+          # Check if all required services are ready
+          if [ "$postgres_ready" = true ] && [ "$api_ready" = true ] && [ "$app_ready" = true ]; then
+            echo ""
+            echo "✅ All services are ready!"
+            all_ready=true
+            break
+          fi
+          
+          sleep $WAIT_INTERVAL
+        done
+        
+        if [ "$all_ready" = false ]; then
+          echo ""
+          echo "❌ Services failed to become ready after $MAX_ATTEMPTS attempts"
+          echo "ready=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        echo "ready=true" >> $GITHUB_OUTPUT
