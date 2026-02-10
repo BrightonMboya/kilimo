@@ -4,7 +4,7 @@ import { addWorkSpace } from "./add-workspace";
 import { fetchAllWorkspaces } from "./fetch-all-workspaces";
 import { getUsersAndInvites } from "./getUsersAndInvites";
 import { editWorkspace } from "./edit-workspace";
-import { invites } from "./invites";
+// import { invites } from "./invites"; // Temporarily disabled - react-email version mismatch
 import { deleteTeamInvite } from "./delete-team-invite";
 import { resetInviteLink } from "./reset-invites";
 import { acceptInvite } from "./accept-invite";
@@ -16,7 +16,7 @@ const workspace = mergeRouters(
   fetchAllWorkspaces,
   getUsersAndInvites,
   editWorkspace,
-  invites,
+  // invites, // Temporarily disabled - react-email version mismatch
   deleteTeamInvite,
   resetInviteLink,
   acceptInvite,

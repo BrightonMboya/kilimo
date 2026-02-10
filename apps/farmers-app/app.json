@@ -14,7 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.janiai.farmersapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,6 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
+      "package": "com.janiai.farmersapp",
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -33,6 +38,12 @@
       "expo-font",
       "expo-web-browser",
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b86fd641-b98f-4b30-84bc-2b9ca3c50893"
+      }
+    }
   }
 }
