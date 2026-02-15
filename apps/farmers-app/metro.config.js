@@ -23,5 +23,17 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
 ];
+// 3. Ensure a single copy of React is used across the app and all workspace packages.
+// Without this, workspace packages (e.g. @kilimo/api) can resolve React from the root
+// node_modules (React 18) while the app uses its own (React 19), causing "Invalid hook call".
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === "react" || moduleName === "react-dom" || moduleName === "react-native") {
+    return {
+      filePath: require.resolve(moduleName, { paths: [projectRoot] }),
+      type: "sourceFile",
+    };
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
 
 module.exports = withNativeWind(config, { input: "./global.css" });

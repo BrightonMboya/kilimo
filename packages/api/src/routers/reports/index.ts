@@ -6,6 +6,7 @@ import { deleteReport } from "./delete";
 import { deleteTrackingEvent } from "./deleteTrackingEvent";
 import { markAsFinishedTracking } from "./markAsFinishedTracking";
 import { add } from "./add";
+import { myReports } from "./myReports";
 
 const reports = mergeRouters(
   fetchByOrganization,
@@ -15,6 +16,7 @@ const reports = mergeRouters(
   deleteTrackingEvent,
   markAsFinishedTracking,
   add,
+  myReports,
 );
 
 export default reports;

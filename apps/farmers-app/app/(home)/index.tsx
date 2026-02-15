@@ -1,9 +1,9 @@
 import { useUser, useAuth } from '@clerk/clerk-expo'
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert, Animated } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Leaf, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle } from 'lucide-react-native'
+import { Leaf, CloudRain, Droplets, Search, Plus, LogOut, X, Map, ChevronRight, CheckCircle, FileText, Clock, CircleCheck, Trash2 } from 'lucide-react-native'
 import { Link } from 'expo-router'
-import { MOCK_WEATHER } from './mockData'
+import { useWeather } from '../../hooks/useWeather'
 import { trpc } from '../../utils/api'
 import React, { useState, useRef, useEffect } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -47,6 +47,7 @@ export default function Page() {
   const { user } = useUser()
   const { signOut } = useAuth()
   const queryClient = useQueryClient()
+  const { weather, isLoading: isLoadingWeather } = useWeather()
 
   // Toast state
   const [toastMessage, setToastMessage] = useState('')
@@ -68,6 +69,83 @@ export default function Page() {
     undefined,
     { enabled: !!user?.id }
   )
+
+  // Fetch reports for the current user
+  const { data: reports, refetch: refetchReports, isLoading: isLoadingReports } = trpc.reports.myReports.useQuery(
+    undefined,
+    { enabled: !!user?.id }
+  )
+
+  // Reports modal state
+  const [reportsModalVisible, setReportsModalVisible] = useState(false)
+  const [reportDetailId, setReportDetailId] = useState<string | null>(null)
+  const [createReportModalVisible, setCreateReportModalVisible] = useState(false)
+  const [newReportName, setNewReportName] = useState('')
+  const [newReportDate, setNewReportDate] = useState(new Date())
+  const [showReportDatePicker, setShowReportDatePicker] = useState(false)
+  const [selectedFieldId, setSelectedFieldId] = useState('')
+  const [harvestQuantity, setHarvestQuantity] = useState('')
+  const [harvestUnit, setHarvestUnit] = useState('kg')
+  const [harvestInputsUsed, setHarvestInputsUsed] = useState('')
+  const [newReportEvents, setNewReportEvents] = useState<{ eventName: string; description: string; dateCreated: Date }[]>([])
+
+  const createReportMutation = trpc.reports.createReportWithHarvest.useMutation({
+    onSuccess: () => {
+      refetchReports()
+      setCreateReportModalVisible(false)
+      setNewReportName('')
+      setNewReportDate(new Date())
+      setSelectedFieldId('')
+      setHarvestQuantity('')
+      setHarvestUnit('kg')
+      setHarvestInputsUsed('')
+      setNewReportEvents([])
+      showToast('Report created successfully')
+    },
+    onError: (error: any) => {
+      Alert.alert("Error", error.message || "Failed to create report")
+    }
+  })
+
+  const handleCreateReport = () => {
+    if (!newReportName.trim()) {
+      Alert.alert("Error", "Please enter a report name")
+      return
+    }
+    if (!selectedFieldId) {
+      Alert.alert("Error", "Please select a field")
+      return
+    }
+    if (!harvestQuantity || isNaN(Number(harvestQuantity)) || Number(harvestQuantity) <= 0) {
+      Alert.alert("Error", "Please enter a valid quantity")
+      return
+    }
+    createReportMutation.mutate({
+      reportName: newReportName,
+      dateCreated: newReportDate,
+      fieldId: selectedFieldId,
+      quantity: parseInt(harvestQuantity, 10),
+      unit: harvestUnit,
+      inputsUsed: harvestInputsUsed,
+      trackingEvents: newReportEvents.length > 0 ? newReportEvents : [],
+    })
+  }
+
+  const addTrackingEvent = () => {
+    setNewReportEvents([...newReportEvents, { eventName: '', description: '', dateCreated: new Date() }])
+  }
+
+  const updateTrackingEvent = (index: number, field: string, value: any) => {
+    const updated = [...newReportEvents]
+    updated[index] = { ...updated[index]!, [field]: value }
+    setNewReportEvents(updated)
+  }
+
+  const removeTrackingEvent = (index: number) => {
+    setNewReportEvents(newReportEvents.filter((_, i) => i !== index))
+  }
+
+  const selectedReport = reportDetailId ? reports?.find((r: any) => r.id === reportDetailId) : null
 
   const createTaskMutation = trpc.tasks.create.useMutation({
     onSuccess: () => {
@@ -211,13 +289,21 @@ export default function Page() {
             </View>
             <View className="flex-1">
               <View className="flex-row items-end">
-                <Text className="text-3xl font-bold text-white">{MOCK_WEATHER.temp}°</Text>
-                <Text className="text-sm mb-1 ml-1 text-white">Nairobi</Text>
+                <Text className="text-3xl font-bold text-white">
+                  {isLoadingWeather ? '--' : `${weather?.temp}°`}
+                </Text>
+                <Text className="text-sm mb-1 ml-1 text-white">
+                  {weather?.location ?? '...'}
+                </Text>
               </View>
-              <Text className="text-xs text-green-100 mt-1">{MOCK_WEATHER.advice}</Text>
+              <Text className="text-xs text-green-100 mt-1">
+                {isLoadingWeather ? 'Loading weather...' : weather?.advice}
+              </Text>
             </View>
             <View className="items-end">
-              <Text className="text-xs font-bold text-white">{MOCK_WEATHER.precip} Rain</Text>
+              <Text className="text-xs font-bold text-white">
+                {isLoadingWeather ? '--' : `${weather?.precip} Rain`}
+              </Text>
             </View>
           </View>
         </View>
@@ -251,6 +337,63 @@ export default function Page() {
           onToggleComplete={handleToggleComplete}
           onDelete={handleDeleteTask}
         />
+
+        {/* Traceability Reports */}
+        <View className="px-4 mt-6">
+          <View className="flex-row justify-between items-center mb-3">
+            <Text className="font-bold text-gray-800 text-lg">Traceability Reports</Text>
+            <TouchableOpacity onPress={() => setReportsModalVisible(true)}>
+              <Text className="text-green-600 text-sm font-medium">
+                {reports && reports.length > 0 ? 'See All' : 'View'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {isLoadingReports ? (
+            <ActivityIndicator size="small" color="#16A34A" />
+          ) : reports && reports.length > 0 ? (
+            <View className="gap-3">
+              {reports.slice(0, 2).map((report: any) => (
+                <TouchableOpacity
+                  key={report.id}
+                  onPress={() => { setReportDetailId(report.id); setReportsModalVisible(true) }}
+                  className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex-row items-center"
+                >
+                  <View className="bg-blue-100 p-3 rounded-xl mr-3">
+                    <FileText size={20} color="#2563EB" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="font-semibold text-gray-800">{report.name}</Text>
+                    <Text className="text-xs text-gray-500 mt-0.5">
+                      {report.Harvests?.name} · {new Date(report.dateCreated).toLocaleDateString()}
+                    </Text>
+                  </View>
+                  {report.finishedTracking ? (
+                    <CircleCheck size={18} color="#16A34A" />
+                  ) : (
+                    <Clock size={18} color="#EAB308" />
+                  )}
+                </TouchableOpacity>
+              ))}
+              {reports.length > 2 && (
+                <TouchableOpacity onPress={() => setReportsModalVisible(true)} className="py-2">
+                  <Text className="text-green-600 text-sm font-medium text-center">
+                    +{reports.length - 2} more reports
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setReportsModalVisible(true)}
+              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 items-center justify-center"
+            >
+              <FileText size={32} color="#D1D5DB" />
+              <Text className="text-gray-500 text-sm mt-2">No reports yet</Text>
+              <Text className="text-green-600 font-medium mt-1">Create your first report</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {/* Field Overview */}
         <View className="px-4 mt-6 mb-8">
@@ -409,6 +552,343 @@ export default function Page() {
                     <ActivityIndicator color="white" />
                   ) : (
                     <Text className="text-white text-center font-semibold text-lg">Create Task</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Reports List Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={reportsModalVisible && !reportDetailId && !createReportModalVisible}
+        onRequestClose={() => setReportsModalVisible(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-3xl p-6 h-[85%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-bold text-gray-900">Traceability Reports</Text>
+              <TouchableOpacity onPress={() => setReportsModalVisible(false)} className="bg-gray-100 p-2 rounded-full">
+                <X size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              {reports && reports.length > 0 ? (
+                <View className="gap-3">
+                  {reports.map((report: any) => (
+                    <TouchableOpacity
+                      key={report.id}
+                      onPress={() => setReportDetailId(report.id)}
+                      className="bg-white p-4 rounded-xl border border-gray-200 flex-row items-center"
+                    >
+                      <View className={`p-3 rounded-xl mr-3 ${report.finishedTracking ? 'bg-green-100' : 'bg-blue-100'}`}>
+                        <FileText size={20} color={report.finishedTracking ? '#16A34A' : '#2563EB'} />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="font-semibold text-gray-800">{report.name}</Text>
+                        <Text className="text-xs text-gray-500 mt-0.5">
+                          {report.Harvests?.name} ({report.Harvests?.crop})
+                        </Text>
+                        <Text className="text-xs text-gray-400 mt-0.5">
+                          {new Date(report.dateCreated).toLocaleDateString()} · {report.ReportTrackingEvents?.length || 0} events
+                        </Text>
+                      </View>
+                      <View className={`px-2 py-1 rounded-full ${report.finishedTracking ? 'bg-green-100' : 'bg-yellow-100'}`}>
+                        <Text className={`text-xs font-medium ${report.finishedTracking ? 'text-green-700' : 'text-yellow-700'}`}>
+                          {report.finishedTracking ? 'Complete' : 'Tracking'}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : (
+                <View className="items-center justify-center py-12">
+                  <FileText size={48} color="#D1D5DB" />
+                  <Text className="text-gray-500 text-center mt-4">No traceability reports yet</Text>
+                  <Text className="text-gray-400 text-sm text-center mt-1">Create a report to track your produce from farm to market</Text>
+                </View>
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              onPress={() => setCreateReportModalVisible(true)}
+              className="bg-green-600 rounded-xl py-4 mt-4 shadow-sm"
+            >
+              <Text className="text-white text-center font-semibold text-lg">Create New Report</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Report Detail Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!reportDetailId}
+        onRequestClose={() => setReportDetailId(null)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-3xl p-6 h-[85%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-bold text-gray-900">Report Details</Text>
+              <TouchableOpacity onPress={() => setReportDetailId(null)} className="bg-gray-100 p-2 rounded-full">
+                <X size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+
+            {selectedReport ? (
+              <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+                {/* Report Header */}
+                <View className="bg-green-50 p-4 rounded-xl border border-green-200 mb-4">
+                  <Text className="text-lg font-bold text-green-800">{selectedReport.name}</Text>
+                  <Text className="text-sm text-green-600 mt-1">
+                    Created: {new Date(selectedReport.dateCreated).toLocaleDateString()}
+                  </Text>
+                  <View className={`self-start mt-2 px-3 py-1 rounded-full ${selectedReport.finishedTracking ? 'bg-green-200' : 'bg-yellow-200'}`}>
+                    <Text className={`text-xs font-bold ${selectedReport.finishedTracking ? 'text-green-800' : 'text-yellow-800'}`}>
+                      {selectedReport.finishedTracking ? 'Tracking Complete' : 'In Progress'}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Harvest & Farmer Info */}
+                <View className="bg-white p-4 rounded-xl border border-gray-200 mb-4">
+                  <Text className="font-semibold text-gray-800 mb-2">Harvest Details</Text>
+                  <View className="gap-1">
+                    <Text className="text-sm text-gray-600">Harvest: {selectedReport.Harvests?.name}</Text>
+                    <Text className="text-sm text-gray-600">Crop: {selectedReport.Harvests?.crop}</Text>
+                    {selectedReport.Harvests?.Farmers && (
+                      <>
+                        <Text className="text-sm text-gray-600">Farmer: {selectedReport.Harvests.Farmers.fullName}</Text>
+                        <Text className="text-sm text-gray-600">
+                          Location: {selectedReport.Harvests.Farmers.province}, {selectedReport.Harvests.Farmers.country}
+                        </Text>
+                      </>
+                    )}
+                  </View>
+                </View>
+
+                {/* Tracking Events Timeline */}
+                <View className="mb-4">
+                  <Text className="font-semibold text-gray-800 mb-3">Tracking Events</Text>
+                  {selectedReport.ReportTrackingEvents && selectedReport.ReportTrackingEvents.length > 0 ? (
+                    <View className="gap-3">
+                      {selectedReport.ReportTrackingEvents.map((event: any, idx: number) => (
+                        <View key={event.id} className="flex-row">
+                          <View className="items-center mr-3">
+                            <View className="w-3 h-3 bg-green-500 rounded-full" />
+                            {idx < selectedReport.ReportTrackingEvents.length - 1 && (
+                              <View className="w-0.5 flex-1 bg-green-200 mt-1" />
+                            )}
+                          </View>
+                          <View className="flex-1 bg-white p-3 rounded-xl border border-gray-200 mb-1">
+                            <Text className="font-medium text-gray-800">{event.eventName}</Text>
+                            <Text className="text-sm text-gray-500 mt-1">{event.description}</Text>
+                            <Text className="text-xs text-gray-400 mt-1">
+                              {new Date(event.dateCreated).toLocaleDateString()}
+                            </Text>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  ) : (
+                    <View className="bg-gray-50 p-4 rounded-xl items-center">
+                      <Text className="text-gray-500 text-sm">No tracking events recorded</Text>
+                    </View>
+                  )}
+                </View>
+              </ScrollView>
+            ) : (
+              <View className="flex-1 items-center justify-center">
+                <ActivityIndicator size="large" color="#16A34A" />
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
+
+      {/* Create Report Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={createReportModalVisible}
+        onRequestClose={() => setCreateReportModalVisible(false)}
+      >
+        <View className="flex-1 justify-end bg-black/50">
+          <View className="bg-white rounded-t-3xl p-6 h-[90%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-2xl font-bold text-gray-900">Create Report</Text>
+              <TouchableOpacity onPress={() => setCreateReportModalVisible(false)} className="bg-gray-100 p-2 rounded-full">
+                <X size={24} color="#374151" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              <View className="gap-4">
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Report Name *</Text>
+                  <TextInput
+                    value={newReportName}
+                    onChangeText={setNewReportName}
+                    placeholder="e.g., Avocado Batch #42 Traceability"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Select Field *</Text>
+                  {isLoadingFields ? (
+                    <ActivityIndicator size="small" color="#16A34A" />
+                  ) : fields && fields.length > 0 ? (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+                      {fields.map((field) => (
+                        <TouchableOpacity
+                          key={field.id}
+                          onPress={() => setSelectedFieldId(field.id)}
+                          className={`mr-2 px-4 py-3 rounded-xl border ${
+                            selectedFieldId === field.id
+                              ? 'bg-green-50 border-green-500'
+                              : 'bg-gray-50 border-gray-200'
+                          }`}
+                        >
+                          <Text className={`font-medium ${selectedFieldId === field.id ? 'text-green-700' : 'text-gray-800'}`}>
+                            {field.name}
+                          </Text>
+                          <Text className={`text-xs mt-0.5 ${selectedFieldId === field.id ? 'text-green-600' : 'text-gray-500'}`}>
+                            {field.crop}{field.variety ? ` (${field.variety})` : ''}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <View className="bg-gray-50 p-4 rounded-xl items-center">
+                      <Text className="text-gray-400 text-sm">No fields found. Add a field first.</Text>
+                    </View>
+                  )}
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Quantity Harvested *</Text>
+                  <TextInput
+                    value={harvestQuantity}
+                    onChangeText={setHarvestQuantity}
+                    placeholder="e.g., 500"
+                    keyboardType="numeric"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Unit</Text>
+                  <View className="flex-row gap-2">
+                    {['kg', 'tons', 'bags', 'crates'].map((u) => (
+                      <TouchableOpacity
+                        key={u}
+                        onPress={() => setHarvestUnit(u)}
+                        className={`flex-1 py-3 rounded-xl border ${
+                          harvestUnit === u
+                            ? 'bg-green-50 border-green-500'
+                            : 'bg-white border-gray-200'
+                        }`}
+                      >
+                        <Text className={`text-center capitalize font-medium ${
+                          harvestUnit === u ? 'text-green-700' : 'text-gray-600'
+                        }`}>
+                          {u}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Inputs Used</Text>
+                  <TextInput
+                    value={harvestInputsUsed}
+                    onChangeText={setHarvestInputsUsed}
+                    placeholder="e.g., NPK 17:17:17, Manure"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-gray-900"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Date</Text>
+                  <TouchableOpacity
+                    onPress={() => setShowReportDatePicker(true)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5"
+                  >
+                    <Text className="text-gray-900">{newReportDate.toLocaleDateString()}</Text>
+                  </TouchableOpacity>
+                  {showReportDatePicker && (
+                    <DateTimePicker
+                      value={newReportDate}
+                      mode="date"
+                      display="default"
+                      onChange={(event, selectedDate) => {
+                        setShowReportDatePicker(false)
+                        if (selectedDate) setNewReportDate(selectedDate)
+                      }}
+                    />
+                  )}
+                </View>
+
+                {/* Tracking Events */}
+                <View>
+                  <View className="flex-row justify-between items-center mb-2">
+                    <Text className="text-gray-700 font-medium">Tracking Events</Text>
+                    <TouchableOpacity onPress={addTrackingEvent} className="bg-green-100 px-3 py-1.5 rounded-lg">
+                      <Text className="text-green-700 text-sm font-medium">+ Add Event</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {newReportEvents.length === 0 ? (
+                    <View className="bg-gray-50 p-4 rounded-xl items-center">
+                      <Text className="text-gray-400 text-sm">No tracking events added yet</Text>
+                      <Text className="text-gray-400 text-xs mt-1">Add events like "Harvested", "Packed", "Shipped"</Text>
+                    </View>
+                  ) : (
+                    <View className="gap-3">
+                      {newReportEvents.map((event, idx) => (
+                        <View key={idx} className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                          <View className="flex-row justify-between items-center mb-2">
+                            <Text className="text-sm font-medium text-gray-700">Event {idx + 1}</Text>
+                            <TouchableOpacity onPress={() => removeTrackingEvent(idx)}>
+                              <Trash2 size={16} color="#DC2626" />
+                            </TouchableOpacity>
+                          </View>
+                          <TextInput
+                            value={event.eventName}
+                            onChangeText={(v) => updateTrackingEvent(idx, 'eventName', v)}
+                            placeholder="Event name (e.g., Harvested)"
+                            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-gray-900 mb-2"
+                          />
+                          <TextInput
+                            value={event.description}
+                            onChangeText={(v) => updateTrackingEvent(idx, 'description', v)}
+                            placeholder="Description"
+                            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-gray-900"
+                          />
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleCreateReport}
+                  disabled={createReportMutation.isPending || !newReportName.trim() || !selectedFieldId || !harvestQuantity}
+                  className={`w-full bg-green-600 rounded-xl py-4 mt-6 shadow-sm ${
+                    (createReportMutation.isPending || !newReportName.trim() || !selectedFieldId || !harvestQuantity) ? 'opacity-50' : ''
+                  }`}
+                >
+                  {createReportMutation.isPending ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-lg">Create Report</Text>
                   )}
                 </TouchableOpacity>
               </View>

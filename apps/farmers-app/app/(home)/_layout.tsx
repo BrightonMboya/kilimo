@@ -1,5 +1,5 @@
 import { Tabs, Redirect } from 'expo-router'
-import { Home, Map, BookOpen, User, Sprout } from 'lucide-react-native'
+import { Home, Map, ShieldCheck, User, Sprout } from 'lucide-react-native'
 import { View, ActivityIndicator } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 
@@ -69,11 +69,11 @@ export default function HomeLayout() {
         }}
       />
       <Tabs.Screen
-        name="books"
+        name="qms"
         options={{
-          title: 'Books',
+          title: 'QMS',
           tabBarIcon: ({ color, size, focused }) => (
-            <BookOpen size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+            <ShieldCheck size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
