@@ -58,6 +58,19 @@ export default function Page() {
     setToastVisible(true)
   }
 
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(undefined)
+
+  const { data: seasonsData, isLoading: isLoadingSeasons } = trpc.farmerFields.getSeasons.useQuery(
+    undefined,
+    { enabled: !!user?.id }
+  )
+
+  useEffect(() => {
+    if (!selectedSeasonId && seasonsData?.currentSeason?.id) {
+      setSelectedSeasonId(seasonsData.currentSeason.id)
+    }
+  }, [selectedSeasonId, seasonsData?.currentSeason?.id])
+
   // Fetch tasks for the current user
   const { data: tasks, refetch: refetchTasks, isLoading: isLoadingTasks } = trpc.tasks.myTasks.useQuery(
     undefined,
@@ -66,14 +79,14 @@ export default function Page() {
 
   // Fetch fields for the current user
   const { data: fields, isLoading: isLoadingFields } = trpc.farmerFields.myFields.useQuery(
-    undefined,
-    { enabled: !!user?.id }
+    { seasonId: selectedSeasonId },
+    { enabled: !!user?.id && !!selectedSeasonId }
   )
 
   // Fetch reports for the current user
   const { data: reports, refetch: refetchReports, isLoading: isLoadingReports } = trpc.reports.myReports.useQuery(
-    undefined,
-    { enabled: !!user?.id }
+    { seasonId: selectedSeasonId },
+    { enabled: !!user?.id && !!selectedSeasonId }
   )
 
   // Reports modal state
@@ -84,10 +97,23 @@ export default function Page() {
   const [newReportDate, setNewReportDate] = useState(new Date())
   const [showReportDatePicker, setShowReportDatePicker] = useState(false)
   const [selectedFieldId, setSelectedFieldId] = useState('')
+  const [selectedCropCycleId, setSelectedCropCycleId] = useState('')
   const [harvestQuantity, setHarvestQuantity] = useState('')
   const [harvestUnit, setHarvestUnit] = useState('kg')
   const [harvestInputsUsed, setHarvestInputsUsed] = useState('')
   const [newReportEvents, setNewReportEvents] = useState<{ eventName: string; description: string; dateCreated: Date }[]>([])
+
+  const { data: fieldCropCycles } = trpc.farmerFields.myCropCycles.useQuery(
+    {
+      seasonId: selectedSeasonId,
+      fieldId: selectedFieldId || undefined,
+    },
+    { enabled: !!user?.id && !!selectedSeasonId && !!selectedFieldId }
+  )
+
+  useEffect(() => {
+    setSelectedCropCycleId('')
+  }, [selectedFieldId])
 
   const createReportMutation = trpc.reports.createReportWithHarvest.useMutation({
     onSuccess: () => {
@@ -96,6 +122,7 @@ export default function Page() {
       setNewReportName('')
       setNewReportDate(new Date())
       setSelectedFieldId('')
+      setSelectedCropCycleId('')
       setHarvestQuantity('')
       setHarvestUnit('kg')
       setHarvestInputsUsed('')
@@ -124,6 +151,7 @@ export default function Page() {
       reportName: newReportName,
       dateCreated: newReportDate,
       fieldId: selectedFieldId,
+      cropCycleId: selectedCropCycleId || undefined,
       quantity: parseInt(harvestQuantity, 10),
       unit: harvestUnit,
       inputsUsed: harvestInputsUsed,
@@ -310,6 +338,34 @@ export default function Page() {
 
         {/* Quick Actions */}
         <View className="px-4 mt-6">
+          <View className="mb-4">
+            <Text className="font-bold text-gray-800 mb-2 text-lg">Season</Text>
+            {isLoadingSeasons ? (
+              <ActivityIndicator size="small" color="#16A34A" />
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-row gap-2">
+                  {seasonsData?.seasons?.map((season) => (
+                    <TouchableOpacity
+                      key={season.id}
+                      onPress={() => setSelectedSeasonId(season.id)}
+                      className={`px-4 py-2 rounded-full border ${
+                        selectedSeasonId === season.id
+                          ? 'bg-green-50 border-green-500'
+                          : 'bg-white border-gray-200'
+                      }`}
+                    >
+                      <Text className={`text-sm font-medium ${
+                        selectedSeasonId === season.id ? 'text-green-700' : 'text-gray-600'
+                      }`}>
+                        {season.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            )}
+          </View>
           <Text className="font-bold text-gray-800 mb-3 text-lg">Quick Actions</Text>
           <View className="flex-row justify-between gap-2">
             {[
@@ -770,6 +826,40 @@ export default function Page() {
                     </View>
                   )}
                 </View>
+
+                {selectedFieldId ? (
+                  <View>
+                    <Text className="text-gray-700 font-medium mb-2">Select Crop Cycle</Text>
+                    {fieldCropCycles && fieldCropCycles.length > 0 ? (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
+                        {fieldCropCycles.map((cycle) => (
+                          <TouchableOpacity
+                            key={cycle.id}
+                            onPress={() => setSelectedCropCycleId(cycle.id)}
+                            className={`mr-2 px-4 py-3 rounded-xl border ${
+                              selectedCropCycleId === cycle.id
+                                ? 'bg-green-50 border-green-500'
+                                : 'bg-gray-50 border-gray-200'
+                            }`}
+                          >
+                            <Text className={`font-medium ${selectedCropCycleId === cycle.id ? 'text-green-700' : 'text-gray-800'}`}>
+                              {cycle.crop}
+                            </Text>
+                            <Text className={`text-xs mt-0.5 ${selectedCropCycleId === cycle.id ? 'text-green-600' : 'text-gray-500'}`}>
+                              {cycle.variety || 'General cycle'}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    ) : (
+                      <View className="bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        <Text className="text-gray-500 text-sm">
+                          No crop cycle found for this field in the selected season. One will be created automatically.
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                ) : null}
 
                 <View>
                   <Text className="text-gray-700 font-medium mb-2">Quantity Harvested *</Text>

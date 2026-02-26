@@ -1,9 +1,10 @@
 import { View, Text, ScrollView, TouchableOpacity, Modal, TextInput, Alert, ActivityIndicator, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowLeft, Map, BookOpen, Plus, Camera, CheckCircle, AlertTriangle, ChevronRight, X, Trash2, Edit3, Droplets, Leaf, Search, Bug } from 'lucide-react-native'
 import { trpc, type RouterOutputs } from '../../utils/api'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import * as Location from 'expo-location'
 
 // Type definitions derived from API
 type Field = RouterOutputs['farmerFields']['myFields'][number]
@@ -40,10 +41,12 @@ type FieldStatus = typeof FIELD_STATUSES[number]['value']
 export default function FieldsScreen() {
   // State for active field view
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null)
+  const [selectedSeasonId, setSelectedSeasonId] = useState<string | undefined>(undefined)
 
   // Modal states
   const [showFieldModal, setShowFieldModal] = useState(false)
   const [showActivityModal, setShowActivityModal] = useState(false)
+  const [showCropCycleModal, setShowCropCycleModal] = useState(false)
   const [editingField, setEditingField] = useState<Field | null>(null)
 
   // Field form state
@@ -55,6 +58,11 @@ export default function FieldsScreen() {
   const [fieldSoilType, setFieldSoilType] = useState('')
   const [fieldIrrigation, setFieldIrrigation] = useState('')
   const [fieldNotes, setFieldNotes] = useState('')
+  const [fieldLatitude, setFieldLatitude] = useState('')
+  const [fieldLongitude, setFieldLongitude] = useState('')
+  const [fieldAltitude, setFieldAltitude] = useState('')
+  const [locationAccuracyMeters, setLocationAccuracyMeters] = useState<number | null>(null)
+  const [isCapturingLocation, setIsCapturingLocation] = useState(false)
   const [plantingDate, setPlantingDate] = useState<Date | null>(null)
   const [showPlantingDatePicker, setShowPlantingDatePicker] = useState(false)
 
@@ -64,14 +72,34 @@ export default function FieldsScreen() {
   const [activityQuantity, setActivityQuantity] = useState('')
   const [activityUnit, setActivityUnit] = useState('')
   const [activityInputName, setActivityInputName] = useState('')
+  const [activityCropCycleId, setActivityCropCycleId] = useState<string | null>(null)
   const [activityDate, setActivityDate] = useState(new Date())
   const [showActivityDatePicker, setShowActivityDatePicker] = useState(false)
 
+  // Crop cycle form state
+  const [cycleCrop, setCycleCrop] = useState('')
+  const [cycleVariety, setCycleVariety] = useState('')
+
   // API queries
-  const { data: fields, isLoading, refetch } = trpc.farmerFields.myFields.useQuery()
+  const { data: seasonsData } = trpc.farmerFields.getSeasons.useQuery()
+
+  useEffect(() => {
+    if (!selectedSeasonId && seasonsData?.currentSeason?.id) {
+      setSelectedSeasonId(seasonsData.currentSeason.id)
+    }
+  }, [selectedSeasonId, seasonsData?.currentSeason?.id])
+
+  const { data: fields, isLoading, refetch } = trpc.farmerFields.myFields.useQuery(
+    { seasonId: selectedSeasonId },
+    { enabled: !!selectedSeasonId }
+  )
   const { data: activeField, isLoading: isLoadingField } = trpc.farmerFields.getById.useQuery(
-    { id: activeFieldId! },
-    { enabled: !!activeFieldId }
+    { id: activeFieldId!, seasonId: selectedSeasonId },
+    { enabled: !!activeFieldId && !!selectedSeasonId }
+  )
+  const { data: fieldCropCycles, refetch: refetchCropCycles } = trpc.farmerFields.myCropCycles.useQuery(
+    { fieldId: activeFieldId || undefined, seasonId: selectedSeasonId },
+    { enabled: !!activeFieldId && !!selectedSeasonId }
   )
 
   // Mutations
@@ -110,6 +138,18 @@ export default function FieldsScreen() {
     onError: (error) => Alert.alert("Error", error.message)
   })
 
+  const createCropCycleMutation = trpc.farmerFields.createCropCycle.useMutation({
+    onSuccess: () => {
+      refetch()
+      refetchCropCycles()
+      setShowCropCycleModal(false)
+      setCycleCrop('')
+      setCycleVariety('')
+      Alert.alert("Success", "Crop cycle created")
+    },
+    onError: (error) => Alert.alert("Error", error.message)
+  })
+
   // Form helpers
   const resetFieldForm = () => {
     setFieldName('')
@@ -120,6 +160,10 @@ export default function FieldsScreen() {
     setFieldSoilType('')
     setFieldIrrigation('')
     setFieldNotes('')
+    setFieldLatitude('')
+    setFieldLongitude('')
+    setFieldAltitude('')
+    setLocationAccuracyMeters(null)
     setPlantingDate(null)
     setEditingField(null)
   }
@@ -130,6 +174,7 @@ export default function FieldsScreen() {
     setActivityQuantity('')
     setActivityUnit('')
     setActivityInputName('')
+    setActivityCropCycleId(null)
     setActivityDate(new Date())
   }
 
@@ -143,8 +188,41 @@ export default function FieldsScreen() {
     setFieldSoilType(field.soilType || '')
     setFieldIrrigation(field.irrigationType || '')
     setFieldNotes(field.notes || '')
+    setFieldLatitude(field.latitude?.toString() || '')
+    setFieldLongitude(field.longitude?.toString() || '')
+    setFieldAltitude(field.altitude?.toString() || '')
+    setLocationAccuracyMeters(null)
     setPlantingDate(field.plantingDate ? new Date(field.plantingDate) : null)
     setShowFieldModal(true)
+  }
+
+  const captureCurrentLocation = async () => {
+    try {
+      setIsCapturingLocation(true)
+      const permission = await Location.requestForegroundPermissionsAsync()
+
+      if (permission.status !== 'granted') {
+        Alert.alert('Location Permission Needed', 'Please allow location access to capture accurate field coordinates.')
+        return
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.BestForNavigation,
+      })
+
+      setFieldLatitude(position.coords.latitude.toString())
+      setFieldLongitude(position.coords.longitude.toString())
+      setFieldAltitude(
+        position.coords.altitude !== null && position.coords.altitude !== undefined
+          ? position.coords.altitude.toString()
+          : ''
+      )
+      setLocationAccuracyMeters(position.coords.accuracy ?? null)
+    } catch (error) {
+      Alert.alert('Location Error', 'Could not fetch your location. Try again in an open area with good GPS signal.')
+    } finally {
+      setIsCapturingLocation(false)
+    }
   }
 
   const handleSaveField = () => {
@@ -179,7 +257,31 @@ export default function FieldsScreen() {
       return
     }
 
-    const data = {
+    const latitudeValue = fieldLatitude.trim() ? parseFloat(fieldLatitude) : undefined
+    const longitudeValue = fieldLongitude.trim() ? parseFloat(fieldLongitude) : undefined
+    const altitudeValue = fieldAltitude.trim() ? parseFloat(fieldAltitude) : undefined
+
+    if (fieldLatitude.trim() && (isNaN(latitudeValue as number) || (latitudeValue as number) < -90 || (latitudeValue as number) > 90)) {
+      Alert.alert("Error", "Latitude must be between -90 and 90")
+      return
+    }
+
+    if (fieldLongitude.trim() && (isNaN(longitudeValue as number) || (longitudeValue as number) < -180 || (longitudeValue as number) > 180)) {
+      Alert.alert("Error", "Longitude must be between -180 and 180")
+      return
+    }
+
+    if ((fieldLatitude.trim() && !fieldLongitude.trim()) || (!fieldLatitude.trim() && fieldLongitude.trim())) {
+      Alert.alert("Error", "Please provide both latitude and longitude")
+      return
+    }
+
+    if (fieldAltitude.trim() && isNaN(altitudeValue as number)) {
+      Alert.alert("Error", "Altitude must be a valid number")
+      return
+    }
+
+    const baseData = {
       name: fieldName.trim(),
       crop: fieldCrop.trim(),
       variety: fieldVariety.trim() || undefined,
@@ -192,9 +294,20 @@ export default function FieldsScreen() {
     }
 
     if (editingField) {
-      updateFieldMutation.mutate({ id: editingField.id, ...data })
+      updateFieldMutation.mutate({
+        id: editingField.id,
+        ...baseData,
+        latitude: fieldLatitude.trim() ? latitudeValue : null,
+        longitude: fieldLongitude.trim() ? longitudeValue : null,
+        altitude: fieldAltitude.trim() ? altitudeValue : null,
+      })
     } else {
-      createFieldMutation.mutate(data)
+      createFieldMutation.mutate({
+        ...baseData,
+        latitude: latitudeValue,
+        longitude: longitudeValue,
+        altitude: altitudeValue,
+      })
     }
   }
 
@@ -233,6 +346,7 @@ export default function FieldsScreen() {
 
     logActivityMutation.mutate({
       fieldId: activeFieldId,
+      cropCycleId: activityCropCycleId || undefined,
       activityType,
       description: activityDescription.trim() || undefined,
       quantity: activityQuantity ? parseFloat(activityQuantity) : undefined,
@@ -241,6 +355,268 @@ export default function FieldsScreen() {
       date: activityDate,
     })
   }
+
+  const handleCreateCropCycle = () => {
+    if (!activeFieldId) return
+    if (!selectedSeasonId) {
+      Alert.alert("Error", "Select a season first")
+      return
+    }
+    if (!cycleCrop.trim()) {
+      Alert.alert("Error", "Please enter crop name")
+      return
+    }
+
+    createCropCycleMutation.mutate({
+      fieldId: activeFieldId,
+      seasonId: selectedSeasonId,
+      crop: cycleCrop.trim(),
+      variety: cycleVariety.trim() || undefined,
+      status: 'active',
+    })
+  }
+
+  const renderFieldModal = () => (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={showFieldModal}
+      onRequestClose={() => { setShowFieldModal(false); resetFieldForm() }}
+    >
+      <View className="flex-1 justify-end bg-black/50">
+        <View className="bg-white rounded-t-3xl p-6 h-[90%]">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-xl font-bold text-gray-900">
+              {editingField ? 'Edit Field' : 'Add New Field'}
+            </Text>
+            <TouchableOpacity onPress={() => { setShowFieldModal(false); resetFieldForm() }} className="bg-gray-100 p-2 rounded-full">
+              <X size={24} color="#374151" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+            <View className="gap-4">
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Field Name *</Text>
+                <TextInput
+                  value={fieldName}
+                  onChangeText={setFieldName}
+                  placeholder="e.g., North Field"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                />
+              </View>
+
+              <View className="flex-row gap-3">
+                <View className="flex-1">
+                  <Text className="text-gray-700 font-medium mb-2">Crop *</Text>
+                  <TextInput
+                    value={fieldCrop}
+                    onChangeText={setFieldCrop}
+                    placeholder="e.g., Coffee"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-gray-700 font-medium mb-2">Variety</Text>
+                  <TextInput
+                    value={fieldVariety}
+                    onChangeText={setFieldVariety}
+                    placeholder="e.g., SL-28"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  />
+                </View>
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Size (hectares) *</Text>
+                <TextInput
+                  value={fieldSize}
+                  onChangeText={setFieldSize}
+                  placeholder="2.5"
+                  keyboardType="decimal-pad"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                />
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Status</Text>
+                <View className="flex-row gap-2">
+                  {FIELD_STATUSES.map((status) => (
+                    <TouchableOpacity
+                      key={status.value}
+                      onPress={() => setFieldStatus(status.value)}
+                      className={`flex-1 py-3 rounded-xl border ${
+                        fieldStatus === status.value ? 'bg-green-50 border-green-500' : 'border-gray-200'
+                      }`}
+                    >
+                      <Text className={`text-center text-sm font-medium ${
+                        fieldStatus === status.value ? 'text-green-700' : 'text-gray-600'
+                      }`}>
+                        {status.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Soil Type</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View className="flex-row gap-2">
+                    {SOIL_TYPES.map((soil) => (
+                      <TouchableOpacity
+                        key={soil}
+                        onPress={() => setFieldSoilType(soil)}
+                        className={`px-4 py-2 rounded-lg border ${
+                          fieldSoilType === soil ? 'bg-green-50 border-green-500' : 'border-gray-200'
+                        }`}
+                      >
+                        <Text className={`text-sm ${fieldSoilType === soil ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
+                          {soil}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Irrigation Type</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View className="flex-row gap-2">
+                    {IRRIGATION_TYPES.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        onPress={() => setFieldIrrigation(type)}
+                        className={`px-4 py-2 rounded-lg border ${
+                          fieldIrrigation === type ? 'bg-green-50 border-green-500' : 'border-gray-200'
+                        }`}
+                      >
+                        <Text className={`text-sm ${fieldIrrigation === type ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
+                          {type}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Planting Date</Text>
+                <TouchableOpacity
+                  onPress={() => setShowPlantingDatePicker(true)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3"
+                >
+                  <Text className={plantingDate ? 'text-gray-900' : 'text-gray-400'}>
+                    {plantingDate ? plantingDate.toLocaleDateString() : 'Select date'}
+                  </Text>
+                </TouchableOpacity>
+                {showPlantingDatePicker && (
+                  <DateTimePicker
+                    value={plantingDate || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowPlantingDatePicker(false)
+                      if (selectedDate) setPlantingDate(selectedDate)
+                    }}
+                  />
+                )}
+              </View>
+
+              <View>
+                <View className="flex-row justify-between items-center mb-2">
+                  <Text className="text-gray-700 font-medium">Field Location</Text>
+                  <TouchableOpacity
+                    onPress={captureCurrentLocation}
+                    disabled={isCapturingLocation}
+                    className={`px-3 py-2 rounded-lg ${isCapturingLocation ? 'bg-gray-200' : 'bg-green-100'}`}
+                  >
+                    {isCapturingLocation ? (
+                      <ActivityIndicator size="small" color="#374151" />
+                    ) : (
+                      <Text className="text-green-700 text-sm font-medium">
+                        {fieldLatitude && fieldLongitude ? 'Refresh GPS' : 'Use Current GPS'}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+                <Text className="text-xs text-gray-500 mb-2">
+                  For best accuracy, stand inside the field and wait a few seconds before capturing.
+                </Text>
+                {locationAccuracyMeters !== null && (
+                  <Text className="text-xs text-gray-600 mb-2">
+                    Estimated accuracy: ±{Math.round(locationAccuracyMeters)}m
+                  </Text>
+                )}
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <Text className="text-gray-700 font-medium mb-2">Latitude</Text>
+                    <TextInput
+                      value={fieldLatitude}
+                      onChangeText={setFieldLatitude}
+                      placeholder="-1.2921"
+                      keyboardType="decimal-pad"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-gray-700 font-medium mb-2">Longitude</Text>
+                    <TextInput
+                      value={fieldLongitude}
+                      onChangeText={setFieldLongitude}
+                      placeholder="36.8219"
+                      keyboardType="decimal-pad"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                    />
+                  </View>
+                </View>
+                <View className="mt-3">
+                  <Text className="text-gray-700 font-medium mb-2">Altitude (optional, meters)</Text>
+                  <TextInput
+                    value={fieldAltitude}
+                    onChangeText={setFieldAltitude}
+                    placeholder="1795"
+                    keyboardType="decimal-pad"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  />
+                </View>
+              </View>
+
+              <View>
+                <Text className="text-gray-700 font-medium mb-2">Notes</Text>
+                <TextInput
+                  value={fieldNotes}
+                  onChangeText={setFieldNotes}
+                  placeholder="Any additional notes..."
+                  multiline
+                  numberOfLines={3}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  style={{ textAlignVertical: 'top' }}
+                />
+              </View>
+
+              <TouchableOpacity
+                onPress={handleSaveField}
+                disabled={createFieldMutation.isPending || updateFieldMutation.isPending}
+                className={`w-full bg-green-600 rounded-xl py-4 mt-4 ${
+                  (createFieldMutation.isPending || updateFieldMutation.isPending) ? 'opacity-50' : ''
+                }`}
+              >
+                {(createFieldMutation.isPending || updateFieldMutation.isPending) ? (
+                  <ActivityIndicator color="white" />
+                ) : (
+                  <Text className="text-white text-center font-semibold text-lg">
+                    {editingField ? 'Update Field' : 'Create Field'}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  )
 
   const getStatusColor = (status: string) => {
     return FIELD_STATUSES.find(s => s.value === status)?.color || '#6B7280'
@@ -285,6 +661,40 @@ export default function FieldsScreen() {
         </View>
 
         <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
+          {/* Crop Cycles */}
+          <View className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="font-bold text-gray-800">Crop Cycles</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setCycleCrop(activeField.crop || '')
+                  setCycleVariety(activeField.variety || '')
+                  setShowCropCycleModal(true)
+                }}
+                className="bg-green-100 px-3 py-1.5 rounded-lg"
+              >
+                <Text className="text-green-700 text-xs font-semibold">+ Add Crop Cycle</Text>
+              </TouchableOpacity>
+            </View>
+            {fieldCropCycles && fieldCropCycles.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-row gap-2">
+                  {fieldCropCycles.map((cycle) => (
+                    <View key={cycle.id} className="px-3 py-2 rounded-lg bg-gray-50 border border-gray-200">
+                      <Text className="text-sm font-semibold text-gray-800">{cycle.crop}</Text>
+                      <Text className="text-xs text-gray-500">{cycle.variety || 'General'}</Text>
+                      <Text className="text-xs text-gray-400 mt-0.5 capitalize">{cycle.status}</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <Text className="text-sm text-gray-500">
+                No crop cycles yet in this season. Add one to separate activities by crop.
+              </Text>
+            )}
+          </View>
+
           {/* Status & Size */}
           <View className="flex-row gap-3 mb-4">
             <View className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -456,6 +866,34 @@ export default function FieldsScreen() {
                     </View>
                   </View>
 
+                  {fieldCropCycles && fieldCropCycles.length > 0 ? (
+                    <View>
+                      <Text className="text-gray-700 font-medium mb-2">Crop Cycle</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        <View className="flex-row gap-2">
+                          {fieldCropCycles.map((cycle) => (
+                            <TouchableOpacity
+                              key={cycle.id}
+                              onPress={() => setActivityCropCycleId(cycle.id)}
+                              className={`px-3 py-2 rounded-lg border ${
+                                activityCropCycleId === cycle.id
+                                  ? 'bg-green-50 border-green-500'
+                                  : 'border-gray-200'
+                              }`}
+                            >
+                              <Text className={`text-sm font-medium ${
+                                activityCropCycleId === cycle.id ? 'text-green-700' : 'text-gray-700'
+                              }`}>
+                                {cycle.crop}
+                              </Text>
+                              <Text className="text-xs text-gray-500">{cycle.variety || 'General'}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </ScrollView>
+                    </View>
+                  ) : null}
+
                   <View>
                     <Text className="text-gray-700 font-medium mb-2">Description</Text>
                     <TextInput
@@ -539,6 +977,59 @@ export default function FieldsScreen() {
             </View>
           </View>
         </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showCropCycleModal}
+          onRequestClose={() => setShowCropCycleModal(false)}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <View className="bg-white rounded-t-3xl p-6 h-[55%]">
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-xl font-bold text-gray-900">Add Crop Cycle</Text>
+                <TouchableOpacity onPress={() => setShowCropCycleModal(false)} className="bg-gray-100 p-2 rounded-full">
+                  <X size={24} color="#374151" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="gap-4">
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Crop *</Text>
+                  <TextInput
+                    value={cycleCrop}
+                    onChangeText={setCycleCrop}
+                    placeholder="e.g., Maize"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  />
+                </View>
+                <View>
+                  <Text className="text-gray-700 font-medium mb-2">Variety</Text>
+                  <TextInput
+                    value={cycleVariety}
+                    onChangeText={setCycleVariety}
+                    placeholder="e.g., H614"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
+                  />
+                </View>
+
+                <TouchableOpacity
+                  onPress={handleCreateCropCycle}
+                  disabled={createCropCycleMutation.isPending}
+                  className={`w-full bg-green-600 rounded-xl py-4 mt-2 ${createCropCycleMutation.isPending ? 'opacity-50' : ''}`}
+                >
+                  {createCropCycleMutation.isPending ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-lg">Create Crop Cycle</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {renderFieldModal()}
       </SafeAreaView>
     )
   }
@@ -565,6 +1056,31 @@ export default function FieldsScreen() {
         </TouchableOpacity>
       </View>
 
+      <View className="px-4 mb-3">
+        <Text className="text-gray-700 font-medium mb-2">Season</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View className="flex-row gap-2">
+            {seasonsData?.seasons?.map((season) => (
+              <TouchableOpacity
+                key={season.id}
+                onPress={() => setSelectedSeasonId(season.id)}
+                className={`px-4 py-2 rounded-full border ${
+                  selectedSeasonId === season.id
+                    ? 'bg-green-50 border-green-500'
+                    : 'bg-white border-gray-200'
+                }`}
+              >
+                <Text className={`text-sm font-medium ${
+                  selectedSeasonId === season.id ? 'text-green-700' : 'text-gray-600'
+                }`}>
+                  {season.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+
       <ScrollView
         className="flex-1 px-4 pb-20"
         showsVerticalScrollIndicator={false}
@@ -584,6 +1100,15 @@ export default function FieldsScreen() {
                   <View className="absolute inset-0 items-center justify-center bg-green-50">
                     <Map size={48} color="#DCFCE7" />
                   </View>
+                  <TouchableOpacity
+                    onPress={(event) => {
+                      event.stopPropagation()
+                      openEditField(field)
+                    }}
+                    className="absolute top-2 right-2 p-2 rounded-full bg-white/90 border border-gray-200"
+                  >
+                    <Edit3 size={14} color="#374151" />
+                  </TouchableOpacity>
                   <View className="absolute bottom-2 right-2 bg-black/50 px-2 py-1 rounded">
                     <Text className="text-white text-xs">{field.size} {field.sizeUnit}</Text>
                   </View>
@@ -633,187 +1158,7 @@ export default function FieldsScreen() {
         )}
       </ScrollView>
 
-      {/* Add/Edit Field Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showFieldModal}
-        onRequestClose={() => { setShowFieldModal(false); resetFieldForm() }}
-      >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-3xl p-6 h-[90%]">
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-xl font-bold text-gray-900">
-                {editingField ? 'Edit Field' : 'Add New Field'}
-              </Text>
-              <TouchableOpacity onPress={() => { setShowFieldModal(false); resetFieldForm() }} className="bg-gray-100 p-2 rounded-full">
-                <X size={24} color="#374151" />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              <View className="gap-4">
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Field Name *</Text>
-                  <TextInput
-                    value={fieldName}
-                    onChangeText={setFieldName}
-                    placeholder="e.g., North Field"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
-                  />
-                </View>
-
-                <View className="flex-row gap-3">
-                  <View className="flex-1">
-                    <Text className="text-gray-700 font-medium mb-2">Crop *</Text>
-                    <TextInput
-                      value={fieldCrop}
-                      onChangeText={setFieldCrop}
-                      placeholder="e.g., Coffee"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-gray-700 font-medium mb-2">Variety</Text>
-                    <TextInput
-                      value={fieldVariety}
-                      onChangeText={setFieldVariety}
-                      placeholder="e.g., SL-28"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
-                    />
-                  </View>
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Size (hectares) *</Text>
-                  <TextInput
-                    value={fieldSize}
-                    onChangeText={setFieldSize}
-                    placeholder="2.5"
-                    keyboardType="decimal-pad"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
-                  />
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Status</Text>
-                  <View className="flex-row gap-2">
-                    {FIELD_STATUSES.map((status) => (
-                      <TouchableOpacity
-                        key={status.value}
-                        onPress={() => setFieldStatus(status.value)}
-                        className={`flex-1 py-3 rounded-xl border ${
-                          fieldStatus === status.value ? 'bg-green-50 border-green-500' : 'border-gray-200'
-                        }`}
-                      >
-                        <Text className={`text-center text-sm font-medium ${
-                          fieldStatus === status.value ? 'text-green-700' : 'text-gray-600'
-                        }`}>
-                          {status.label}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Soil Type</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View className="flex-row gap-2">
-                      {SOIL_TYPES.map((soil) => (
-                        <TouchableOpacity
-                          key={soil}
-                          onPress={() => setFieldSoilType(soil)}
-                          className={`px-4 py-2 rounded-lg border ${
-                            fieldSoilType === soil ? 'bg-green-50 border-green-500' : 'border-gray-200'
-                          }`}
-                        >
-                          <Text className={`text-sm ${fieldSoilType === soil ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
-                            {soil}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </ScrollView>
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Irrigation Type</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View className="flex-row gap-2">
-                      {IRRIGATION_TYPES.map((type) => (
-                        <TouchableOpacity
-                          key={type}
-                          onPress={() => setFieldIrrigation(type)}
-                          className={`px-4 py-2 rounded-lg border ${
-                            fieldIrrigation === type ? 'bg-green-50 border-green-500' : 'border-gray-200'
-                          }`}
-                        >
-                          <Text className={`text-sm ${fieldIrrigation === type ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
-                            {type}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </ScrollView>
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Planting Date</Text>
-                  <TouchableOpacity
-                    onPress={() => setShowPlantingDatePicker(true)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3"
-                  >
-                    <Text className={plantingDate ? 'text-gray-900' : 'text-gray-400'}>
-                      {plantingDate ? plantingDate.toLocaleDateString() : 'Select date'}
-                    </Text>
-                  </TouchableOpacity>
-                  {showPlantingDatePicker && (
-                    <DateTimePicker
-                      value={plantingDate || new Date()}
-                      mode="date"
-                      display="default"
-                      onChange={(event, selectedDate) => {
-                        setShowPlantingDatePicker(false)
-                        if (selectedDate) setPlantingDate(selectedDate)
-                      }}
-                    />
-                  )}
-                </View>
-
-                <View>
-                  <Text className="text-gray-700 font-medium mb-2">Notes</Text>
-                  <TextInput
-                    value={fieldNotes}
-                    onChangeText={setFieldNotes}
-                    placeholder="Any additional notes..."
-                    multiline
-                    numberOfLines={3}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-900"
-                    style={{ textAlignVertical: 'top' }}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  onPress={handleSaveField}
-                  disabled={createFieldMutation.isPending || updateFieldMutation.isPending}
-                  className={`w-full bg-green-600 rounded-xl py-4 mt-4 ${
-                    (createFieldMutation.isPending || updateFieldMutation.isPending) ? 'opacity-50' : ''
-                  }`}
-                >
-                  {(createFieldMutation.isPending || updateFieldMutation.isPending) ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text className="text-white text-center font-semibold text-lg">
-                      {editingField ? 'Update Field' : 'Create Field'}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      {renderFieldModal()}
     </SafeAreaView>
   )
 }

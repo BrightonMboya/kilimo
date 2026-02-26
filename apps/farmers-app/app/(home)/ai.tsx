@@ -3,8 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator,
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Sprout, ArrowUp, Trash2, Plus } from 'lucide-react-native'
 import { useAuth } from '@clerk/clerk-expo'
-import { trpc } from '../../utils/api'
-import Constants from 'expo-constants'
+import { trpc, getBaseUrl } from '../../utils/api'
 
 // Local message type for UI
 interface ChatMessage {
@@ -12,18 +11,6 @@ interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
 }
-
-// Get base URL for API calls
-const getBaseUrl = () => {
-  const debuggerHost =
-    Constants.expoConfig?.hostUri ??
-    Constants.manifest?.debuggerHost ??
-    Constants.manifest2?.extra?.expoGo?.debuggerHost;
-  const localhost = debuggerHost?.split(':')[0];
-  if (localhost) return `http://${localhost}:3000`;
-  if (Platform.OS === 'android') return 'http://10.0.2.2:3000';
-  return 'http://localhost:3000';
-};
 
 export default function AssistantScreen() {
   const { getToken } = useAuth()

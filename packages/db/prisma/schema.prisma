@@ -118,6 +118,8 @@ model User {
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   ProjectUsers     ProjectUsers[]
+  seasons          Season[]
+  cropCycles       CropCycle[]
   Farmers          Farmers[]
   Harvests         Harvests[]
   Reports          Reports[]
@@ -328,16 +330,67 @@ model FarmerFields {
 
   // Relations
   activities          FieldActivity[]
+  cropCycles          CropCycle[]
 
   @@index([userId])
   @@index([status])
   @@index([complianceStatus])
 }
 
+enum CropCycleStatus {
+  planned
+  active
+  completed
+}
+
+model Season {
+  id         String      @id @default(cuid())
+  userId     String
+  name       String
+  startDate  DateTime
+  endDate    DateTime
+  isActive   Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cropCycles CropCycle[]
+
+  @@index([userId, isActive])
+  @@index([userId, startDate, endDate])
+}
+
+model CropCycle {
+  id         String           @id @default(cuid())
+  userId     String
+  seasonId   String
+  fieldId    String
+  crop       String
+  variety    String?
+  notes      String?
+  startedAt  DateTime         @default(now())
+  endedAt    DateTime?
+  status     CropCycleStatus  @default(active)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  season     Season           @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  field      FarmerFields     @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  activities FieldActivity[]
+  harvests   Harvests[]
+  reports    Reports[]
+
+  @@index([userId, seasonId])
+  @@index([fieldId, seasonId])
+  @@index([userId, status])
+}
+
 model FieldActivity {
   id            String       @id @default(cuid())
   fieldId       String
   userId        String       // Clerk user ID (who logged this)
+  cropCycleId   String?
 
   activityType  ActivityType
   description   String?
@@ -365,11 +418,13 @@ model FieldActivity {
 
   // Relations
   field         FarmerFields @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  cropCycle     CropCycle?   @relation(fields: [cropCycleId], references: [id], onDelete: SetNull)
 
   @@index([fieldId])
   @@index([userId])
   @@index([activityType])
   @@index([date])
+  @@index([cropCycleId])
 }
 
 model Harvests {
@@ -385,13 +440,16 @@ model Harvests {
   reports    Reports[]
   Project    Project   @relation(fields: [project_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   project_id String
+  cropCycleId String?
 
   // User who created the harvest
   user   User?   @relation(fields: [userId], references: [id])
   userId String?
+  cropCycle CropCycle? @relation(fields: [cropCycleId], references: [id], onDelete: SetNull)
 
   @@index(userId)
   @@index(project_id)
+  @@index(cropCycleId)
 }
 
 model Equipments {
@@ -445,9 +503,12 @@ model Reports {
   // User who created the harvest
   user                 User?                  @relation(fields: [userId], references: [id])
   userId               String?
+  cropCycleId          String?
+  cropCycle            CropCycle?             @relation(fields: [cropCycleId], references: [id], onDelete: SetNull)
 
   @@index(userId)
   @@index(project_id)
+  @@index(cropCycleId)
 }
 
 model ReportTrackingEvents {

@@ -14,11 +14,13 @@ export const trpc = createTRPCReact<AppRouter>();
  * Extend this function when going to production by
  * setting the baseUrl to your production API URL.
  */
-const getBaseUrl = () => {
-  // For production, set your API URL here
-  // return "https://your-production-api.com";
+export const getBaseUrl = () => {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (apiUrl) {
+    return apiUrl;
+  }
 
-  // Try to get the debugger host from Expo
+  // Development fallback: use Expo debugger host
   const debuggerHost =
     Constants.expoConfig?.hostUri ??
     Constants.manifest?.debuggerHost ??
@@ -30,13 +32,10 @@ const getBaseUrl = () => {
     return `http://${localhost}:3000`;
   }
 
-  // Fallbacks for different environments
   if (Platform.OS === "android") {
-    // Android emulator uses 10.0.2.2 to access host machine
     return "http://10.0.2.2:3000";
   }
 
-  // iOS simulator can use localhost
   return "http://localhost:3000";
 };
 
