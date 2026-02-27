@@ -30,10 +30,10 @@ const nextConfig = withMDX({
    *
    * @see https://github.com/vercel/next.js/issues/41980
    */
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
-  },
+  // i18n: {
+  //   locales: ["en"],
+  //   defaultLocale: "en",
+  // },
   // who gives a damn about eslint while you can just ship stuff
   typescript: {
     ignoreBuildErrors: true,

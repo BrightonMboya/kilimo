@@ -4,7 +4,7 @@ import {
   ShadCnAvatar as Avatar,
   AvatarFallback,
   AvatarImage,
-} from "~/components/ui/avatar";
+} from "~/components//ui/avatar";
 import { authors } from "~/content/blog/authors";
 import { cn } from "@kilimo/utils";
 import { allPosts } from "content-collections";
@@ -13,7 +13,7 @@ import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import styles from "~/components/landingPage/gradient.module.css"
+import styles from "~/components/landingPage/oldComponents/gradient.module.css"
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({

@@ -1,5 +1,3 @@
-import Layout from "~/components/Layout/HomeLayout";
-
-export default function Page({ children }: { children: React.ReactNode }) {
-  return <Layout>{children}</Layout>;
+export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

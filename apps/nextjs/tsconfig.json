@@ -41,6 +41,6 @@
     ".next/types/**/*.ts",
     "next.config.mjs",
     "src/app/(legal)/terms/page.mdx"
-  ],
+, "src/app/(marketing)/layout.tsx"  ],
   "exclude": ["node_modules"]
 }

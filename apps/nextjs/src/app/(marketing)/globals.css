@@ -1,0 +1,229 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-Regular.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-Light.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-Medium.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-SemiBold.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-Bold.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/static/Fonts/Oswald/Oswald-Heavy.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/Oswald-Heavy.woff') format('woff');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald Stencil';
+  src: url('/static/Fonts/Oswald/OswaldStencil-Bold.woff2') format('woff2'),
+       url('/static/Fonts/Oswald/OswaldStencil-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Impact';
+  src: url('/static/Fonts/impact/impact.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Impacted';
+  src: url('/static/Fonts/impact/Impacted.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto';
+  src: url('/static/Fonts/Noto/NotoSansArabic-Bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto';
+  src: url('/static/Fonts/Noto/NotoSansArabic-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto';
+  src: url('/static/Fonts/Noto/NotoSansArabic-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: white) {
+  :root {
+    --foreground: #0a0a0a;
+    --background: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-noto {
+  font-family: 'Noto', sans-serif;
+}
+
+.font-impact {
+  font-family: 'Impact', sans-serif;
+}
+
+.font-impacted {
+  font-family: 'Impacted', sans-serif;
+}
+
+.font-oswald {
+  font-family: 'Oswald', sans-serif;
+}
+
+.font-oswald-stencil {
+  font-family: 'Oswald Stencil', sans-serif;
+}
+
+.text-responsive-xs {
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.125rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+}
+
+.text-responsive-2xl {
+font-size: clamp(0.9375rem, 0.5469rem + 1.25vw, 1.25rem);
+line-height: clamp(0.9375rem, 0.5469rem + 1.25vw, 1rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(1.875rem, 1.5rem + 1.875vw, 2.25rem);
+  line-height: clamp(1.875rem, 1.5rem + 1.875vw, 2rem);
+}
+
+.text-responsive-4xl {
+font-size: clamp(1.875rem, 1.0938rem + 2.5vw, 2.5rem);
+line-height: clamp(1.875rem, 1.0938rem + 2.5vw, 2rem);
+}
+
+.text-responsive-5xl {
+  font-size: clamp(3rem, 2.5rem + 2.5vw, 3.75rem);
+  line-height: clamp(3rem, 2.5rem + 2.5vw, 4rem);
+}
+
+.text-responsive-6xl {
+  font-size: clamp(3.75rem, 3rem + 3.75vw, 4.5rem);
+  line-height: clamp(3.75rem, 3rem + 3.75vw, 4rem);
+}
+
+.text-responsive-7xl {
+  font-size: clamp(4.5rem, 3.5rem + 5vw, 6rem);
+  line-height: clamp(4.5rem, 3.5rem + 5vw, 5rem);
+}
+
+.text-responsive-8xl {
+  font-size: clamp(6rem, 4.5rem + 7.5vw, 8rem);
+  line-height: clamp(6rem, 4.5rem + 7.5vw, 7rem);
+}
+
+.text-responsive-9xl {
+  font-size: clamp(5rem, 1.25rem + 12vw, 8rem);
+  line-height: clamp(5rem, 1.25rem + 12vw, 8rem);
+}
+
+.text-responsive-10xl {
+  font-size: clamp(5rem, -1.5625rem + 12vw, 10rem);
+  line-height: clamp(5rem, -1.5625rem + 12vw, 10rem);
+}
+
+.gradient_gradient__buN4_ {
+  --line:#aca7a7;
+  content:"";
+  position:absolute;
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,var(--line) 1px,transparent 1px 10vmin) 0 -5vmin /10vmin 10vmin,linear-gradient(var(--line) 1px,transparent 1px 10vmin) 0 -5vmin /10vmin 10vmin;
+  -webkit-mask:linear-gradient(-25deg,transparent 30%,#fff);
+  mask:linear-gradient(-25deg,transparent 30%,#fff);
+  top:0;
+  box-sizing:border-box;
+  z-index: 10
+}

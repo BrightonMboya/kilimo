@@ -1,24 +1,14 @@
 import {
-  About,
-  Call2Action,
-  Faq,
-  Features,
-  HeroSection,
-  Pricing,
-} from "~/components/landingPage";
+  // About,
+  // Call2Action,
+  // Faq,
+  // Features,
+  // HeroSection,
+  // Pricing,
+} from "~/components/landingPage/oldComponents";
 
+import { redirect } from 'next/navigation';
 
-function Page() {
-  return (
-    <>
-      <HeroSection />
-      <Features />
-      <About />
-      <Call2Action />
-      {/* <Pricing /> */}
-      <Faq />
-    </>
-  );
+export default function Page() {
+  redirect('/en');
 }
-
-export default Page;

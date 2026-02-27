@@ -1,6 +1,6 @@
 import * as React from "react";
-import Footer from "~/components/landingPage/Footer";
-import { Navigation } from "../landingPage/nav/navigation";
+import Footer from "~/components/landingPage/oldComponents/Footer";
+import { Navigation } from "../landingPage/oldComponents/nav/navigation";
 
 type Props = {
   children: React.ReactNode;

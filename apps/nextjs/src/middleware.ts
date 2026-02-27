@@ -3,13 +3,12 @@ import authConfig from "./utils/lib/auth/auth.config";
 
 export const config = {
   matcher: [
-    "/((?!.*\\..*|_next).*)",
-    "/",
-    "/(api|trpc)(.*)",
+    "/dashboard/:path*",
+    "/welcome/:path*",
+    "/reports/:path*",
   ],
 };
 
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
-});
+export default auth((req) => {});
