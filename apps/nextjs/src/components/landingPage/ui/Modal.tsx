@@ -32,7 +32,7 @@ export default function Modal({ open, onClose, children, className = '' }: Modal
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-9999 flex items-center justify-center pointer-events-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto"
           role="dialog"
           aria-modal="true"
           initial="hidden"
@@ -46,7 +46,7 @@ export default function Modal({ open, onClose, children, className = '' }: Modal
           />
 
           <motion.div
-            className={`relative z-10 max-w-7xl w-full max-h-200 h-full mx-4 p-2 bg-white rounded-xl shadow-xl ${className}`}
+            className={`relative z-10 max-w-7xl w-full max-h-[90vh] h-full mx-4 p-2 bg-white rounded-xl shadow-xl ${className}`}
             variants={panelVariants}
             onClick={(e) => e.stopPropagation()}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}

@@ -198,7 +198,7 @@ export default function CustomCursor() {
   const containerStyle: React.CSSProperties = { direction: 'ltr' };
 
   return (
-    <div style={containerStyle} className="fixed top-0 left-0 w-full h-full pointer-events-none z-9999 mix-blend-exclusion opacity-55">
+    <div style={containerStyle} className="fixed top-0 left-0 w-full h-full pointer-events-none z-[9998] mix-blend-exclusion opacity-55">
       <div
         ref={verticalRef1}
         className="absolute top-0 left-0 w-px border-l-2 border-dashed border-white"

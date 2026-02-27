@@ -69,7 +69,7 @@ export default function Hero({ className }: HeroProps) {
   }, []);
 
   return (
-    <div ref={heroRef} className='relative w-full h-screen overflow-hidden z-100'>
+    <div ref={heroRef} className='relative w-full h-screen overflow-hidden z-[100]'>
       <div className="w-full h-screen absolute">
         <div className="h-full w-full overflow-hidden">
           <Image
@@ -77,7 +77,6 @@ export default function Hero({ className }: HeroProps) {
               alt="Green Farm"
               fill
               priority
-              loading="eager"
               className="object-cover scale-110"
           />
         </div>

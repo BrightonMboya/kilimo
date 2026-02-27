@@ -93,7 +93,7 @@ export default function Carousel({ className }: CarouselProps) {
                     </AnimatePresence>
                 </ParallaxAnimation>
             </div>
-            <div className='w-full h-5/7 flex gap-2 pr-10 pl-6 overflow-visible'>
+            <div className='w-full h-5/6 flex gap-2 pr-10 pl-6 overflow-visible'>
                 <motion.div 
                     className='h-full w-1/5 flex items-start'
                     transition={{ duration: 0.8, delay: 0.2 }}
@@ -169,7 +169,7 @@ export default function Carousel({ className }: CarouselProps) {
                     </ParallaxAnimation>
                 </motion.div>
             </div>
-            <div className='w-full h-1/7 gap-10 flex justify-between text-[50px] font-light  p-4 flex-row whitespace-nowrap'>
+            <div className='w-full h-1/6 gap-10 flex justify-between text-[50px] font-light  p-4 flex-row whitespace-nowrap'>
                 <ParallaxAnimation speed={1} className=' h-full w-fit flex flex-row justify-center items-center'>
                     <AnimatePresence mode="wait">
                         <motion.p
@@ -186,7 +186,7 @@ export default function Carousel({ className }: CarouselProps) {
                 <div className='h-full w-full flex justify-center items-center gap-2'>
                     {products.map((product, index) => {
                         const isActive = index === currentIndex;
-                        const size = isActive ? 'w-22 h-22' : 'w-15 h-15';
+                        const size = isActive ? 'w-[5vw] h-[5vw]' : 'w-[4vw] h-[4vw]';
                         const blend = isActive ? 'mix-blend-normal' : 'mix-blend-luminosity';
                         
                         return (

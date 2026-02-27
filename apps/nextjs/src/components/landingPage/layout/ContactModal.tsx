@@ -10,7 +10,6 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
   const t = useTranslations('contact');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -24,7 +23,6 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
         body: JSON.stringify({
           name,
           email,
-          phoneLocal: phone,
           message,
         }),
       });
@@ -36,7 +34,6 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
 
       setName('');
       setEmail('');
-      setPhone('');
       setMessage('');
       setTimeout(() => {
         onClose();
@@ -53,7 +50,7 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
       <div className="flex h-full w-full flex-row gap-4 text-black z-9999">
         <div className='relative bg-amber-300 w-1/2 h-full rounded-lg overflow-hidden'>
           <Image
-            src="/why-jani-bg.jpg"
+            src="/static/images/why-jani-bg.jpg"
             alt="Contact bg"
             fill
             loading="eager"
