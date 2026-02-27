@@ -91,7 +91,7 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
             </form>
           </div>
             <div className="w-full flex justify-center items-center">
-              <Button className='w-1/2 bg-green-700 hover:bg-green-500' type="submit" variant="black" size="md" disabled={submitting}>
+              <Button onClick={handleSubmit} className='w-1/2 bg-green-700 hover:bg-green-500' type="submit" variant="black" size="md" disabled={submitting}>
                 {submitting ? t('sending') : t('sendMessage')}
               </Button>
             </div>

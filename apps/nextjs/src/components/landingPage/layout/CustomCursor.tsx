@@ -84,9 +84,7 @@ export default function CustomCursor() {
 
     const hoverHandler = (e: Event) => {
       hoveredElRef.current = e.currentTarget as HTMLElement;
-      console.log('Hover handler triggered on:', hoveredElRef.current);
       const rect = hoveredElRef.current.getBoundingClientRect();
-      console.log('Rect:', rect);
       
       const hasRounded = hoveredElRef.current.classList.contains('rounded') || 
                          Array.from(hoveredElRef.current.classList).some(cls => cls.startsWith('rounded-'));
@@ -166,7 +164,6 @@ export default function CustomCursor() {
       );
       console.log('Found cursor-expand elements:', expandables.length, expandables);
       expandables.forEach((el) => {
-        console.log('Attaching to:', el);
         el.removeEventListener("mouseenter", hoverHandler);
         el.removeEventListener("mouseleave", leaveHandler);
         el.addEventListener("mouseenter", hoverHandler);
