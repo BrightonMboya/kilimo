@@ -59,7 +59,7 @@ export default function Carousel({ className }: CarouselProps) {
     };
     
     return (
-        <div className='relative w-screen h-[110vh] flex flex-col overflow-hidden p-4 py-10 pb-30 bg-white z-11'>
+        <section className='relative w-screen h-screen flex flex-col overflow-hidden p-4 py-10 pb-30 bg-white z-11'>
             <div className='w-full h-1/7 gap-2 mt-10 flex justify-between text-[50px] font-light  p-4 flex-row  whitespace-nowrap'>
                 <ParallaxAnimation speed={1.5} className=' h-full w-fit flex flex-row justify-center items-center'>
                     <AnimatePresence mode="wait">
@@ -230,6 +230,6 @@ export default function Carousel({ className }: CarouselProps) {
                     </AnimatePresence>
                 </ParallaxAnimation>
             </div>
-        </div>
+        </section>
     );
 }

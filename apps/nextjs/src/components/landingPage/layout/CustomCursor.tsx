@@ -6,8 +6,6 @@ import { gsap } from "gsap";
 export default function CustomCursor() {
   const [mounted, setMounted] = useState(false);
 
-  const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
-
   const verticalRef1 = useRef<HTMLDivElement>(null);
   const verticalRef2 = useRef<HTMLDivElement>(null);
   const horizontalRef1 = useRef<HTMLDivElement>(null);
@@ -18,11 +16,6 @@ export default function CustomCursor() {
   const gap = 20;
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
 
     const v1 = verticalRef1.current;
     const v2 = verticalRef2.current;
@@ -30,7 +23,7 @@ export default function CustomCursor() {
     const h2 = horizontalRef2.current;
     const gapEl = gapRef.current;
 
-    if (!v1 || !v2 || !h1 || !h2 || !gapEl) return;
+    if (!v1 || !v2 || !h1 || !h2 || !gapEl) return; // this is enough for handling rendering
 
     const moveHandler = (e: MouseEvent) => {
       let x = e.clientX;
@@ -162,7 +155,6 @@ export default function CustomCursor() {
       const expandables = document.querySelectorAll<HTMLElement>(
         ".cursor-expand"
       );
-      console.log('Found cursor-expand elements:', expandables.length, expandables);
       expandables.forEach((el) => {
         el.removeEventListener("mouseenter", hoverHandler);
         el.removeEventListener("mouseleave", leaveHandler);
