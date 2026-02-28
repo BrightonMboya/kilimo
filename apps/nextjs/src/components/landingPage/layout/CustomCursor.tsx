@@ -16,6 +16,10 @@ export default function CustomCursor() {
   const gap = 20;
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
 
     const v1 = verticalRef1.current;
     const v2 = verticalRef2.current;
@@ -23,7 +27,7 @@ export default function CustomCursor() {
     const h2 = horizontalRef2.current;
     const gapEl = gapRef.current;
 
-    if (!v1 || !v2 || !h1 || !h2 || !gapEl) return; // this is enough for handling rendering
+    if (!v1 || !v2 || !h1 || !h2 || !gapEl) return;
 
     const moveHandler = (e: MouseEvent) => {
       let x = e.clientX;
