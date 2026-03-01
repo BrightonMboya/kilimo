@@ -1,8 +1,41 @@
 "use client";
 import Link from "next/link";
-import { FEATURES_LIST } from "./content";
 import { Github, LinkedIn } from "~/components/ui/icons";
 import { Logo, MaxWidthWrapper } from "~/components/ui";
+
+const FEATURES_LIST = [
+  {
+    title: "Farmer Management",
+    description: "Manage records for your farmers",
+    // icon: ChartLine,
+    href: "#",
+  },
+  {
+    title: "Traceability Reports",
+    description: "Reports that map out your supply chain",
+    // icon: Hyperlink,
+    href: "#",
+  },
+  {
+    title: "QR Codes",
+    description: "Gorgeous QR codes for your traceability reports",
+    // icon: QRCode,
+    href: "#",
+  },
+  {
+    title: "Personalization",
+    description: "Personalize Your Reports",
+    // icon: Paintbrush,
+    href: "#",
+  },
+  {
+    title: "Collaboration",
+    description: "Collaborate With Your Team",
+    // icon: Users,
+    href: "#",
+  },
+
+];
 
 const navigation = {
   features: FEATURES_LIST.map(({ title, href }) => ({
@@ -30,7 +63,7 @@ export default function Footer() {
       <MaxWidthWrapper className="relative z-10 overflow-hidden border border-b-0 border-gray-200 bg-white/50 pb-60 pt-16 backdrop-blur-lg md:rounded-t-2xl">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-6">
-            <Link href="/" className="block max-w-fit">
+            <Link href="/apps/nextjs/public" className="block max-w-fit">
               <span className="sr-only">
                 {process.env.NEXT_PUBLIC_APP_NAME} Logo
               </span>

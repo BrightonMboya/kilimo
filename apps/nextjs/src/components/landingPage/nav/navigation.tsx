@@ -56,7 +56,7 @@ export function Navigation() {
       animate="visible"
     >
       <div className="container flex items-center justify-between">
-        <Link href="/" aria-label="Home">
+        <Link href="/apps/nextjs/public" aria-label="Home">
           <Logo className="min-w-[50px]" />
         </Link>
         <div className="flex w-full items-center justify-end sm:w-auto sm:gap-12 lg:justify-between lg:gap-20 ">
@@ -103,7 +103,7 @@ function MobileLinks({ className }: { className?: string }) {
               <li>
                 <MobileNavLink
                   onClick={() => setIsOpen(false)}
-                  href="/"
+                  href="/apps/nextjs/public"
                   label="Home"
                 />
               </li>

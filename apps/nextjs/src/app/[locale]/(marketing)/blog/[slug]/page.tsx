@@ -13,7 +13,7 @@ import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import styles from "~/components/landingPage/oldComponents/gradient.module.css"
+import styles from "~/components/landingPage/gradient.module.css"
 
 export const generateStaticParams = async () =>
   allPosts.map((post) => ({
