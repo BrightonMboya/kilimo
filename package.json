@@ -11,14 +11,9 @@
     "postinstall": "cd packages/db && pnpm prisma generate"
   },
   "devDependencies": {
+    "typescript": "^5.1.6",
     "prettier": "^3.1.0",
-    "turbo": "^1.12.4",
-    "typescript": "^5.1.6"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "estree-walker@3.0.3": "patches/estree-walker@3.0.3.patch"
-    }
+    "turbo": "^1.12.4"
   },
   "packageManager": "pnpm@9.4.0"
 }
