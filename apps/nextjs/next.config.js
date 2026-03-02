@@ -26,14 +26,9 @@ const nextConfig = withMDX({
   },
 
   /**
-   * If you are using `appDir` then you must comment the below `i18n` config out.
-   *
+   * i18n is handled by next-intl middleware in the App Router.
    * @see https://github.com/vercel/next.js/issues/41980
    */
-  // i18n: {
-  //   locales: ["en"],
-  //   defaultLocale: "en",
-  // },
   // who gives a damn about eslint while you can just ship stuff
   typescript: {
     ignoreBuildErrors: true,
