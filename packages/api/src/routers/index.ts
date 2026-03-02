@@ -12,3 +12,4 @@ export { default as fields } from "./fields";
 export { default as financialRecords } from "./financialRecords";
 export { default as farmerFields } from "./farmerFields";
 export { default as chat } from "./chat";
+export { default as contact } from "./contact";

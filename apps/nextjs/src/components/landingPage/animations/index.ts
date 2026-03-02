@@ -1,0 +1,1 @@
+export { default as ParallaxAnimation } from './ParallaxAnimation'

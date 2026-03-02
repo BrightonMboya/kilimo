@@ -1,0 +1,87 @@
+{
+    "site": {
+        "title": "JANI",
+        "description": "Généré par Hamza Ouadia"
+    },
+    "contact": {
+        "getInTouch": "Contactez-nous",
+        "subTitle": "Pour plus d’informations",
+        "sendMessage": "Envoyer un message",
+        "sending": "Envoi…",
+        "placeholder": {
+            "name": "Votre nom",
+            "email": "Votre e-mail",
+            "message": "Votre message",
+            "phone": "Votre numéro de téléphone"
+        },
+        "thanks": "Merci — votre message a été envoyé.",
+        "error": "Une erreur s'est produite. Veuillez réessayer."
+    }
+        ,
+        "hero": {
+            "powering": "Alimente",
+            "roles": {
+                "exporters": "Exportateurs",
+                "growers": "Producteurs",
+                "coops": "Coopératives",
+                "farmers": "Agriculteurs",
+                "millers": "Meuniers"
+            },
+            "trace": "Tracer",
+            "foodFrom": "nourriture de",
+            "farm": "ferme",
+            "to": "à",
+            "fork": "FOURCHETTE",
+            "bookDemo": "Réserver une démo"
+        }
+        ,
+        "navbar": {
+            "joinWaitlist": "Inscrivez-vous"
+        },
+        "finalCta": {
+            "title": "Prêt à numériser la traçabilité agricole en Afrique et au-delà ?",
+            "requestPilot": "Demander un pilote",
+            "ctaLabel": "Rejoindre la liste d'attente"
+        },
+        "footer": {
+            "readyTitle": "Prêt à démarrer votre JANI ?",
+            "getInTouch": "Contactez-nous",
+            "links": {
+                "about": "À propos",
+                "features": "Fonctionnalités",
+                "pricing": "Tarifs",
+                "blog": "Blog"
+            }
+        },
+        "joinJani": {
+            "join": "Rejoindre",
+            "our": "notre",
+            "jani": "JANI",
+            "subtitle": "Simple Rapide Abordable",
+            "steps": {
+                "step1": { "title": "S'inscrire", "description": "Intégrez votre ferme ou coopérative en quelques minutes." },
+                "step2": { "title": "Enregistrer", "description": "Enregistrez les KDEs et suivez les événements critiques" },
+                "step3": { "title": "Rapporter", "description": "Générez des rapports de traçabilité" }
+            }
+        },
+        "traceability": {
+            "title": "Pourquoi JANI ?",
+            "item1": { "title": "Traçabilité", "description": "Visibilité complète des lots du champ à l'étagère." },
+            "item2": { "title": "Conformité", "description": "EUDR & USDA, FDA FSMA 204 prêt par conception." },
+            "item3": { "title": "Qualité", "description": "QMS intégré pour répondre aux normes mondiales" },
+            "item4": { "title": "Certifications", "description": "Générez des rapports pour faciliter les certifications" },
+            "item5": { "title": "Confiance", "description": "Renforcez la confiance des consommateurs et des acheteurs" }
+        }
+        ,
+        "carousel": {
+            "ourValueChains": "Nos chaînes de valeur",
+            "products": {
+                "olive": "Huile d'olive",
+                "coffee": "Café",
+                "tea": "Thé",
+                "fruits": "Fruits",
+                "vegetables": "Légumes",
+                "cereals": "Céréales"
+            }
+        }
+}

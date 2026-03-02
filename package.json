@@ -11,9 +11,9 @@
     "postinstall": "cd packages/db && pnpm prisma generate"
   },
   "devDependencies": {
-    "turbo": "^1.12.4",
     "typescript": "^5.1.6",
-    "prettier": "^3.1.0"
+    "prettier": "^3.1.0",
+    "turbo": "^1.12.4"
   },
   "packageManager": "pnpm@9.4.0"
 }

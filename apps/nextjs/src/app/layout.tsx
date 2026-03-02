@@ -42,8 +42,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: {
+                                     children,
+                                   }: {
   children: React.ReactNode;
 }) {
   return (
@@ -51,15 +51,15 @@ export default function RootLayout({
     <head>
       <link rel="manifest" href="/manifest.json" />
     </head>
-      <body className={`${GeistSans.className} font-sans`}>
-        {/* <Toaster closeButton className="pointer-events-auto" />  */}
-        <Toaster />
-        <Analytics/>
-        {/* <ShadToaster /> */}
-        <TRPCReactProvider headers={headers()}>
-          <ModalProvider>{children}</ModalProvider>
-        </TRPCReactProvider>
-      </body>
+    <body className={`${GeistSans.className} font-sans`}>
+    {/* <Toaster closeButton className="pointer-events-auto" />  */}
+    <Toaster />
+    <Analytics/>
+    {/* <ShadToaster /> */}
+    <TRPCReactProvider headers={headers()}>
+      <ModalProvider>{children}</ModalProvider>
+    </TRPCReactProvider>
+    </body>
     </html>
   );
 }
