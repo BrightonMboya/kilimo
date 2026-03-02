@@ -81,7 +81,7 @@ const AssetPageSection = () => {
       <div>
         <div className="mt-10 hidden rounded-md border-2 border-primary shadow-lg md:block">
                     <img
-                      src="/static/images/product.png"
+                      src="/images/product.png"
                       alt="hero"
                       className="mx-auto max-w-full rounded-md rounded-t-xl rounded-tr-xl"
                     />
@@ -94,7 +94,7 @@ const AssetPageSection = () => {
         <div>
         <div className="mt-10 hidden rounded-md border-2 border-primary shadow-lg md:block">
                     <img
-                      src="/static/images/product.png"
+                      src="/images/product.png"
                       alt="hero"
                       className="mx-auto max-w-full rounded-md rounded-t-xl rounded-tr-xl"
                     />

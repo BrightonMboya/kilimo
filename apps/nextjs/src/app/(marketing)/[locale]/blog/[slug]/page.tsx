@@ -4,7 +4,7 @@ import {
   ShadCnAvatar as Avatar,
   AvatarFallback,
   AvatarImage,
-} from "~/components//ui/avatar";
+} from "~/components/ui/avatar";
 import { authors } from "~/content/blog/authors";
 import { cn } from "@kilimo/utils";
 import { allPosts } from "content-collections";

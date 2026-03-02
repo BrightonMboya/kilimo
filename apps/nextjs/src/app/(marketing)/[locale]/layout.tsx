@@ -5,7 +5,7 @@ import { getMessages } from "next-intl/server";
 import SmoothScrollProvider from "~/components/landingPage/providers/SmoothScrollProvider";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { baseUrl } from "../sitemap";
+import { baseUrl } from "../../sitemap";
 
 const supported = ["en", "fr", "ar"] as const;
 
