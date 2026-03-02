@@ -5,44 +5,31 @@ import { useTranslations } from 'next-intl';
 import Modal from '~/components/landingPage/ui/Modal';
 import { Button } from '~/components/landingPage/ui';
 import Image from 'next/image';
+import { api } from '~/trpc/react';
 
 export default function ContactModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useTranslations('contact');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [submitting, setSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          message,
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error || 'Email send failed');
-      }
-
+  const sendContact = api.contact.send.useMutation({
+    onSuccess: () => {
       setName('');
       setEmail('');
       setMessage('');
       setTimeout(() => {
         onClose();
       }, 5600);
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    sendContact.mutate({ name, email, message });
   }
 // why-jani-bg.jpg
   return (
@@ -97,9 +84,9 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
                 type="submit" 
                 variant="primary"  // already has rounded-lg + green
                 size="md" 
-                disabled={submitting}
+                disabled={sendContact.isPending}
               >
-                {submitting ? t('sending') : t('sendMessage')}
+                {sendContact.isPending ? t('sending') : t('sendMessage')}
               </Button>
             </div>
         </div>

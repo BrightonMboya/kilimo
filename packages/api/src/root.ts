@@ -14,6 +14,7 @@ import {
   financialRecords,
   farmerFields,
   chat,
+  contact,
 } from "./routers";
 
 /**
@@ -36,6 +37,7 @@ export const appRouter = createTRPCRouter({
   financialRecords,
   farmerFields,
   chat,
+  contact,
 });
 
 // export type definition of API
