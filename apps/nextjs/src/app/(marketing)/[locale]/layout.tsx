@@ -11,10 +11,10 @@ const supported = ["en", "fr", "ar"] as const;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  title: { default: "Jani AI", template: "%s | Jani AI" },
+  title: { default: "JANI AI", template: "%s | JANI AI" },
   description: "Jani AI allows you to track food and other resources across the supply chain, letting you provide transparency and trust to your clients.",
   openGraph: {
-    title: "Jani AI",
+    title: "JANI AI",
     description: "A food traceability software",
     url: baseUrl,
     siteName: "Jani AI allows you to track food and other resources across the supply chain, letting you provide transparency and trust to your clients.",

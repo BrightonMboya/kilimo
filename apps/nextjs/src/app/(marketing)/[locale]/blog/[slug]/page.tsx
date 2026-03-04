@@ -30,12 +30,12 @@ export function generateMetadata({
     notFound();
   }
   return {
-    title: `${post.title} | Jani AI`,
+    title: `${post.title} | JANI AI`,
     description: post.description,
   
 
     openGraph: {
-      title: `${post.title} | Jani AI`,
+      title: `${post.title} | JANI AI`,
       description: post.description,
       url: `https://jani-ai.com/${post._meta.path}`,
       siteName: "jani-ai.com",
@@ -52,7 +52,7 @@ export function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${post.title} | Jani AI`,
+      title: `${post.title} | JANI AI`,
       description: post.description,
       site: "@jani-ai",
       creator: "@jani-ai",

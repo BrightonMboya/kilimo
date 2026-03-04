@@ -11,10 +11,10 @@ import { type Post, allPosts } from "content-collections";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Blog | Jani AI",
+  title: "Blog | JANI AI",
   description: "Latest blog posts and news from JANI AI team.",
   openGraph: {
-    title: "Blog | Jani AI",
+    title: "Blog | JANI AI",
     description: "Latest blog posts and news from JANI AI team.",
     url: "https://jani-ai.com/blogs",
     siteName: "jani-ai.com",
@@ -27,7 +27,7 @@ export const metadata = {
     ],
   },
   twitter: {
-    title: "Blog | Jani AI",
+    title: "Blog | JANI AI",
     card: "summary_large_image",
   },
 };
