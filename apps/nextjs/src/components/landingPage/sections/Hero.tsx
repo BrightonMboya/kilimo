@@ -3,10 +3,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '~/components/landingPage/ui';
-import { ArrowUpRight, Download } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import ParallaxAnimation from '~/components/landingPage/animations/ParallaxAnimation';
-import MouseFollow from '~/components/landingPage/animations/MouseFollow';
 import { useTranslations } from 'next-intl';
 
 interface HeroProps {
@@ -69,8 +68,8 @@ export default function Hero({ className }: HeroProps) {
   }, []);
 
   return (
-    <div ref={heroRef} className='relative w-full h-screen overflow-hidden z-[100]'>
-      <div className="w-full h-screen absolute">
+    <div ref={heroRef} className='relative z-[100] h-[100svh] min-h-[100svh] w-full overflow-hidden'>
+      <div className="absolute h-full w-full">
         <div className="h-full w-full overflow-hidden">
           <Image
               src="/static/images/Hero-bg.jpg"
@@ -81,10 +80,10 @@ export default function Hero({ className }: HeroProps) {
           />
         </div>
       </div>
-        <div className='w-screen h-full z-10 relative flex flex-col items-center justify-center pt-25'>
-            <ParallaxAnimation speed={ 2 } className='w-full h-fit text-white flex flex-col justify-center items-center p-4 gap-4'>
+        <div className='relative z-10 flex h-full w-full flex-col items-center justify-center px-3 pb-8 pt-24 md:pt-25'>
+            <ParallaxAnimation speed={ 2 } className='flex h-fit w-full flex-col items-center justify-center gap-3 p-3 text-white md:gap-4 md:p-4'>
                 <div className='w-fit h-fit p-2 cursor-expand'>
-                  <p className='font-medium text-responsive-6xl'>{t('powering')}</p>
+                  <p className='text-center font-medium text-responsive-6xl'>{t('powering')}</p>
                 </div>
                 <div className='w-fit h-fit overflow-visible cursor-expand'>
                     <AnimatePresence mode="wait">
@@ -94,33 +93,33 @@ export default function Hero({ className }: HeroProps) {
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: -100, opacity: 0 }}
                             transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            className='font-extrabold text-responsive-10xl p-2 uppercase font-impact'
+                            className='p-2 text-center font-impact text-responsive-10xl font-extrabold uppercase'
                         >
                           {roles[currentRoleIndex]}
                         </motion.p>
                     </AnimatePresence>
                 </div>
-                <div className='w-fit h-fit flex flex-col justify-center items-center gap-1'>
-                    <p className='font-bold p-2 text-responsive-5xl cursor-expand uppercase font-impact'>{t('trace')}</p>
-                    <p className='font-medium p-2 text-responsive-4xl whitespace-nowrap'>{t('foodFrom')}</p>
-                    <div className='flex flex-row  justify-center items-center'>
-                      <p className='font-bold p-2 text-responsive-5xl cursor-expand uppercase font-impact'>{t('farm')}</p>
-                      <p className='font-medium p-2 text-responsive-4xl whitespace-nowrap'>{t('to')}</p>
-                      <p className='font-bold p-2 text-responsive-5xl cursor-expand uppercase font-impact'>{t('fork')}</p>
+                <div className='flex h-fit w-fit flex-col items-center justify-center gap-1'>
+                    <p className='cursor-expand p-2 text-responsive-5xl text-center font-impact font-bold uppercase'>{t('trace')}</p>
+                    <p className='p-2 text-center text-responsive-4xl font-medium md:whitespace-nowrap'>{t('foodFrom')}</p>
+                    <div className='flex flex-row flex-wrap justify-center items-center'>
+                      <p className='cursor-expand p-2 text-responsive-5xl text-center font-impact font-bold uppercase'>{t('farm')}</p>
+                      <p className='p-2 text-responsive-4xl text-center font-medium md:whitespace-nowrap'>{t('to')}</p>
+                      <p className='cursor-expand p-2 text-responsive-5xl text-center font-impact font-bold uppercase'>{t('fork')}</p>
                     </div>
                 </div>
             </ParallaxAnimation>
-            <div className='w-full h-fit flex flex-row justify-center items-center gap-2 p-2'>
+            <div className='flex h-fit w-full flex-row items-center justify-center gap-2 p-2'>
                 <a
                   href="https://cal.com/brightonmboya"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-fit h-fit text-3xl flex justify-center items-center gap-2"
+                  className="flex h-fit w-fit items-center justify-center gap-2"
                   onClick={handleBookDemoClick}
                 >
-                  <Button variant="ghost" size="lg" className='w-fit cursor-expand h-fit pl-8 text-3xl flex justify-center items-center gap-2'>
+                  <Button variant="ghost" size="md" className='flex h-fit w-fit cursor-expand items-center justify-center gap-2 px-5 text-base md:pl-8 md:text-3xl'>
                     <p>{t('bookDemo')}</p>
-                    <ArrowUpRight width={30} height={30} strokeWidth={2.5}/>
+                    <ArrowUpRight width={22} height={22} strokeWidth={2.5}/>
                   </Button>
                 </a>
             </div>

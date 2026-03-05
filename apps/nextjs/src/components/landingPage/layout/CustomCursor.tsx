@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 
 export default function CustomCursor() {
   const [mounted, setMounted] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const verticalRef1 = useRef<HTMLDivElement>(null);
   const verticalRef2 = useRef<HTMLDivElement>(null);
@@ -17,6 +18,9 @@ export default function CustomCursor() {
 
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      setIsTouchDevice(window.matchMedia("(hover: none), (pointer: coarse)").matches);
+    }
   }, []);
 
   useEffect(() => {
@@ -187,7 +191,7 @@ export default function CustomCursor() {
     };
   }, [mounted]);
 
-  if (!mounted) return null;
+  if (!mounted || isTouchDevice) return null;
   const containerStyle: React.CSSProperties = { direction: 'ltr' };
 
   return (

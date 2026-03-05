@@ -29,7 +29,7 @@ export default function JoinJani({ className }: JoinJaniProps) {
   ];
 
   return (
-    <section className={`relative flex justify-center items-center py-20 px-4 md:px-8 lg:px-16 w-screen h-screen overflow-hidden bg-green-800 text-white ${className}`}>
+    <section className={`relative flex min-h-[100svh] w-full items-center justify-center overflow-hidden bg-green-800 px-4 py-16 text-white md:h-screen md:px-8 md:py-20 lg:px-16 ${className}`}>
       <span className='absolute left-0 top-0'>
         <svg width="2000" height="1200" viewBox="0 0 2000 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="200" cy="800" r="300" stroke="white" strokeOpacity="0.08" strokeWidth="80" />
@@ -45,10 +45,10 @@ export default function JoinJani({ className }: JoinJaniProps) {
           <path d="M400 1000L350 900L500 950L400 1000Z" stroke="white" strokeOpacity="0.11" strokeWidth="15" />
         </svg>
       </span>
-      <ParallaxAnimation speed={-3} className='max-w-7xl mx-auto flex flex-col gap-8 z-11'>
+      <ParallaxAnimation speed={-3} className='z-11 mx-auto flex w-full max-w-7xl flex-col gap-8'>
         {/* Header */}
           <div className='text-center flex flex-col gap-4'>
-          <div className='flex gap-4 justify-center items-center'>
+          <div className='flex flex-wrap items-center justify-center gap-2 md:gap-4'>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -78,7 +78,7 @@ export default function JoinJani({ className }: JoinJaniProps) {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className='text-4xl'
+            className='text-xl md:text-4xl'
           >
             {t('subtitle')}
           </motion.p>

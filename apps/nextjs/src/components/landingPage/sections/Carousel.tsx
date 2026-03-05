@@ -59,9 +59,9 @@ export default function Carousel({ className }: CarouselProps) {
     };
     
     return (
-        <section className='relative w-screen h-screen flex flex-col overflow-hidden p-4 py-10 pb-30 bg-white z-11'>
-            <div className='w-full h-1/7 gap-2 mt-10 flex justify-between text-[50px] font-light  p-4 flex-row  whitespace-nowrap'>
-                <ParallaxAnimation speed={1.5} className=' h-full w-fit flex flex-row justify-center items-center'>
+        <section className='relative z-11 flex min-h-[100svh] w-full flex-col overflow-hidden bg-white px-3 pb-8 pt-24 md:h-screen md:px-4 md:py-10 md:pb-30'>
+            <div className='mt-2 flex h-fit w-full flex-row items-center justify-center gap-2 p-2 text-3xl font-light md:mt-10 md:h-1/7 md:justify-between md:p-4 md:text-[50px]'>
+                <ParallaxAnimation speed={1.5} className='hidden h-full w-fit flex-row items-center justify-center md:flex'>
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={`top-left-${currentIndex}`}
@@ -74,12 +74,12 @@ export default function Carousel({ className }: CarouselProps) {
                         </motion.p>
                     </AnimatePresence>
                 </ParallaxAnimation>
-                <ParallaxAnimation speed={1.5} className='w-full h-full flex justify-center items-center font-bold text-green-700'>
+                <ParallaxAnimation speed={1.5} className='flex h-full w-full items-center justify-center font-bold text-green-700'>
                     <p>
                         {t('ourValueChains')}
                     </p>
                 </ParallaxAnimation>
-                <ParallaxAnimation speed={1} className=' h-full w-fit flex flex-row justify-center items-center'>
+                <ParallaxAnimation speed={1} className='hidden h-full w-fit flex-row items-center justify-center md:flex'>
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={`top-right-${currentIndex}`}
@@ -93,9 +93,9 @@ export default function Carousel({ className }: CarouselProps) {
                     </AnimatePresence>
                 </ParallaxAnimation>
             </div>
-            <div className='w-full h-5/6 flex gap-2 pr-10 pl-6 overflow-visible'>
+            <div className='flex h-full w-full flex-col gap-2 overflow-visible md:h-5/6 md:flex-row md:pl-6 md:pr-10'>
                 <motion.div 
-                    className='h-full w-1/5 flex items-start'
+                    className='hidden h-full w-1/5 items-start md:flex'
                     transition={{ duration: 0.8, delay: 0.2 }}
                 >
                     <ParallaxAnimation speed={1} className='w-full h-1/2  relative overflow-hidden '>
@@ -119,7 +119,7 @@ export default function Carousel({ className }: CarouselProps) {
                     </ParallaxAnimation>
                 </motion.div>
                 <motion.div 
-                    className='h-full w-3/5'
+                    className='h-[58svh] w-full md:h-full md:w-3/5'
                     transition={{ duration: 0.8, delay: 0.4 }}
                 >
                     <div className='w-full h-full  relative overflow-hidden '>
@@ -143,7 +143,7 @@ export default function Carousel({ className }: CarouselProps) {
                     </div>
                 </motion.div>
                 <motion.div 
-                    className='h-full w-1/5 flex items-end'
+                    className='hidden h-full w-1/5 items-end md:flex'
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
@@ -169,8 +169,8 @@ export default function Carousel({ className }: CarouselProps) {
                     </ParallaxAnimation>
                 </motion.div>
             </div>
-            <div className='w-full h-1/6 gap-10 flex justify-between text-[50px] font-light  p-4 flex-row whitespace-nowrap'>
-                <ParallaxAnimation speed={1} className=' h-full w-fit flex flex-row justify-center items-center'>
+            <div className='flex h-fit w-full flex-row items-center justify-center gap-4 p-2 text-3xl font-light md:h-1/6 md:justify-between md:gap-10 md:p-4 md:text-[50px]'>
+                <ParallaxAnimation speed={1} className='hidden h-full w-fit flex-row items-center justify-center md:flex'>
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={`bottom-left-${currentIndex}`}
@@ -183,16 +183,16 @@ export default function Carousel({ className }: CarouselProps) {
                         </motion.p>
                     </AnimatePresence>
                 </ParallaxAnimation>
-                <div className='h-full w-full flex justify-center items-center gap-2'>
+                <div className='flex h-full w-full flex-wrap items-center justify-center gap-2 md:flex-nowrap'>
                     {products.map((product, index) => {
                         const isActive = index === currentIndex;
-                        const size = isActive ? 'w-[5vw] h-[5vw]' : 'w-[4vw] h-[4vw]';
+                        const size = isActive ? 'h-16 w-16 md:h-[5vw] md:w-[5vw]' : 'h-14 w-14 md:h-[4vw] md:w-[4vw]';
                         const blend = isActive ? 'mix-blend-normal' : 'mix-blend-luminosity';
                         
                         return (
                             <motion.div 
                                 key={index} 
-                                className={`${size} ${blend} cursor-expand relative overflow-hidden cursor-pointer hover:mix-blend-normal transition-all duration-300`}
+                                className={`${size} ${blend} relative cursor-expand cursor-pointer overflow-hidden transition-all duration-300 hover:mix-blend-normal`}
                                 onClick={() => handleClick(index)}
                                 onMouseEnter={() => setIsHovered(true)}
                                 onMouseLeave={() => setIsHovered(false)}
@@ -216,7 +216,7 @@ export default function Carousel({ className }: CarouselProps) {
                         );
                     })}
                 </div>
-                <ParallaxAnimation speed={1.5} className=' h-full w-fit flex flex-row justify-center items-center'>
+                <ParallaxAnimation speed={1.5} className='hidden h-full w-fit flex-row items-center justify-center md:flex'>
                     <AnimatePresence mode="wait">
                         <motion.p
                             key={`bottom-right-${currentIndex}`}

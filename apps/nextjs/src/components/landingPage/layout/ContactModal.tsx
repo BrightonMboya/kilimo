@@ -34,8 +34,8 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
 // why-jani-bg.jpg
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="flex h-full w-full flex-row gap-4 text-black z-9999">
-        <div className='relative bg-amber-300 w-1/2 h-full rounded-lg overflow-hidden'>
+      <div className="z-9999 flex h-full w-full flex-col gap-3 text-black md:flex-row md:gap-4">
+        <div className='relative h-40 w-full overflow-hidden rounded-lg bg-amber-300 md:h-full md:w-1/2'>
           <Image
             src="/static/images/why-jani-bg.jpg"
             alt="Contact bg"
@@ -44,9 +44,9 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
             className="object-center scale-110 z-10"
           />
         </div>
-        <div className='w-1/2 h-full flex flex-col justify-around p-2 gap-4'>
-          <div className='w-full flex gap-4 flex-col justify-center items-center'>
-            <h2 className="text-8xl font-semibold text-green-800">{t('getInTouch')}</h2>
+        <div className='flex h-full w-full flex-col justify-around gap-3 p-2 md:w-1/2 md:gap-4'>
+          <div className='flex w-full flex-col items-center justify-center gap-3 md:gap-4'>
+            <h2 className="text-4xl font-semibold text-green-800 md:text-7xl">{t('getInTouch')}</h2>
           </div>
           <div className='flex flex-col justify-start items-center'>
             <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-full">
@@ -72,7 +72,7 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
                 placeholder={t('placeholder.message')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full h-60 px-4 py-2 border rounded-md"
+                className="h-36 w-full rounded-md border px-4 py-2 md:h-60"
               />
 
             </form>
@@ -80,7 +80,7 @@ export default function ContactModal({ open, onClose }: { open: boolean; onClose
             <div className="w-full flex justify-center items-center">
               <Button 
                 onClick={handleSubmit} 
-                className='w-1/2' 
+                className='w-full md:w-1/2' 
                 type="submit" 
                 variant="primary"  // already has rounded-lg + green
                 size="md" 

@@ -105,16 +105,16 @@ export default function Navbar({ className }: NavbarProps) {
 
   return (
     <motion.div 
-      className={`fixed top-0 w-screen h-[5rem] pl-4 pr-4 flex z-[9990] transition-colors duration-200 ${
+      className={`fixed top-0 z-[9990] flex h-16 w-full px-3 transition-colors duration-200 md:h-20 md:px-4 ${
         isInHeroSection ? 'bg-transparent' : 'bg-white shadow-md'
       }`}
       initial={{ y: 0, opacity: 0 }}
       animate={{ y: isVisible ? 0 : -100, opacity: 1 }}
       transition={{ duration: 1.3, ease: [0.6, 0.01, 0.05, 0.95] }}
     >
-        <nav className='w-full h-full flex flex-row justify-between gap-4'>
-            <div className='h-full w-fit justify-center items-center gap-4 flex flex-row '>
-              <Link href={`/${selectedLanguage}`} className='relative flex justify-start items-center cursor-expand overflow-hidden w-[10rem] h-[5rem]'>
+        <nav className='flex h-full w-full flex-row justify-between gap-2 md:gap-4'>
+            <div className='flex h-full w-fit flex-row items-center justify-center gap-2 md:gap-4'>
+              <Link href={`/${selectedLanguage}`} className='relative flex h-16 w-[8rem] cursor-expand items-center justify-start overflow-hidden md:h-20 md:w-[10rem]'>
                 <Image 
                   src={isInHeroSection ? "/static/images/JANI AI -HD- White.png" : "/static/images/JANI AI -HD- Green.png"}
                   alt="JANI Logo" 
@@ -124,18 +124,18 @@ export default function Navbar({ className }: NavbarProps) {
               </Link>
             </div>
             {/* <div className='h-full w-2/3 '/> */}
-            <div className='h-full w-fit gap-4 flex flex-row justify-center items-center'>
-                <div className={` ${isInHeroSection ? " backdrop-blur-2xl border border-gray-50": "" } relative px-4 rounded-full w-full flex justify-center items-center gap-2 p-2`} ref={menuRef}>
-                    <p className={`font-bold transition-colors duration-300 px-2 ${
+            <div className='flex h-full w-fit flex-row items-center justify-center gap-2 md:gap-4'>
+                <div className={` ${isInHeroSection ? " backdrop-blur-2xl border border-gray-50": "" } relative flex w-full items-center justify-center gap-1 rounded-full px-2 py-1.5 md:gap-2 md:px-4 md:py-2`} ref={menuRef}>
+                    <p className={`px-1 text-sm font-bold uppercase transition-colors duration-300 md:px-2 md:text-base ${
                       isInHeroSection ? 'text-white' : 'text-gray-900'
                     }`}>{selectedLanguage}</p>
                     <div 
-                      className={`rounded-full p-1 hover:bg-gray-500/10 cursor-expand hover:cursor-pointer transition-colors duration-300 ${
+                      className={`cursor-expand rounded-full p-1 transition-colors duration-300 hover:cursor-pointer hover:bg-gray-500/10 ${
                         isInHeroSection ? 'text-white' : 'text-gray-900'
                       }`}
                       onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
                     >
-                        <ChevronDown width={15} height={15} strokeWidth={2.5}/>
+                        <ChevronDown width={14} height={14} strokeWidth={2.5}/>
                     </div>
                     
                     <AnimatePresence>
@@ -145,7 +145,7 @@ export default function Navbar({ className }: NavbarProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
-                          className='absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg border border-gray-200 py-2 min-w-30 z-[50]'
+                          className='absolute right-0 top-full z-[50] mt-2 min-w-36 rounded-lg border border-gray-200 bg-white py-2 shadow-lg'
                         >
                           {languages.map((lang) => (
                             <button
@@ -163,15 +163,15 @@ export default function Navbar({ className }: NavbarProps) {
                       )}
                     </AnimatePresence>
                 </div>
-                <div className=' w-fit h-full flex justify-end items-center'>
+                <div className='flex h-full w-fit items-center justify-end'>
                   <a
                     href="https://szan6fk6p17.typeform.com/to/d2P3Z44V"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-fit h-fit text-3xl flex justify-center items-center gap-2"
+                    className="flex h-fit w-fit items-center justify-center gap-2"
                     onClick={handleWaitListClick}
                   >
-                    <Button variant={ isInHeroSection ? "secondary" : "primary"} size="lg">
+                    <Button variant={ isInHeroSection ? "secondary" : "primary"} size="sm" className="px-3 text-sm md:px-6 md:py-3 md:text-lg">
                       {t('joinWaitlist')}
                     </Button>
                   </a>

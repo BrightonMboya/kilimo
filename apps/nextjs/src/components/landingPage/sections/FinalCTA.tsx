@@ -22,7 +22,7 @@ export default function FinalCTA({ className }: FinalCTAProps) {
     }
   }
   return (
-    <section className={`relative h-screen w-screen flex justify-center items-center py-24 px-4 md:px-8 lg:px-16 bg-white ${className}`}>
+    <section className={`relative flex min-h-[100svh] w-full items-center justify-center bg-white px-4 py-16 md:h-screen md:px-8 md:py-24 lg:px-16 ${className}`}>
       <div className=' gradient_gradient__buN4_'/>
       <ParallaxAnimation speed={0.3} className='max-w-5xl mx-auto text-center flex flex-col gap-8 z-20'>
         <motion.h2
@@ -40,16 +40,16 @@ export default function FinalCTA({ className }: FinalCTAProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className='flex flex-col sm:flex-row gap-4 justify-center items-center'
+          className='flex flex-col items-center justify-center gap-4 sm:flex-row'
         >
           <a
             href="https://szan6fk6p17.typeform.com/to/d2P3Z44V"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-fit h-fit text-3xl flex justify-center items-center gap-2"
+            className="flex h-fit w-fit items-center justify-center gap-2"
             onClick={handleWaitListClick}
           >
-            <Button size='lg' variant='primary'>
+            <Button size='md' variant='primary' className='md:px-6 md:py-3 md:text-lg'>
               {t('requestPilot')}
             </Button>
             {/* <Button size='lg' variant='secondary'>

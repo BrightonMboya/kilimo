@@ -4,19 +4,19 @@ import { InfiniteScroll } from '~/components/landingPage/providers';
 
 export default function Home() {
   return (
-    <div className="relative flex flex-col">
+    <div className="relative flex w-full flex-col overflow-x-hidden">
       <InfiniteScroll />
       <CustomCursor />
       <Navbar />
 
-      <div id="content-section-1" className="w-full h-fit z-10">
+      <div id="content-section-1" className="z-10 h-fit w-full">
         <Hero />
         <Carousel />
         <TraceabilityJourney />
         <JoinJani />
         <FinalCTA />
       </div>
-      <div className="h-[110vh] -z-100" />
+      <div className="-z-100 h-[85svh] md:h-[110vh]" />
       <Hero />
       <Footer />
     </div>
