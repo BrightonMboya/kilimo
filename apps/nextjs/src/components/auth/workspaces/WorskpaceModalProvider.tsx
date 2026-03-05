@@ -8,7 +8,6 @@ import {
   createContext,
   useEffect,
 } from "react";
-import { api } from "~/trpc/react";
 
 
 export const ModalContext = createContext<{
@@ -23,8 +22,6 @@ export default function ModalProvider({ children }: { children: ReactNode }) {
 
   const { AddWorkspaceModal, setShowAddWorkspaceModal } =
     useAddWorkspaceModal();
-     const { data, isLoading } = api.workspace.fetchAllWorkspaces.useQuery();
-     const workspaces = data?.workspaces;
 
 //   const { id, error } = useWorkspace();
 

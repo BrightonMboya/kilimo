@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -25,6 +25,16 @@ const panelVariants = {
 };
 
 export default function Modal({ open, onClose, children, className = '' }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || typeof document === 'undefined') {
+    return null;
+  }
+
   const isRtl = typeof document !== 'undefined' && document.documentElement.dir === 'rtl';
   const posStyle = isRtl ? { left: '0.5rem' } : { right: '0.5rem' };
 
