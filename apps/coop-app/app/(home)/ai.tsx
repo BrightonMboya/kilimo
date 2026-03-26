@@ -1,0 +1,312 @@
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Sparkles, ArrowUp, Trash2, Plus } from 'lucide-react-native'
+import { useAuth } from '@clerk/clerk-expo'
+import { trpc, getBaseUrl } from '../../utils/api'
+
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+}
+
+const SUGGESTIONS = [
+  'Show missing KDE',
+  'Summary of today collection',
+  'Pending payments',
+  'Farmer compliance status',
+]
+
+export default function AssistantScreen() {
+  const { getToken } = useAuth()
+  const [inputText, setInputText] = useState('')
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [streamingContent, setStreamingContent] = useState('')
+  const scrollViewRef = useRef<ScrollView>(null)
+  const xhrRef = useRef<XMLHttpRequest | null>(null)
+
+  const deleteConversationMutation = trpc.chat.deleteConversation.useMutation({
+    onSuccess: () => {
+      setConversationId(null)
+      setMessages([])
+    },
+  })
+
+  useEffect(() => {
+    if (messages.length || streamingContent) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true })
+      }, 100)
+    }
+  }, [messages.length, streamingContent])
+
+  const handleSend = useCallback(async (text?: string) => {
+    const message = (text ?? inputText).trim()
+    if (!message || isLoading) return
+
+    setInputText('')
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: message,
+    }
+    setMessages(prev => [...prev, userMessage])
+
+    setIsLoading(true)
+    setStreamingContent('')
+
+    try {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+
+      const xhr = new XMLHttpRequest()
+      xhrRef.current = xhr
+
+      let fullContent = ''
+      let receivedLength = 0
+
+      xhr.open('POST', `${getBaseUrl()}/api/chat`)
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.setRequestHeader('Authorization', token)
+
+      xhr.onprogress = () => {
+        const newData = xhr.responseText.substring(receivedLength)
+        receivedLength = xhr.responseText.length
+        if (newData) {
+          fullContent += newData
+          setStreamingContent(fullContent)
+        }
+      }
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const newConvId = xhr.getResponseHeader('X-Conversation-Id')
+          if (newConvId && !conversationId) {
+            setConversationId(newConvId)
+          }
+
+          if (fullContent) {
+            const assistantMessage: ChatMessage = {
+              id: `assistant-${Date.now()}`,
+              role: 'assistant',
+              content: fullContent,
+            }
+            setMessages(prev => [...prev, assistantMessage])
+          }
+        } else {
+          const errorMessage: ChatMessage = {
+            id: `error-${Date.now()}`,
+            role: 'assistant',
+            content: 'Sorry, I encountered an error. Please try again.',
+          }
+          setMessages(prev => [...prev, errorMessage])
+        }
+
+        setIsLoading(false)
+        setStreamingContent('')
+        xhrRef.current = null
+      }
+
+      xhr.onerror = () => {
+        const errorMessage: ChatMessage = {
+          id: `error-${Date.now()}`,
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+        }
+        setMessages(prev => [...prev, errorMessage])
+        setIsLoading(false)
+        setStreamingContent('')
+        xhrRef.current = null
+      }
+
+      xhr.send(JSON.stringify({
+        message,
+        conversationId: conversationId || undefined,
+      }))
+    } catch (error: any) {
+      const errorMessage: ChatMessage = {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: 'Sorry, I encountered an error. Please try again.',
+      }
+      setMessages(prev => [...prev, errorMessage])
+      setIsLoading(false)
+      setStreamingContent('')
+    }
+  }, [inputText, isLoading, conversationId, getToken])
+
+  const handleNewConversation = () => {
+    if (xhrRef.current) {
+      xhrRef.current.abort()
+      xhrRef.current = null
+    }
+    setConversationId(null)
+    setMessages([])
+    setStreamingContent('')
+    setIsLoading(false)
+  }
+
+  const handleDeleteConversation = () => {
+    if (conversationId) {
+      deleteConversationMutation.mutate({ id: conversationId })
+    }
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-gray-50" edges={['top']}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+        keyboardVerticalOffset={0}
+      >
+        {/* Header */}
+        <View className="bg-white p-4 border-b border-gray-200 flex-row items-center shadow-sm">
+          <View className="w-10 h-10 bg-emerald-100 rounded-full items-center justify-center mr-3">
+            <Sparkles size={24} color="#065F46" />
+          </View>
+          <View className="flex-1">
+            <Text className="font-bold text-gray-800 text-lg">JANI Assistant</Text>
+            <Text className="text-xs text-emerald-700">Smart help for traceability teams</Text>
+          </View>
+          <View className="flex-row gap-2">
+            <TouchableOpacity
+              onPress={handleNewConversation}
+              className="p-2 bg-gray-100 rounded-full"
+            >
+              <Plus size={20} color="#374151" />
+            </TouchableOpacity>
+            {conversationId && (
+              <TouchableOpacity
+                onPress={handleDeleteConversation}
+                className="p-2 bg-red-50 rounded-full"
+              >
+                <Trash2 size={20} color="#DC2626" />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* Chat Area */}
+        <ScrollView
+          ref={scrollViewRef}
+          className="flex-1 p-4"
+          contentContainerStyle={{ gap: 16, paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {messages.length === 0 && !isLoading ? (
+            <View>
+              {/* Welcome */}
+              <View className="items-start mb-4">
+                <View className="flex-row items-start">
+                  <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
+                    <Sparkles size={16} color="#065F46" />
+                  </View>
+                  <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[85%]">
+                    <Text className="text-sm text-gray-700">
+                      Hello! I'm JANI, your cooperative assistant. I can help with:
+                    </Text>
+                    <View className="mt-2 pl-2">
+                      <Text className="text-xs text-gray-600 mb-1">- KDE completeness checks</Text>
+                      <Text className="text-xs text-gray-600 mb-1">- Collection summaries</Text>
+                      <Text className="text-xs text-gray-600 mb-1">- Payment tracking</Text>
+                      <Text className="text-xs text-gray-600 mb-1">- Farmer compliance status</Text>
+                    </View>
+                    <Text className="text-sm text-gray-700 mt-2">
+                      How can I help your team today?
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Quick Suggestions */}
+              <View className="flex-row flex-wrap gap-2 ml-10">
+                {SUGGESTIONS.map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => handleSend(s)}
+                    className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2"
+                  >
+                    <Text className="text-xs text-emerald-700 font-medium">{s}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : (
+            messages.map((message) => (
+              <View
+                key={message.id}
+                className={message.role === 'user' ? 'items-end' : 'items-start'}
+              >
+                {message.role === 'user' ? (
+                  <View className="bg-emerald-700 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
+                    <Text className="text-sm text-white">{message.content}</Text>
+                  </View>
+                ) : (
+                  <View className="flex-row items-start max-w-[85%]">
+                    <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
+                      <Sparkles size={16} color="#065F46" />
+                    </View>
+                    <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex-1">
+                      <Text className="text-sm text-gray-700">{message.content}</Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+            ))
+          )}
+
+          {/* Streaming */}
+          {isLoading && (
+            <View className="items-start">
+              <View className="flex-row items-start max-w-[85%]">
+                <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
+                  <Sparkles size={16} color="#065F46" />
+                </View>
+                <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex-1">
+                  {streamingContent ? (
+                    <Text className="text-sm text-gray-700">{streamingContent}</Text>
+                  ) : (
+                    <View className="flex-row items-center gap-2">
+                      <ActivityIndicator size="small" color="#065F46" />
+                      <Text className="text-sm text-gray-500">Thinking...</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Input */}
+        <View className="p-4 bg-white border-t border-gray-200">
+          <View className="flex-row gap-2 items-end">
+            <TextInput
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Ask about collections, payments, KDE..."
+              className="flex-1 bg-gray-100 rounded-2xl px-4 py-3 text-sm text-gray-800 max-h-24"
+              placeholderTextColor="#9CA3AF"
+              multiline
+              onSubmitEditing={() => handleSend()}
+              returnKeyType="send"
+              blurOnSubmit={false}
+            />
+            <TouchableOpacity
+              onPress={() => handleSend()}
+              disabled={!inputText.trim() || isLoading}
+              className={`p-3 rounded-full shadow-md ${
+                inputText.trim() && !isLoading ? 'bg-emerald-700' : 'bg-gray-300'
+              }`}
+            >
+              <ArrowUp size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  )
+}

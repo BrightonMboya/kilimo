@@ -559,3 +559,160 @@ model ChatMessage {
   @@index([conversationId])
   @@index([createdAt])
 }
+
+// ============================================
+// COOP APP - COOPERATIVES & AGGREGATION
+// ============================================
+
+enum QualityGrade {
+  A
+  B
+  C
+}
+
+enum PaymentStatus {
+  pending_payment
+  confirmed
+  paid
+}
+
+enum InviteStatus {
+  pending_invite
+  accepted
+  declined
+  expired
+}
+
+model Cooperative {
+  id           String   @id @default(cuid())
+  userId       String // Clerk user ID of the cooperative manager
+  name         String
+  slug         String   @unique
+  location     String?
+  country      String?
+  contactName  String?
+  contactPhone String?
+  contactEmail String?
+  logo         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  coopFarmers  CoopFarmer[]
+  collections  Collection[]
+  payments     Payment[]
+  invites      CoopInvite[]
+
+  @@index([userId])
+}
+
+model CoopFarmer {
+  id            String   @id @default(cuid())
+  cooperativeId String
+  userId        String?  // Clerk user ID — linked when farmer accepts invite
+  fullName      String
+  phoneNumber   String?
+  email         String?
+  location      String?
+  farmSizeHa    Float?
+  crops         String? // comma-separated list
+  qrCode        String   @unique @default(cuid())
+  syncStatus    String   @default("synced")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cooperative   Cooperative      @relation(fields: [cooperativeId], references: [id], onDelete: Cascade)
+  fields        CoopFarmerField[]
+  collections   Collection[]
+  payments      Payment[]
+
+  @@index([cooperativeId])
+  @@index([qrCode])
+  @@index([userId])
+}
+
+model CoopInvite {
+  id            String       @id @default(cuid())
+  cooperativeId String
+  email         String
+  farmerName    String?
+  status        InviteStatus @default(pending_invite)
+  expiresAt     DateTime
+  acceptedAt    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  cooperative   Cooperative  @relation(fields: [cooperativeId], references: [id], onDelete: Cascade)
+
+  @@unique([cooperativeId, email])
+  @@index([email])
+  @@index([status])
+}
+
+model CoopFarmerField {
+  id           String   @id @default(cuid())
+  coopFarmerId String
+  name         String
+  crop         String
+  variety      String?
+  sizeHa       Float
+  latitude     Float?
+  longitude    Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  coopFarmer   CoopFarmer @relation(fields: [coopFarmerId], references: [id], onDelete: Cascade)
+
+  @@index([coopFarmerId])
+}
+
+model Collection {
+  id            String       @id @default(cuid())
+  cooperativeId String
+  coopFarmerId  String
+  lotCode       String       @unique
+  date          DateTime     @default(now())
+  crop          String
+  variety       String?
+  quantity      Float
+  unit          String       @default("kg")
+  weightKg      Float
+  qualityGrade  QualityGrade @default(B)
+  notes         String?
+  syncStatus    String       @default("synced")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  cooperative   Cooperative  @relation(fields: [cooperativeId], references: [id], onDelete: Cascade)
+  coopFarmer    CoopFarmer   @relation(fields: [coopFarmerId], references: [id], onDelete: Cascade)
+  payment       Payment?
+
+  @@index([cooperativeId])
+  @@index([coopFarmerId])
+  @@index([date])
+  @@index([lotCode])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  cooperativeId String
+  coopFarmerId  String
+  collectionId  String?       @unique
+  date          DateTime      @default(now())
+  pricePerKg    Float
+  totalAmount   Float
+  deductions    Float         @default(0)
+  currency      String        @default("KES")
+  status        PaymentStatus @default(pending_payment)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  cooperative   Cooperative   @relation(fields: [cooperativeId], references: [id], onDelete: Cascade)
+  coopFarmer    CoopFarmer    @relation(fields: [coopFarmerId], references: [id], onDelete: Cascade)
+  collection    Collection?   @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+
+  @@index([cooperativeId])
+  @@index([coopFarmerId])
+  @@index([date])
+  @@index([status])
+}

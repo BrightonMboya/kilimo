@@ -15,6 +15,11 @@ import {
   farmerFields,
   chat,
   contact,
+  coop,
+  coopFarmers,
+  collection,
+  payments,
+  coopInvites,
 } from "./routers";
 
 /**
@@ -38,6 +43,11 @@ export const appRouter = createTRPCRouter({
   farmerFields,
   chat,
   contact,
+  coop,
+  coopFarmers,
+  collection,
+  payments,
+  coopInvites,
 });
 
 // export type definition of API

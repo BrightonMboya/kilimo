@@ -1,0 +1,91 @@
+import { Tabs, Redirect } from 'expo-router'
+import { Home, Users, Sparkles, Package, Receipt } from 'lucide-react-native'
+import { View, ActivityIndicator } from 'react-native'
+import { useAuth } from '@clerk/clerk-expo'
+
+export default function HomeLayout() {
+  const { isSignedIn, isLoaded } = useAuth()
+
+  if (!isLoaded) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#065F46" />
+      </View>
+    )
+  }
+
+  if (!isSignedIn) {
+    return <Redirect href="/sign-in" />
+  }
+
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: 'white',
+          borderTopWidth: 1,
+          borderTopColor: '#E5E7EB',
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 10,
+        },
+        tabBarActiveTintColor: '#065F46',
+        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '500',
+          marginTop: 4,
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <Home size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="farmers"
+        options={{
+          title: 'Farmers',
+          tabBarIcon: ({ color, focused }) => (
+            <Users size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ai"
+        options={{
+          title: '',
+          tabBarIcon: ({ focused }) => (
+            <View className={`bg-emerald-700 w-14 h-14 rounded-full items-center justify-center shadow-lg transform -translate-y-4 border-4 border-gray-50 ${focused ? 'bg-emerald-800' : ''}`}>
+              <Sparkles size={28} color="white" />
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="collection"
+        options={{
+          title: 'Collection',
+          tabBarIcon: ({ color, focused }) => (
+            <Package size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="books"
+        options={{
+          title: 'Books',
+          tabBarIcon: ({ color, focused }) => (
+            <Receipt size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+    </Tabs>
+  )
+}

@@ -10,17 +10,12 @@ import { Platform } from "react-native";
 
 export const trpc = createTRPCReact<AppRouter>();
 
-/**
- * Extend this function when going to production by
- * setting the baseUrl to your production API URL.
- */
 export const getBaseUrl = () => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   if (apiUrl) {
     return apiUrl;
   }
 
-  // Development fallback: use Expo debugger host
   const debuggerHost =
     Constants.expoConfig?.hostUri ??
     Constants.manifest?.debuggerHost ??
@@ -40,11 +35,6 @@ export const getBaseUrl = () => {
 };
 
 const url = `${getBaseUrl()}/api/trpc`;
-
-/**
- * A wrapper for your app that provides the TRPC context.
- * Use only in _app.tsx
- */
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const { getToken } = useAuth();
@@ -73,8 +63,4 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/**
- * A set of typesafe hooks for consuming your API.
- */
-export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@kilimo/api";
