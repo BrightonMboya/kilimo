@@ -28,7 +28,11 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.janiai.coopapp",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -46,7 +50,11 @@
       ]
     ],
     "extra": {
-      "router": {}
-    }
+      "router": {},
+      "eas": {
+        "projectId": "d3ba1749-1747-442d-95cc-1aa1084bcfc4"
+      }
+    },
+    "owner": "jani-ai"
   }
 }
