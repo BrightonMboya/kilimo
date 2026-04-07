@@ -8,16 +8,18 @@ import { TRPCProvider } from '../utils/api';
 const tokenCache = {
   async getToken(key: string) {
     try {
-      return SecureStore.getItemAsync(key);
+      const value = await SecureStore.getItemAsync(key);
+      return value;
     } catch (err) {
+      console.warn('SecureStore.getToken failed:', err);
       return null;
     }
   },
   async saveToken(key: string, value: string) {
     try {
-      return SecureStore.setItemAsync(key, value);
+      await SecureStore.setItemAsync(key, value);
     } catch (err) {
-      return;
+      console.warn('SecureStore.saveToken failed:', err);
     }
   },
 };
