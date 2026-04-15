@@ -9,7 +9,7 @@ export default function HomeLayout() {
   if (!isLoaded) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#065F46" />
+        <ActivityIndicator size="large" color="#16A34A" />
       </View>
     )
   }
@@ -30,7 +30,7 @@ export default function HomeLayout() {
           paddingBottom: 20,
           paddingTop: 10,
         },
-        tabBarActiveTintColor: '#065F46',
+        tabBarActiveTintColor: '#16A34A',
         tabBarInactiveTintColor: '#9CA3AF',
         tabBarLabelStyle: {
           fontSize: 10,
@@ -62,7 +62,7 @@ export default function HomeLayout() {
         options={{
           title: '',
           tabBarIcon: ({ focused }) => (
-            <View className={`bg-emerald-700 w-14 h-14 rounded-full items-center justify-center shadow-lg transform -translate-y-4 border-4 border-gray-50 ${focused ? 'bg-emerald-800' : ''}`}>
+            <View className={`bg-green-700 w-14 h-14 rounded-full items-center justify-center shadow-lg transform -translate-y-4 border-4 border-gray-50 ${focused ? 'bg-green-800' : ''}`}>
               <Sparkles size={28} color="white" />
             </View>
           ),

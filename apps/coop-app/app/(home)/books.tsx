@@ -10,7 +10,7 @@ import { trpc } from '../../utils/api'
 const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   pending_payment: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Pending' },
   confirmed: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Confirmed' },
-  paid: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Paid' },
+  paid: { bg: 'bg-green-50', text: 'text-green-700', label: 'Paid' },
 }
 
 export default function BooksScreen() {
@@ -115,7 +115,7 @@ export default function BooksScreen() {
           <Text className="text-xl font-bold text-gray-900">Books</Text>
           <TouchableOpacity
             onPress={() => setShowAdd(true)}
-            className="bg-emerald-700 rounded-xl px-4 py-2.5 flex-row items-center gap-2"
+            className="bg-green-700 rounded-xl px-4 py-2.5 flex-row items-center gap-2"
           >
             <Plus size={16} color="white" />
             <Text className="text-white font-semibold text-sm">Add</Text>
@@ -138,14 +138,14 @@ export default function BooksScreen() {
         showsVerticalScrollIndicator={false}
         className="flex-1 px-5 pt-3"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#065F46" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
         }
       >
         {/* Summary Cards */}
         <View className="flex-row gap-3 mb-4">
           <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             <Text className="text-xs text-gray-500 mb-1">Total Paid</Text>
-            <Text className="text-lg font-bold text-emerald-800">
+            <Text className="text-lg font-bold text-green-800">
               {(summary?.totalPaid ?? 0).toLocaleString()}
             </Text>
           </View>
@@ -158,20 +158,20 @@ export default function BooksScreen() {
         </View>
 
         {/* Pricing Model Info */}
-        <View className="bg-emerald-50 rounded-2xl p-4 mb-4 border border-emerald-100">
-          <Text className="text-sm font-semibold text-emerald-800 mb-1">Pricing Model</Text>
-          <Text className="text-xs text-emerald-700 font-mono">
+        <View className="bg-green-50 rounded-2xl p-4 mb-4 border border-green-100">
+          <Text className="text-sm font-semibold text-green-800 mb-1">Pricing Model</Text>
+          <Text className="text-xs text-green-700 font-mono">
             Amount = (Weight kg x Price/kg) - Deductions
           </Text>
         </View>
 
         {/* Payment List */}
         {paymentsQuery.isLoading ? (
-          <ActivityIndicator size="large" color="#065F46" className="mt-10" />
+          <ActivityIndicator size="large" color="#16A34A" className="mt-10" />
         ) : payments.length === 0 ? (
           <View className="items-center justify-center mt-16">
-            <View className="w-16 h-16 bg-emerald-50 rounded-full items-center justify-center mb-4">
-              <Receipt size={32} color="#065F46" />
+            <View className="w-16 h-16 bg-green-50 rounded-full items-center justify-center mb-4">
+              <Receipt size={32} color="#16A34A" />
             </View>
             <Text className="text-gray-500 text-base">No payments recorded yet</Text>
             <Text className="text-gray-400 text-sm mt-1">Tap "Add" to record a payment</Text>
@@ -210,7 +210,7 @@ export default function BooksScreen() {
                 </View>
 
                 <View className="flex-row items-center justify-between pt-2 border-t border-gray-100">
-                  <Text className="text-sm font-bold text-emerald-800">
+                  <Text className="text-sm font-bold text-green-800">
                     {payment.totalAmount.toLocaleString()} {payment.currency}
                   </Text>
                   <View className="flex-row gap-2">
@@ -225,9 +225,9 @@ export default function BooksScreen() {
                     {(payment.status === 'pending_payment' || payment.status === 'confirmed') && (
                       <TouchableOpacity
                         onPress={() => confirmMutation.mutate({ id: payment.id, status: 'paid' })}
-                        className="bg-emerald-50 rounded-lg px-3 py-1.5"
+                        className="bg-green-50 rounded-lg px-3 py-1.5"
                       >
-                        <Text className="text-xs text-emerald-700 font-medium">Mark Paid</Text>
+                        <Text className="text-xs text-green-700 font-medium">Mark Paid</Text>
                       </TouchableOpacity>
                     )}
                   </View>
@@ -261,7 +261,7 @@ export default function BooksScreen() {
                   <Text className={selectedFarmerName ? 'text-gray-900 text-base' : 'text-gray-400 text-base'}>
                     {selectedFarmerName || 'Select a farmer'}
                   </Text>
-                  <QrCode size={18} color="#065F46" />
+                  <QrCode size={18} color="#16A34A" />
                 </TouchableOpacity>
               </View>
 
@@ -280,9 +280,9 @@ export default function BooksScreen() {
 
               {/* Weight - from lot or manual */}
               {selectedWeightKg > 0 ? (
-                <View className="bg-emerald-50 rounded-xl p-3 flex-row items-center gap-2">
-                  <Scale size={16} color="#065F46" />
-                  <Text className="text-sm text-emerald-800 font-medium">
+                <View className="bg-green-50 rounded-xl p-3 flex-row items-center gap-2">
+                  <Scale size={16} color="#16A34A" />
+                  <Text className="text-sm text-green-800 font-medium">
                     Weight from lot: {selectedWeightKg} kg
                   </Text>
                 </View>
@@ -335,7 +335,7 @@ export default function BooksScreen() {
                       key={c}
                       onPress={() => setCurrency(c)}
                       className={`flex-1 py-3 rounded-xl items-center border ${
-                        currency === c ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-gray-200'
+                        currency === c ? 'bg-green-700 border-green-700' : 'bg-white border-gray-200'
                       }`}
                     >
                       <Text className={`text-sm font-medium ${currency === c ? 'text-white' : 'text-gray-700'}`}>{c}</Text>
@@ -348,7 +348,7 @@ export default function BooksScreen() {
               {pricePerKg && effectiveWeightKg > 0 && (
                 <View className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <Text className="text-xs text-gray-500 mb-1">Calculated Amount</Text>
-                  <Text className="text-2xl font-bold text-emerald-800">
+                  <Text className="text-2xl font-bold text-green-800">
                     {calculatedAmount().toLocaleString()} {currency}
                   </Text>
                   <Text className="text-xs text-gray-400 mt-1">
@@ -378,7 +378,7 @@ export default function BooksScreen() {
               onPress={handleCreate}
               disabled={!selectedFarmerId || !pricePerKg || effectiveWeightKg <= 0 || createMutation.isPending}
               className={`rounded-xl py-4 items-center ${
-                selectedFarmerId && pricePerKg && effectiveWeightKg > 0 ? 'bg-emerald-700' : 'bg-gray-300'
+                selectedFarmerId && pricePerKg && effectiveWeightKg > 0 ? 'bg-green-700' : 'bg-gray-300'
               }`}
             >
               {createMutation.isPending ? (
@@ -424,8 +424,8 @@ export default function BooksScreen() {
                 }}
                 className="bg-white rounded-xl p-4 mb-2 border border-gray-100 flex-row items-center gap-3"
               >
-                <View className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center">
-                  <QrCode size={18} color="#065F46" />
+                <View className="w-10 h-10 rounded-full bg-green-50 items-center justify-center">
+                  <QrCode size={18} color="#16A34A" />
                 </View>
                 <View className="flex-1">
                   <Text className="font-medium text-gray-900">{farmer.fullName}</Text>
@@ -462,7 +462,7 @@ export default function BooksScreen() {
               >
                 <View className="flex-row items-center justify-between">
                   <Text className="font-mono text-sm text-gray-800">{col.lotCode}</Text>
-                  <Text className="text-sm font-bold text-emerald-800">{col.weightKg} kg</Text>
+                  <Text className="text-sm font-bold text-green-800">{col.weightKg} kg</Text>
                 </View>
                 <Text className="text-xs text-gray-500 mt-1">
                   {col.crop}{col.variety ? ` - ${col.variety}` : ''} - {col.coopFarmer?.fullName}

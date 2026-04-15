@@ -8,7 +8,7 @@ import { Search, Plus, X, Package, QrCode, Scale, Leaf } from 'lucide-react-nati
 import { trpc } from '../../utils/api'
 
 const GRADE_COLORS: Record<string, { bg: string; text: string }> = {
-  A: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
+  A: { bg: 'bg-green-50', text: 'text-green-700' },
   B: { bg: 'bg-amber-50', text: 'text-amber-700' },
   C: { bg: 'bg-red-50', text: 'text-red-700' },
 }
@@ -93,7 +93,7 @@ export default function CollectionScreen() {
           <Text className="text-xl font-bold text-gray-900">Collection</Text>
           <TouchableOpacity
             onPress={() => setShowAdd(true)}
-            className="bg-emerald-700 rounded-xl px-4 py-2.5 flex-row items-center gap-2"
+            className="bg-green-700 rounded-xl px-4 py-2.5 flex-row items-center gap-2"
           >
             <Plus size={16} color="white" />
             <Text className="text-white font-semibold text-sm">New</Text>
@@ -116,27 +116,27 @@ export default function CollectionScreen() {
         showsVerticalScrollIndicator={false}
         className="flex-1 px-5 pt-3"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#065F46" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
         }
       >
         {/* KDE Info Card */}
-        <View className="bg-emerald-50 rounded-2xl p-4 mb-4 border border-emerald-100">
-          <Text className="text-sm font-semibold text-emerald-800 mb-2">Captured at collection</Text>
+        <View className="bg-green-50 rounded-2xl p-4 mb-4 border border-green-100">
+          <Text className="text-sm font-semibold text-green-800 mb-2">Captured at collection</Text>
           <View className="flex-row flex-wrap gap-x-6 gap-y-1">
-            <Text className="text-xs text-emerald-700">Quantity + Weight</Text>
-            <Text className="text-xs text-emerald-700">Quality Grade</Text>
-            <Text className="text-xs text-emerald-700">Crop + Variety</Text>
-            <Text className="text-xs text-emerald-700">Farmer ID + QR</Text>
-            <Text className="text-xs text-emerald-700">Date + Location</Text>
+            <Text className="text-xs text-green-700">Quantity + Weight</Text>
+            <Text className="text-xs text-green-700">Quality Grade</Text>
+            <Text className="text-xs text-green-700">Crop + Variety</Text>
+            <Text className="text-xs text-green-700">Farmer ID + QR</Text>
+            <Text className="text-xs text-green-700">Date + Location</Text>
           </View>
         </View>
 
         {collectionsQuery.isLoading ? (
-          <ActivityIndicator size="large" color="#065F46" className="mt-10" />
+          <ActivityIndicator size="large" color="#16A34A" className="mt-10" />
         ) : collections.length === 0 ? (
           <View className="items-center justify-center mt-16">
-            <View className="w-16 h-16 bg-emerald-50 rounded-full items-center justify-center mb-4">
-              <Package size={32} color="#065F46" />
+            <View className="w-16 h-16 bg-green-50 rounded-full items-center justify-center mb-4">
+              <Package size={32} color="#16A34A" />
             </View>
             <Text className="text-gray-500 text-base">No collections yet</Text>
             <Text className="text-gray-400 text-sm mt-1">Tap "New" to record a produce lot</Text>
@@ -159,7 +159,7 @@ export default function CollectionScreen() {
                 </View>
 
                 <View className="flex-row items-center gap-2 mb-2">
-                  <Leaf size={14} color="#065F46" />
+                  <Leaf size={14} color="#16A34A" />
                   <Text className="text-sm font-medium text-gray-900">
                     {col.crop}{col.variety ? ` - ${col.variety}` : ''}
                   </Text>
@@ -170,15 +170,15 @@ export default function CollectionScreen() {
                     {col.coopFarmer?.fullName ?? 'Unknown'}
                   </Text>
                   <View className="flex-row items-center gap-1">
-                    <Scale size={14} color="#065F46" />
-                    <Text className="text-sm font-bold text-emerald-800">{col.weightKg} kg</Text>
+                    <Scale size={14} color="#16A34A" />
+                    <Text className="text-sm font-bold text-green-800">{col.weightKg} kg</Text>
                   </View>
                 </View>
 
                 {col.payment && (
                   <View className="mt-2 pt-2 border-t border-gray-100 flex-row items-center justify-between">
                     <Text className="text-xs text-gray-400">Payment</Text>
-                    <Text className={`text-xs font-medium ${col.payment.status === 'paid' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    <Text className={`text-xs font-medium ${col.payment.status === 'paid' ? 'text-green-600' : 'text-amber-600'}`}>
                       {col.payment.status === 'paid' ? 'Paid' : 'Pending'} - {col.payment.totalAmount?.toLocaleString()}
                     </Text>
                   </View>
@@ -212,7 +212,7 @@ export default function CollectionScreen() {
                   <Text className={selectedFarmerName ? 'text-gray-900 text-base' : 'text-gray-400 text-base'}>
                     {selectedFarmerName || 'Select a farmer'}
                   </Text>
-                  <QrCode size={18} color="#065F46" />
+                  <QrCode size={18} color="#16A34A" />
                 </TouchableOpacity>
               </View>
 
@@ -248,7 +248,7 @@ export default function CollectionScreen() {
                       onPress={() => setGrade(g)}
                       className={`flex-1 py-3 rounded-xl items-center border ${
                         grade === g
-                          ? 'bg-emerald-700 border-emerald-700'
+                          ? 'bg-green-700 border-green-700'
                           : 'bg-white border-gray-200'
                       }`}
                     >
@@ -280,7 +280,7 @@ export default function CollectionScreen() {
                         key={u}
                         onPress={() => setUnit(u)}
                         className={`flex-1 py-3 rounded-xl items-center border ${
-                          unit === u ? 'bg-emerald-700 border-emerald-700' : 'bg-white border-gray-200'
+                          unit === u ? 'bg-green-700 border-green-700' : 'bg-white border-gray-200'
                         }`}
                       >
                         <Text className={`text-xs font-medium ${unit === u ? 'text-white' : 'text-gray-700'}`}>{u}</Text>
@@ -323,7 +323,7 @@ export default function CollectionScreen() {
               onPress={handleCreate}
               disabled={!selectedFarmerId || !crop.trim() || !quantity || !weightKg || createMutation.isPending}
               className={`rounded-xl py-4 items-center ${
-                selectedFarmerId && crop.trim() && quantity && weightKg ? 'bg-emerald-700' : 'bg-gray-300'
+                selectedFarmerId && crop.trim() && quantity && weightKg ? 'bg-green-700' : 'bg-gray-300'
               }`}
             >
               {createMutation.isPending ? (
@@ -370,8 +370,8 @@ export default function CollectionScreen() {
                 }}
                 className="bg-white rounded-xl p-4 mb-2 border border-gray-100 flex-row items-center gap-3"
               >
-                <View className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center">
-                  <QrCode size={18} color="#065F46" />
+                <View className="w-10 h-10 rounded-full bg-green-50 items-center justify-center">
+                  <QrCode size={18} color="#16A34A" />
                 </View>
                 <View className="flex-1">
                   <Text className="font-medium text-gray-900">{farmer.fullName}</Text>

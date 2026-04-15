@@ -197,14 +197,14 @@ export default function FarmersScreen() {
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={() => setShowInvite(true)}
-              className="bg-emerald-50 rounded-xl px-3 py-2.5 flex-row items-center gap-1.5"
+              className="bg-green-50 rounded-xl px-3 py-2.5 flex-row items-center gap-1.5"
             >
-              <Send size={14} color="#065F46" />
-              <Text className="text-emerald-700 font-semibold text-sm">Invite</Text>
+              <Send size={14} color="#16A34A" />
+              <Text className="text-green-700 font-semibold text-sm">Invite</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setShowAddFarmer(true)}
-              className="bg-emerald-700 rounded-xl px-3 py-2.5 flex-row items-center gap-1.5"
+              className="bg-green-700 rounded-xl px-3 py-2.5 flex-row items-center gap-1.5"
             >
               <Plus size={14} color="white" />
               <Text className="text-white font-semibold text-sm">Add</Text>
@@ -228,7 +228,7 @@ export default function FarmersScreen() {
         showsVerticalScrollIndicator={false}
         className="flex-1 px-5 pt-3"
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#065F46" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
         }
       >
         {/* Pending Invites */}
@@ -257,11 +257,11 @@ export default function FarmersScreen() {
 
         {/* Farmers List */}
         {farmersQuery.isLoading ? (
-          <ActivityIndicator size="large" color="#065F46" className="mt-10" />
+          <ActivityIndicator size="large" color="#16A34A" className="mt-10" />
         ) : farmers.length === 0 && pendingInvites.length === 0 ? (
           <View className="items-center justify-center mt-20">
-            <View className="w-16 h-16 bg-emerald-50 rounded-full items-center justify-center mb-4">
-              <User size={32} color="#065F46" />
+            <View className="w-16 h-16 bg-green-50 rounded-full items-center justify-center mb-4">
+              <User size={32} color="#16A34A" />
             </View>
             <Text className="text-gray-500 text-base">No farmers registered yet</Text>
             <Text className="text-gray-400 text-sm mt-1">Invite farmers or add them manually</Text>
@@ -277,13 +277,13 @@ export default function FarmersScreen() {
                 >
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-3 flex-1">
-                      <View className={`w-10 h-10 rounded-full items-center justify-center ${isLinked ? 'bg-emerald-100' : 'bg-gray-100'}`}>
-                        <User size={20} color={isLinked ? '#065F46' : '#6B7280'} />
+                      <View className={`w-10 h-10 rounded-full items-center justify-center ${isLinked ? 'bg-green-100' : 'bg-gray-100'}`}>
+                        <User size={20} color={isLinked ? '#16A34A' : '#6B7280'} />
                       </View>
                       <View className="flex-1">
                         <View className="flex-row items-center gap-1.5">
                           <Text className="font-semibold text-gray-900">{farmer.fullName}</Text>
-                          {isLinked && <Link2 size={12} color="#065F46" />}
+                          {isLinked && <Link2 size={12} color="#16A34A" />}
                         </View>
                         <Text className="text-xs text-gray-500 mt-0.5">
                           {farmer.location ?? 'No location'} - {farmer.fields?.length ?? 0} fields
@@ -292,8 +292,8 @@ export default function FarmersScreen() {
                     </View>
                     <View className="flex-row items-center gap-2">
                       {isLinked ? (
-                        <View className="bg-emerald-50 rounded-lg px-2 py-1">
-                          <Text className="text-xs text-emerald-700 font-medium">Linked</Text>
+                        <View className="bg-green-50 rounded-lg px-2 py-1">
+                          <Text className="text-xs text-green-700 font-medium">Linked</Text>
                         </View>
                       ) : (
                         <View className="bg-gray-100 rounded-lg px-2 py-1">
@@ -310,16 +310,16 @@ export default function FarmersScreen() {
                   <View className="bg-white rounded-2xl p-4 mt-1 shadow-sm border border-gray-100">
                     {/* QR Code */}
                     <View className="items-center mb-4 p-3 bg-gray-50 rounded-xl">
-                      <QrCode size={48} color="#065F46" />
+                      <QrCode size={48} color="#16A34A" />
                       <Text className="text-xs text-gray-500 mt-2 font-mono">{farmer.qrCode}</Text>
-                      <Text className="text-xs text-emerald-700 mt-1">Unique Farmer ID</Text>
+                      <Text className="text-xs text-green-700 mt-1">Unique Farmer ID</Text>
                     </View>
 
                     {/* Link Status */}
                     {farmerDetail?.isLinked ? (
-                      <View className="bg-emerald-50 rounded-xl p-3 mb-4 flex-row items-center gap-2 border border-emerald-100">
-                        <CheckCircle size={16} color="#065F46" />
-                        <Text className="text-sm text-emerald-800 font-medium">
+                      <View className="bg-green-50 rounded-xl p-3 mb-4 flex-row items-center gap-2 border border-green-100">
+                        <CheckCircle size={16} color="#16A34A" />
+                        <Text className="text-sm text-green-800 font-medium">
                           Account linked - Farm data synced from Farmers App
                         </Text>
                       </View>
@@ -363,19 +363,19 @@ export default function FarmersScreen() {
                     {/* Linked Farmer App Data */}
                     {farmerDetail?.farmerAppData && (
                       <View className="mb-4">
-                        <Text className="text-sm font-semibold text-emerald-800 mb-2">
+                        <Text className="text-sm font-semibold text-green-800 mb-2">
                           Farm Data (from Farmers App)
                         </Text>
 
                         {/* Real fields from farmer app */}
                         {farmerDetail.farmerAppData.fields.map((field: any) => (
-                          <View key={field.id} className="bg-emerald-50 rounded-xl p-3 mb-2 border border-emerald-100">
+                          <View key={field.id} className="bg-green-50 rounded-xl p-3 mb-2 border border-green-100">
                             <View className="flex-row items-center gap-2 mb-1">
-                              <Leaf size={14} color="#065F46" />
-                              <Text className="text-sm font-medium text-emerald-900">{field.name}</Text>
-                              <Text className="text-xs text-emerald-600">{field.crop}{field.variety ? ` - ${field.variety}` : ''}</Text>
+                              <Leaf size={14} color="#16A34A" />
+                              <Text className="text-sm font-medium text-green-900">{field.name}</Text>
+                              <Text className="text-xs text-green-600">{field.crop}{field.variety ? ` - ${field.variety}` : ''}</Text>
                             </View>
-                            <Text className="text-xs text-emerald-700 ml-5">
+                            <Text className="text-xs text-green-700 ml-5">
                               {field.size} {field.sizeUnit ?? 'ha'} - {field.status} - {field.activities?.length ?? 0} activities
                             </Text>
                           </View>
@@ -387,7 +387,7 @@ export default function FarmersScreen() {
                             <Text className="text-xs font-semibold text-gray-700 mb-1">Recent Activities</Text>
                             {farmerDetail.farmerAppData.recentActivities.slice(0, 5).map((activity: any) => (
                               <View key={activity.id} className="flex-row items-center gap-2 py-1.5 border-b border-gray-100">
-                                <View className="w-2 h-2 rounded-full bg-emerald-500" />
+                                <View className="w-2 h-2 rounded-full bg-green-500" />
                                 <Text className="text-xs text-gray-700 flex-1">
                                   {ACTIVITY_LABELS[activity.activityType] ?? activity.activityType} - {activity.field?.name ?? ''}
                                 </Text>
@@ -400,7 +400,7 @@ export default function FarmersScreen() {
                         )}
 
                         {farmerDetail.farmerAppData.fields.length === 0 && (
-                          <Text className="text-xs text-emerald-600 text-center py-2">
+                          <Text className="text-xs text-green-600 text-center py-2">
                             Farmer hasn't added fields in the app yet
                           </Text>
                         )}
@@ -416,17 +416,17 @@ export default function FarmersScreen() {
                             setSelectedFarmerId(farmer.id)
                             setShowAddField(true)
                           }}
-                          className="bg-emerald-50 rounded-lg px-3 py-1.5 flex-row items-center gap-1"
+                          className="bg-green-50 rounded-lg px-3 py-1.5 flex-row items-center gap-1"
                         >
-                          <Plus size={14} color="#065F46" />
-                          <Text className="text-xs text-emerald-700 font-medium">Add Field</Text>
+                          <Plus size={14} color="#16A34A" />
+                          <Text className="text-xs text-green-700 font-medium">Add Field</Text>
                         </TouchableOpacity>
                       </View>
 
                       {(farmerDetail?.fields ?? farmer.fields ?? []).map((field: any) => (
                         <View key={field.id} className="bg-gray-50 rounded-xl p-3 mb-2 flex-row items-center justify-between">
                           <View className="flex-row items-center gap-2 flex-1">
-                            <MapPin size={14} color="#065F46" />
+                            <MapPin size={14} color="#16A34A" />
                             <View>
                               <Text className="text-sm font-medium text-gray-800">{field.name}</Text>
                               <Text className="text-xs text-gray-500">{field.crop}{field.variety ? ` - ${field.variety}` : ''} - {field.sizeHa} ha</Text>
@@ -470,9 +470,9 @@ export default function FarmersScreen() {
           </View>
 
           <ScrollView className="flex-1 px-5 pt-5" showsVerticalScrollIndicator={false}>
-            <View className="bg-emerald-50 rounded-xl p-4 mb-6 border border-emerald-100">
-              <Text className="text-sm text-emerald-800 font-medium mb-1">How invites work</Text>
-              <Text className="text-xs text-emerald-700">
+            <View className="bg-green-50 rounded-xl p-4 mb-6 border border-green-100">
+              <Text className="text-sm text-green-800 font-medium mb-1">How invites work</Text>
+              <Text className="text-xs text-green-700">
                 Send an invite to a farmer's email. When they sign in to the Farmers App with that email, they'll see the invite and can accept it. Once accepted, their farm data (fields, activities, harvests) will be visible here.
               </Text>
             </View>
@@ -508,7 +508,7 @@ export default function FarmersScreen() {
             <TouchableOpacity
               onPress={handleSendInvite}
               disabled={!inviteEmail.trim() || sendInviteMutation.isPending}
-              className={`rounded-xl py-4 items-center flex-row justify-center gap-2 ${inviteEmail.trim() ? 'bg-emerald-700' : 'bg-gray-300'}`}
+              className={`rounded-xl py-4 items-center flex-row justify-center gap-2 ${inviteEmail.trim() ? 'bg-green-700' : 'bg-gray-300'}`}
             >
               {sendInviteMutation.isPending ? (
                 <ActivityIndicator color="white" />
@@ -566,7 +566,7 @@ export default function FarmersScreen() {
             <TouchableOpacity
               onPress={handleAddFarmer}
               disabled={!farmerName.trim() || createFarmerMutation.isPending}
-              className={`rounded-xl py-4 items-center ${farmerName.trim() ? 'bg-emerald-700' : 'bg-gray-300'}`}
+              className={`rounded-xl py-4 items-center ${farmerName.trim() ? 'bg-green-700' : 'bg-gray-300'}`}
             >
               {createFarmerMutation.isPending ? (
                 <ActivityIndicator color="white" />
@@ -610,8 +610,8 @@ export default function FarmersScreen() {
                 <View className="flex-row items-center justify-between mb-1.5">
                   <Text className="text-sm font-medium text-gray-700">GPS Coordinates</Text>
                   <TouchableOpacity onPress={handleCaptureGPS} className="flex-row items-center gap-1">
-                    <MapPin size={14} color="#065F46" />
-                    <Text className="text-xs text-emerald-700 font-medium">Capture GPS</Text>
+                    <MapPin size={14} color="#16A34A" />
+                    <Text className="text-xs text-green-700 font-medium">Capture GPS</Text>
                   </TouchableOpacity>
                 </View>
                 <View className="flex-row gap-3">
@@ -626,7 +626,7 @@ export default function FarmersScreen() {
             <TouchableOpacity
               onPress={handleAddField}
               disabled={!fieldName.trim() || !fieldCrop.trim() || !fieldSize || addFieldMutation.isPending}
-              className={`rounded-xl py-4 items-center ${fieldName.trim() && fieldCrop.trim() && fieldSize ? 'bg-emerald-700' : 'bg-gray-300'}`}
+              className={`rounded-xl py-4 items-center ${fieldName.trim() && fieldCrop.trim() && fieldSize ? 'bg-green-700' : 'bg-gray-300'}`}
             >
               {addFieldMutation.isPending ? (
                 <ActivityIndicator color="white" />

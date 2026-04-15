@@ -25,30 +25,30 @@ export default function HomeScreen() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#065F46" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />
         }
       >
         {dashboardQuery.isLoading && (
           <View className="items-center justify-center py-20">
-            <ActivityIndicator size="large" color="#065F46" />
+            <ActivityIndicator size="large" color="#16A34A" />
           </View>
         )}
 
         {/* Header */}
-        <View className="bg-emerald-800 px-5 pt-5 pb-8 rounded-b-3xl">
+        <View className="bg-green-800 px-5 pt-5 pb-8 rounded-b-3xl">
           <View className="flex-row items-center justify-between mb-6">
             <View className="flex-row items-center gap-3">
               <View className="h-11 w-11 rounded-2xl bg-white/20 items-center justify-center">
                 <Leaf size={22} color="white" />
               </View>
               <View>
-                <Text className="text-emerald-200 text-xs font-medium">JANI COOP</Text>
+                <Text className="text-green-200 text-xs font-medium">JANI COOP</Text>
                 <Text className="text-white text-lg font-bold">{coopName}</Text>
               </View>
             </View>
           </View>
 
-          <Text className="text-emerald-100 text-sm mb-1">Trace - Transform - Trust</Text>
+          <Text className="text-green-100 text-sm mb-1">Trace - Transform - Trust</Text>
           <Text className="text-white/60 text-xs">Aggregator & Co-op Console</Text>
         </View>
 
@@ -57,8 +57,8 @@ export default function HomeScreen() {
           <View className="flex-row flex-wrap gap-3 mb-6">
             <View className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <View className="flex-row items-center gap-2 mb-2">
-                <View className="w-8 h-8 rounded-lg bg-emerald-50 items-center justify-center">
-                  <Users size={16} color="#065F46" />
+                <View className="w-8 h-8 rounded-lg bg-green-50 items-center justify-center">
+                  <Users size={16} color="#16A34A" />
                 </View>
                 <Text className="text-xs text-gray-500">Farmers</Text>
               </View>
@@ -67,8 +67,8 @@ export default function HomeScreen() {
 
             <View className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <View className="flex-row items-center gap-2 mb-2">
-                <View className="w-8 h-8 rounded-lg bg-emerald-50 items-center justify-center">
-                  <Map size={16} color="#065F46" />
+                <View className="w-8 h-8 rounded-lg bg-green-50 items-center justify-center">
+                  <Map size={16} color="#16A34A" />
                 </View>
                 <Text className="text-xs text-gray-500">Fields</Text>
               </View>
@@ -77,8 +77,8 @@ export default function HomeScreen() {
 
             <View className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <View className="flex-row items-center gap-2 mb-2">
-                <View className="w-8 h-8 rounded-lg bg-emerald-50 items-center justify-center">
-                  <Package size={16} color="#065F46" />
+                <View className="w-8 h-8 rounded-lg bg-green-50 items-center justify-center">
+                  <Package size={16} color="#16A34A" />
                 </View>
                 <Text className="text-xs text-gray-500">Lots Today</Text>
               </View>
@@ -87,8 +87,8 @@ export default function HomeScreen() {
 
             <View className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
               <View className="flex-row items-center gap-2 mb-2">
-                <View className="w-8 h-8 rounded-lg bg-emerald-50 items-center justify-center">
-                  <Scale size={16} color="#065F46" />
+                <View className="w-8 h-8 rounded-lg bg-green-50 items-center justify-center">
+                  <Scale size={16} color="#16A34A" />
                 </View>
                 <Text className="text-xs text-gray-500">Kg Today</Text>
               </View>
@@ -105,8 +105,8 @@ export default function HomeScreen() {
               onPress={() => router.push('/farmers')}
               className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-row items-center gap-3"
             >
-              <View className="w-10 h-10 rounded-xl bg-emerald-50 items-center justify-center">
-                <UserPlus size={20} color="#065F46" />
+              <View className="w-10 h-10 rounded-xl bg-green-50 items-center justify-center">
+                <UserPlus size={20} color="#16A34A" />
               </View>
               <Text className="text-sm font-medium text-gray-700">Add Farmer</Text>
             </TouchableOpacity>
@@ -115,8 +115,8 @@ export default function HomeScreen() {
               onPress={() => router.push('/collection')}
               className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-row items-center gap-3"
             >
-              <View className="w-10 h-10 rounded-xl bg-emerald-50 items-center justify-center">
-                <Package size={20} color="#065F46" />
+              <View className="w-10 h-10 rounded-xl bg-green-50 items-center justify-center">
+                <Package size={20} color="#16A34A" />
               </View>
               <Text className="text-sm font-medium text-gray-700">Record Lot</Text>
             </TouchableOpacity>
@@ -125,8 +125,8 @@ export default function HomeScreen() {
               onPress={() => router.push('/ai')}
               className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-row items-center gap-3"
             >
-              <View className="w-10 h-10 rounded-xl bg-emerald-50 items-center justify-center">
-                <Sparkles size={20} color="#065F46" />
+              <View className="w-10 h-10 rounded-xl bg-green-50 items-center justify-center">
+                <Sparkles size={20} color="#16A34A" />
               </View>
               <Text className="text-sm font-medium text-gray-700">Ask JANI</Text>
             </TouchableOpacity>
@@ -135,8 +135,8 @@ export default function HomeScreen() {
               onPress={() => router.push('/books')}
               className="flex-1 min-w-[45%] bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-row items-center gap-3"
             >
-              <View className="w-10 h-10 rounded-xl bg-emerald-50 items-center justify-center">
-                <Receipt size={20} color="#065F46" />
+              <View className="w-10 h-10 rounded-xl bg-green-50 items-center justify-center">
+                <Receipt size={20} color="#16A34A" />
               </View>
               <Text className="text-sm font-medium text-gray-700">Payments</Text>
             </TouchableOpacity>

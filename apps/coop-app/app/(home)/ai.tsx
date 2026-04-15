@@ -165,12 +165,12 @@ export default function AssistantScreen() {
       >
         {/* Header */}
         <View className="bg-white p-4 border-b border-gray-200 flex-row items-center shadow-sm">
-          <View className="w-10 h-10 bg-emerald-100 rounded-full items-center justify-center mr-3">
-            <Sparkles size={24} color="#065F46" />
+          <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
+            <Sparkles size={24} color="#16A34A" />
           </View>
           <View className="flex-1">
             <Text className="font-bold text-gray-800 text-lg">JANI Assistant</Text>
-            <Text className="text-xs text-emerald-700">Smart help for traceability teams</Text>
+            <Text className="text-xs text-green-700">Smart help for traceability teams</Text>
           </View>
           <View className="flex-row gap-2">
             <TouchableOpacity
@@ -202,8 +202,8 @@ export default function AssistantScreen() {
               {/* Welcome */}
               <View className="items-start mb-4">
                 <View className="flex-row items-start">
-                  <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
-                    <Sparkles size={16} color="#065F46" />
+                  <View className="w-8 h-8 bg-green-100 rounded-full items-center justify-center mr-2 mt-1">
+                    <Sparkles size={16} color="#16A34A" />
                   </View>
                   <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-[85%]">
                     <Text className="text-sm text-gray-700">
@@ -228,9 +228,9 @@ export default function AssistantScreen() {
                   <TouchableOpacity
                     key={s}
                     onPress={() => handleSend(s)}
-                    className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2"
+                    className="bg-green-50 border border-green-200 rounded-xl px-3 py-2"
                   >
-                    <Text className="text-xs text-emerald-700 font-medium">{s}</Text>
+                    <Text className="text-xs text-green-700 font-medium">{s}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -242,13 +242,13 @@ export default function AssistantScreen() {
                 className={message.role === 'user' ? 'items-end' : 'items-start'}
               >
                 {message.role === 'user' ? (
-                  <View className="bg-emerald-700 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
+                  <View className="bg-green-700 p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
                     <Text className="text-sm text-white">{message.content}</Text>
                   </View>
                 ) : (
                   <View className="flex-row items-start max-w-[85%]">
-                    <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
-                      <Sparkles size={16} color="#065F46" />
+                    <View className="w-8 h-8 bg-green-100 rounded-full items-center justify-center mr-2 mt-1">
+                      <Sparkles size={16} color="#16A34A" />
                     </View>
                     <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex-1">
                       <Text className="text-sm text-gray-700">{message.content}</Text>
@@ -263,15 +263,15 @@ export default function AssistantScreen() {
           {isLoading && (
             <View className="items-start">
               <View className="flex-row items-start max-w-[85%]">
-                <View className="w-8 h-8 bg-emerald-100 rounded-full items-center justify-center mr-2 mt-1">
-                  <Sparkles size={16} color="#065F46" />
+                <View className="w-8 h-8 bg-green-100 rounded-full items-center justify-center mr-2 mt-1">
+                  <Sparkles size={16} color="#16A34A" />
                 </View>
                 <View className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 flex-1">
                   {streamingContent ? (
                     <Text className="text-sm text-gray-700">{streamingContent}</Text>
                   ) : (
                     <View className="flex-row items-center gap-2">
-                      <ActivityIndicator size="small" color="#065F46" />
+                      <ActivityIndicator size="small" color="#16A34A" />
                       <Text className="text-sm text-gray-500">Thinking...</Text>
                     </View>
                   )}
@@ -299,7 +299,7 @@ export default function AssistantScreen() {
               onPress={() => handleSend()}
               disabled={!inputText.trim() || isLoading}
               className={`p-3 rounded-full shadow-md ${
-                inputText.trim() && !isLoading ? 'bg-emerald-700' : 'bg-gray-300'
+                inputText.trim() && !isLoading ? 'bg-green-700' : 'bg-gray-300'
               }`}
             >
               <ArrowUp size={20} color="white" />

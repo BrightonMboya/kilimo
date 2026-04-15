@@ -134,7 +134,7 @@ export default function SignUpScreen() {
 
             <TouchableOpacity
               onPress={onVerifyPress}
-              className="w-full bg-emerald-700 rounded-xl py-4 active:bg-emerald-800 mt-4 shadow-sm"
+              className="w-full bg-green-700 rounded-xl py-4 active:bg-green-800 mt-4 shadow-sm"
             >
               <Text className="text-white text-center font-semibold text-lg">Verify & Continue</Text>
             </TouchableOpacity>
@@ -152,10 +152,10 @@ export default function SignUpScreen() {
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="px-8">
           <View className="items-center mb-6">
-            <View className="w-16 h-16 bg-emerald-700 rounded-2xl items-center justify-center mb-4">
+            <View className="w-16 h-16 bg-green-700 rounded-2xl items-center justify-center mb-4">
               <Leaf size={32} color="white" />
             </View>
-            <Text className="text-sm font-medium text-emerald-700 tracking-wider">JANI COOP</Text>
+            <Text className="text-sm font-medium text-green-700 tracking-wider">JANI COOP</Text>
           </View>
 
           <View className="mb-10">
@@ -210,7 +210,7 @@ export default function SignUpScreen() {
 
             <TouchableOpacity
               onPress={onSignUpPress}
-              className="w-full bg-emerald-700 rounded-xl py-4 active:bg-emerald-800 mt-6 shadow-sm"
+              className="w-full bg-green-700 rounded-xl py-4 active:bg-green-800 mt-6 shadow-sm"
             >
               <Text className="text-white text-center font-semibold text-lg">Create Account</Text>
             </TouchableOpacity>
@@ -235,7 +235,7 @@ export default function SignUpScreen() {
               <Text className="text-gray-500 text-base">Already have an account?</Text>
               <Link href="/sign-in" asChild>
                 <TouchableOpacity>
-                  <Text className="text-emerald-700 font-semibold text-base">Sign in</Text>
+                  <Text className="text-green-700 font-semibold text-base">Sign in</Text>
                 </TouchableOpacity>
               </Link>
             </View>
