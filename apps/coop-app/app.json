@@ -17,8 +17,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.janiai.coopapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "This app uses the camera to scan QR codes for farmer verification."
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -28,11 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.janiai.coopapp",
-      "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ]
+      "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -41,20 +36,7 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "expo-web-browser",
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow JANI Coop to access your camera for QR code scanning."
-        }
-      ],
-      [
-        "@sentry/react-native/expo",
-        {
-          "organization": "jani-x5",
-          "project": "jani-coop-app"
-        }
-      ]
+      "expo-web-browser"
     ],
     "extra": {
       "router": {},

@@ -1,12 +1,12 @@
+const { getDefaultConfig } = require("@expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
-const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const path = require("path");
 
 const projectRoot = __dirname;
 const workspaceRoot = path.resolve(projectRoot, "../..");
 
-// Sentry-wrapped Metro config (produces source maps that match Hermes bytecode)
-const config = getSentryExpoConfig(projectRoot);
+// Create the default Metro config
+const config = getDefaultConfig(projectRoot);
 
 // Add import aliases
 config.resolver.alias = {
