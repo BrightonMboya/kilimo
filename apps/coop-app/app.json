@@ -47,6 +47,13 @@
         {
           "cameraPermission": "Allow JANI Coop to access your camera for QR code scanning."
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "jani-x5",
+          "project": "jani-coop-app"
+        }
       ]
     ],
     "extra": {
