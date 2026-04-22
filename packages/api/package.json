@@ -5,6 +5,7 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./client": "./client.ts",
     "./schemas/*": "./src/schemas/*.ts"
   },
   "license": "MIT",

@@ -1,4 +1,4 @@
-import type { AppRouter } from "@kilimo/api";
+import type { AppRouter } from "@kilimo/api/client";
 import { createTRPCReact } from "@trpc/react-query";
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -77,4 +77,4 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
  * A set of typesafe hooks for consuming your API.
  */
 export const api = createTRPCReact<AppRouter>();
-export { type RouterInputs, type RouterOutputs } from "@kilimo/api";
+export { type RouterInputs, type RouterOutputs } from "@kilimo/api/client";

@@ -62,3 +62,7 @@ certificates
 
 # expo
 .expo/
+
+# generated native folders inside app workspaces
+apps/*/ios/
+apps/*/android/

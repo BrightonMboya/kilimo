@@ -18,7 +18,8 @@
       "bundleIdentifier": "com.janiai.coopapp",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "appleTeamId": "QX76R34XQ5"
     },
     "android": {
       "adaptiveIcon": {

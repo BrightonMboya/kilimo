@@ -1,6 +1,6 @@
 import { Tabs, Redirect } from 'expo-router'
 import { Home, Users, Sparkles, Package, Receipt } from 'lucide-react-native'
-import { View, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { useAuth } from '@clerk/clerk-expo'
 
 export default function HomeLayout() {
@@ -8,7 +8,7 @@ export default function HomeLayout() {
 
   if (!isLoaded) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 items-center justify-center bg-white">
         <ActivityIndicator size="large" color="#16A34A" />
       </View>
     )
@@ -62,9 +62,7 @@ export default function HomeLayout() {
         options={{
           title: '',
           tabBarIcon: ({ focused }) => (
-            <View className={`bg-green-700 w-14 h-14 rounded-full items-center justify-center shadow-lg transform -translate-y-4 border-4 border-gray-50 ${focused ? 'bg-green-800' : ''}`}>
-              <Sparkles size={28} color="white" />
-            </View>
+            <Sparkles size={28} color={focused ? '#16A34A' : '#9CA3AF'} />
           ),
         }}
       />
