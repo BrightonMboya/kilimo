@@ -15,10 +15,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import styles from "~/components/landingPage/gradient.module.css"
 
-export const generateStaticParams = async () =>
-  allPosts.map((post) => ({
-    slug: post.slug,
-  }));
+export const dynamic = "force-dynamic";
 
 export function generateMetadata({
   params,
