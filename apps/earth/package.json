@@ -1,0 +1,42 @@
+{
+  "name": "@kilimo/earth",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev -p 3100",
+    "start": "next start -p 3100",
+    "type-check": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ai-sdk/groq": "^3.0.4",
+    "@kilimo/utils": "workspace:*",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@turf/buffer": "^7.1.0",
+    "@turf/helpers": "^7.1.0",
+    "ai": "^6.0.27",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "google-auth-library": "^9.14.1",
+    "lucide-react": "^0.563.0",
+    "maplibre-gl": "^4.7.1",
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-map-gl": "^7.1.7",
+    "tailwind-merge": "^3.4.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18.3.28",
+    "@types/react-dom": "^18.3.7",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^9",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3",
+    "typescript": "^5"
+  }
+}
