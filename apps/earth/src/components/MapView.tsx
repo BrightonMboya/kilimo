@@ -3,17 +3,23 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { Map, Marker } from "maplibre-gl";
 
-const OSM_STYLE = {
+const SATELLITE_STYLE = {
   version: 8,
   sources: {
-    osm: {
+    satellite: {
       type: "raster" as const,
-      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      ],
       tileSize: 256,
-      attribution: "© OpenStreetMap contributors",
+      maxzoom: 19,
+      attribution:
+        "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
     },
   },
-  layers: [{ id: "osm", type: "raster" as const, source: "osm" }],
+  layers: [
+    { id: "satellite", type: "raster" as const, source: "satellite" },
+  ],
 };
 
 type Point = { lat: number; lng: number };
@@ -36,9 +42,10 @@ export function MapView({
     if (!ref.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: ref.current,
-      style: OSM_STYLE as maplibregl.StyleSpecification,
+      style: SATELLITE_STYLE as maplibregl.StyleSpecification,
       center: [37.9, 0.0], // Kenya-ish default
       zoom: 4,
+      maxZoom: 20,
     });
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.on("click", (e) => {
@@ -61,7 +68,7 @@ export function MapView({
       return;
     }
     if (!markerRef.current) {
-      markerRef.current = new maplibregl.Marker({ color: "#2e7d32" })
+      markerRef.current = new maplibregl.Marker({ color: "#ef4444" })
         .setLngLat([point.lng, point.lat])
         .addTo(map);
     } else {
