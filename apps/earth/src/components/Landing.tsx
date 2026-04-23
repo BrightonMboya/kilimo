@@ -33,7 +33,7 @@ export function Landing() {
         </div>
 
         <h1 className="max-w-4xl text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl md:text-7xl md:leading-[1] lg:max-w-6xl lg:text-8xl lg:leading-[0.95] lg:tracking-tighter xl:max-w-7xl xl:text-[7.5rem]">
-          Prove your farms are deforestation-free.
+          Prove your farm is deforestation-free.
         </h1>
 
         <p className="mt-6 max-w-2xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg lg:mt-8 lg:max-w-4xl">
