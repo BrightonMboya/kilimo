@@ -29,25 +29,38 @@ export function generateMetadata({
   if (!post) {
     notFound();
   }
+  const author = authors[post.author];
+  const canonicalUrl = `https://jani-ai.com${post.url}`;
+  const publishedTime = format(parseISO(post.date.toString()), "yyyy-MM-dd");
+  const image = post.image
+    ? {
+        url: post.image,
+        width: 1200,
+        height: 800,
+        alt: post.title,
+      }
+    : undefined;
+
   return {
     title: `${post.title} | JANI AI`,
     description: post.description,
-  
-
+    keywords: post.tags,
+    authors: author ? [{ name: author.name }] : undefined,
+    category: post.tags?.[0],
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title: `${post.title} | JANI AI`,
       description: post.description,
-      url: `https://jani-ai.com/${post._meta.path}`,
+      url: canonicalUrl,
       siteName: "jani-ai.com",
       type: "article",
-      images: {
-        url: `${post.image}`,
-        width: 1200,
-        height: 800,
-      },
-
-      publishedTime: format(parseISO(post.date.toString()), "yyyy-MM-dd"),
-      modifiedTime: format(parseISO(post.date.toString()), "yyyy-MM-dd"),
+      locale: "en_US",
+      images: image,
+      publishedTime,
+      modifiedTime: publishedTime,
+      authors: author ? [author.name] : undefined,
       tags: post.tags,
     },
     twitter: {
@@ -56,11 +69,11 @@ export function generateMetadata({
       description: post.description,
       site: "@jani-ai",
       creator: "@jani-ai",
-      images: {
-        url: `${post.image}`,
-        width: 1200,
-        height: 800,
-      },
+      images: image,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
