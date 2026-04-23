@@ -125,7 +125,7 @@ export function EarthWorkspace() {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col">
+    <div id="workspace" className="flex h-screen w-full flex-col">
       <header className="flex items-center justify-between border-b px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
