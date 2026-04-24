@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.janiai.coopapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "JANI Coop uses your location to tag farmer fields on the map for traceability."
       }
     },
     "android": {
@@ -27,7 +28,11 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.janiai.coopapp",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,7 +42,14 @@
       "expo-secure-store",
       "expo-font",
       "expo-web-browser",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "jani-x5",
+          "project": "jani-coop-app"
+        }
+      ]
     ],
     "extra": {
       "router": {},
