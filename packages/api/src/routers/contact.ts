@@ -22,7 +22,7 @@ export default createTRPCRouter({
 
       await resend.emails.send({
         from: "enquiries@jani-ai.com",
-        to: "enquiries@jani-ai.com",
+        to: "reggie@jani-ai.com",
         subject: `Contact form: ${input.name}`,
         html: `<p><strong>Name:</strong> ${input.name}</p><p><strong>Email:</strong> ${input.email}</p><p>${input.message}</p>`,
         replyTo: input.email,
