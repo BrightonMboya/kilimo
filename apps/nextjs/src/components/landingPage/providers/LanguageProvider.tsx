@@ -3,16 +3,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import en from '~/locales/en.json';
 import fr from '~/locales/fr.json';
-import ar from '~/locales/fr.json';
+import ar from '~/locales/ar.json';
+import it from '~/locales/it.json';
 
 
-type Locale = 'en' | 'fr' | 'ar';
+type Locale = 'en' | 'fr' | 'ar' | 'it';
 
 // messages are nested objects (not flat string maps), so allow any-shaped records
 const messages: Record<Locale, Record<string, any>> = {
   en,
   fr,
   ar,
+  it,
 };
 
 const LanguageContext = createContext({

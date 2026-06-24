@@ -17,6 +17,7 @@ const languages = [
   { code: 'en', label: 'English' },
   { code: 'fr', label: 'Français' },
   { code: 'ar', label: 'العربية' },
+  { code: 'it', label: 'Italiano' },
 ];
 
 export default function Navbar({ className }: NavbarProps) {

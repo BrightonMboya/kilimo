@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { baseUrl } from "../../sitemap";
 
-const supported = ["en", "fr", "ar"] as const;
+const supported = ["en", "fr", "ar", "it"] as const;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
